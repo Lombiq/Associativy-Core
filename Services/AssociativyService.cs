@@ -14,37 +14,6 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class AssociativyService : IAssociativyService
     {
-        private class GraphNode
-        {
-            public int Id { get; set; }
-            public int MinimumDepth { get; set; }
-            public bool IsDeadEnd { get; set; }
-            public Dictionary<int, GraphNode> Neighbours { get; set; }
-
-            public GraphNode(int id)
-            {
-                Id = id;
-                MinimumDepth = int.MaxValue;
-                IsDeadEnd = false;
-                Neighbours = new Dictionary<int, GraphNode>();
-            }
-        }
-
-        private class StackItem
-        {
-            public int Depth { get; set; }
-            public List<int> Path { get; set; }
-            public GraphNode Node { get; set; }
-
-            public StackItem()
-            {
-                Depth = 0;
-                Path = new List<int>();
-            }
-        }
-
-
-
         private readonly IContentManager _contentManager;
         private readonly IRepository<NodeToNodeRecord> _nodeToNodeRecordRepository;
         private readonly IRepository<NodePartRecord> _nodePartRecordRepository;
@@ -100,22 +69,56 @@ namespace Associativy.Services
             var succeededNodeIds = new List<int>();
             succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
 
+            // Esetleg?
+            //_contentManager.Query<NodePart, NodePartRecord>().Where(node => succeededNodeIds.Contains(node.Id)).List();
+            
             return _nodePartRecordRepository.Fetch(node => succeededNodeIds.Contains(node.Id)).ToList();
         }
+
+        #region CalcPaths() classes
+        private class PathNode
+        {
+            public int Id { get; set; }
+            public int MinimumDepth { get; set; }
+            public bool IsDeadEnd { get; set; }
+            public Dictionary<int, PathNode> Neighbours { get; set; }
+
+            public PathNode(int id)
+            {
+                Id = id;
+                MinimumDepth = int.MaxValue;
+                IsDeadEnd = false;
+                Neighbours = new Dictionary<int, PathNode>();
+            }
+        }
+
+        private class StackItem
+        {
+            public int Depth { get; set; }
+            public List<int> Path { get; set; }
+            public PathNode Node { get; set; }
+
+            public StackItem()
+            {
+                Depth = 0;
+                Path = new List<int>();
+            }
+        }
+        #endregion
 
         public List<List<int>> CalcPaths(int startId, int targetId, int maxDepth = 3)
         {
             var found = false; // Maybe can be removed
-            var visitedNodes = new Dictionary<int, GraphNode>();
+            var visitedNodes = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
             var stack = new Stack<StackItem>();
 
-            visitedNodes[startId] = new GraphNode(startId) { MinimumDepth = 0 };
+            visitedNodes[startId] = new PathNode(startId) { MinimumDepth = 0 };
             stack.Push(new StackItem { Node = visitedNodes[startId] });
-            visitedNodes[targetId] = new GraphNode(targetId);
+            visitedNodes[targetId] = new PathNode(targetId);
 
             StackItem stackItem;
-            GraphNode currentNode;
+            PathNode currentNode;
             List<int> currentPath;
             int currentDepth;
             while (stack.Count != 0)
@@ -148,7 +151,7 @@ namespace Associativy.Services
                 // We can traverse the graph further
                 else if (!currentNode.IsDeadEnd)
                 {
-                    var neighbours = new Dictionary<int, GraphNode>();
+                    var neighbours = new Dictionary<int, PathNode>();
 
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
@@ -167,7 +170,7 @@ namespace Associativy.Services
                         {
                             if (!visitedNodes.ContainsKey(neighbourId))
                             {
-                                visitedNodes[neighbourId] = new GraphNode(neighbourId);
+                                visitedNodes[neighbourId] = new PathNode(neighbourId);
                             }
                             neighbours[neighbourId] = visitedNodes[neighbourId];
                         }
