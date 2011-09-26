@@ -42,6 +42,18 @@
   <PropertyGroup />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="QuickGraph, Version=3.6.0.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\QuickGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Data, Version=3.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz, Version=3.6.0.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.ComponentModel.DataAnnotations">
@@ -79,9 +91,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Handlers\NodeHandler.cs" />
     <Compile Include="Migrations.cs" />
-    <Compile Include="Models\GraphNode.cs" />
-    <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\INode.cs" />
+    <Compile Include="Models\NodePartRecord.cs" />
+    <Compile Include="Models\NodePart.cs" />
+    <Compile Include="Models\NodeToNodeRecord.cs" />
     <Compile Include="Routes.cs" />
     <Compile Include="Services\AssociativyService.cs" />
     <Compile Include="Services\IAssociativyService.cs" />

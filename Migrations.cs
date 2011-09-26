@@ -10,22 +10,23 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Migrations
 {
-    [OrchardFeature("Piedone.Facebook.Suite")]
-    public class BaseMigrations : DataMigrationImpl {
+    [OrchardFeature("Associativy")]
+    public class Migrations : DataMigrationImpl {
 
         public int Create() {
-			// Creating table FacebookSuiteSettingsPartRecord
-			SchemaBuilder.CreateTable("FacebookSuiteSettingsPartRecord", table => table
-				.ContentPartRecord()
-				.Column("AppId", DbType.String)
-				.Column("AppSecret", DbType.String)
-				.Column("CancelUrlPath", DbType.String)
-				.Column("CanvasPage", DbType.String)
-				.Column("CanvasUrl", DbType.String)
-				.Column("SecureCanvasUrl", DbType.String)
-				.Column("SiteUrl", DbType.String)
-				.Column("UseFacebookBeta", DbType.Boolean)
-			);
+            SchemaBuilder.CreateTable("NodePartRecord",
+                table => table
+                    .ContentPartRecord()
+                    .Column<string>("Label")
+                );
+
+            //SchemaBuilder.CreateForeignKey("NodeRecord_Id", 
+            SchemaBuilder.CreateTable("NodeToNodeRecord",
+                table => table
+                    .Column<int>("Id", column => column.PrimaryKey().Identity())
+                    .Column<int>("NodeRecord1Id")
+                    .Column<int>("NodeRecord2Id")
+                );
 
 
 
