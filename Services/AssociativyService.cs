@@ -9,78 +9,156 @@ using Orchard.ContentManagement;
 using QuickGraph;
 using System.Threading.Tasks;
 using Orchard.ContentManagement.Records;
+using Orchard.Caching;
+using Orchard.Services;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
     public class AssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : NodePart<TNodePartRecord>
-        where TNodePartRecord : NodePartRecord //ContentPartRecord
+        where TNodePart : ContentPart<TNodePartRecord>, INode
+        where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         #region Dependencies
         private readonly IContentManager _contentManager;
         private readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         private readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
+        private readonly ICacheManager _cacheManager;
+        private readonly IClock _clock;
         #endregion
 
-        public AssociativyService(IContentManager contentManager, IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository, IRepository<TNodePartRecord> nodePartRecordRepository)
+        public AssociativyService(
+            IContentManager contentManager, 
+            IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository, 
+            IRepository<TNodePartRecord> nodePartRecordRepository,
+            ICacheManager cacheManager,
+            IClock clock)
         {
             _contentManager = contentManager;
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _nodePartRecordRepository = nodePartRecordRepository;
+            _cacheManager = cacheManager;
+            _clock = clock;
         }
 
-        //public IList<NodePartRecord> GetNeighbours(int nodeId)
-        //{
-        //    var neighbourIds = GetNeighbourIds(nodeId);
+        private const int CacheLifetimeMin = 0;
 
-        //    return _nodePartRecordRepository.Fetch(node => neighbourIds.Contains(node.Id)).ToList();
-        //    //var z = _contentManager.Query<NodePart, NodePartRecord>().Where(node => neighbourIds.Contains(node.Id)).List(); // ez valszeg azért nem megy, mert nem a contentmanagerrel hoztuk létre a node-okat
+        public TNodePart CreateNode<TNodeParams>(TNodeParams nodeParams) where TNodeParams : INodeParams<TNodePart>
+        {
+            var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
+            nodeParams.MapToPart(node);
+            _contentManager.Create(node);
+
+            return node;
+        }
+
+        //class GraphToken : IVolatileToken
+        //{
+        //    public bool IsCurrent
+        //    {
+        //        get { valahogy kitalálni, módosult-e a tábla }
+        //    }
         //}
 
-        //public TNodePart CreateNode(INode node)
-        //{
-        //    var notion1 = _contentManager.New<TNodePart>("Notion");
-        //    notion1 = node;
-        //    notion1.Label = "forró";
-        //    _contentManager.Create(notion1);
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetWholeGraph(int zoomLevel = 0)
+        {
+            return _cacheManager.Get("Assciativy Whole Graph", ctx =>
+            {
+                ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                return GetWholeGraphWithoutCaching(zoomLevel);
+            });
+        }
 
-        //    return notion1;
-        //}
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetWholeGraphWithoutCaching(int zoomLevel = 0)
+        {
+            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+
+            var nodes = _contentManager.Query<TNodePart, TNodePartRecord>().List().ToDictionary<TNodePart, int>(node => node.Id);
+
+            foreach (var node in _contentManager.Query<TNodePart, TNodePartRecord>().List().ToDictionary<TNodePart, int>(node => node.Id))
+            {
+                graph.AddVertex(node.Value);
+            }
+
+            foreach (var connection in _nodeToNodeRecordRepository.Table.ToList())
+            {
+                graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
+            }
+
+            // Leaves out nodes that don't have any neighbours
+            //foreach (var connection in _nodeToNodeRecordRepository.Table.ToList())
+            //{
+            //    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
+            //}
+
+            return graph;
+        }
 
         public void AddConnection(TNodePart node1, TNodePart node2)
         {
-            if (!AreConnected(node1.Id, node2.Id))
-            {
-                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = node1.Id, Record2Id = node2.Id });
-            }
+            AddConnection(node1.Id, node2.Id);
         }
 
         public void AddConnection(int nodeId1, int nodeId2)
         {
+            //if ()
+            //{
+                
+            //}
+
             if (!AreConnected(nodeId1, nodeId2))
             {
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
             }
         }
 
-        public List<string> GetSimilarTerms(string snippet)
+        public List<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
-            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).ToList();
+            if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
+            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
-        // Valami ContentItem leszármazott legyen a T NodePartRecord helyett?
         public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false)
         {
-            // Check cache
+            return _cacheManager.Get("Assciativy Whole Graph", ctx =>
+            {
+                ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                return MakeAssociationsWithoutCaching(terms, simpleAlgorithm);
+            });
+        }
+
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociationsWithoutCaching(IList<string> terms, bool simpleAlgorithm = false)
+        {
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
-            //graph.AddVerticesAndEdge(new UndirectedEdge<NodePartRecord>(1, 2));
+            //graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(1, 2));
 
             return graph;
         }
 
+        #region Node CRUD
+        public TNodePart GetNode(int id)
+        {
+            return _contentManager.Get<TNodePart>(id);
+        }
+
+        public void DeleteNode(int id)
+        {
+            // Since there is no cummulative delete...
+            var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
+                connector.Record1Id == id || connector.Record2Id == id).ToList();
+
+            foreach (var connector in connectionsToBeDeleted)
+            {
+                _nodeToNodeRecordRepository.Delete(connector);
+            }
+
+            _contentManager.Remove(_contentManager.Get(id));
+        }
+        #endregion
+
+        // Ezeket esetleg egy leszármaztatott repositoryba?
         private IList<int> GetNeighbourIds(int nodeId)
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
@@ -96,7 +174,7 @@ namespace Associativy.Services
                 connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
 
-        private int neighbourCount(int nodeId)
+        private int GetNeighbourCount(int nodeId)
         {
             return _nodeToNodeRecordRepository.
                 Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);

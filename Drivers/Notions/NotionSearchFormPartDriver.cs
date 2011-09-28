@@ -16,17 +16,6 @@ namespace Associativy.Drivers.Notions
             return ContentShape("Parts_Notions_SearchForm",
                                 () => shapeHelper.Parts_Notions_SearchForm(
                                                                 ViewModel: new NotionSearchViewModel()));
-
-
-            //var model = new NotionSearchViewModel();
-            //return ContentShape("Parts_Notions_SearchForm",
-            //                    () =>
-            //                    {
-            //                        var shape = shapeHelper.Parts_Notions_SearchForm();
-            //                        shape.ContentPart = part;
-            //                        shape.ViewModel = model;
-            //                        return shape;
-            //                    });
         }
     }
 }

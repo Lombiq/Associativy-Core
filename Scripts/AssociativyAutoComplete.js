@@ -1,7 +1,7 @@
 ﻿(function ($) {
     $.extend({
         associativyAutoComplete: {
-            terms: function (textboxId) {
+            terms: function (textboxId, fetchUrl) {
                 if (textboxId == null)
                     textboxId = 'terms';
 
@@ -20,7 +20,7 @@
                     }
                 }).autocomplete({
                     source: function (request, response) {
-                        $.getJSON('/site/associations/fetchSimilarTerms', {
+                        $.getJSON(fetchUrl, {
                             term: extractLast(request.term)
                         }, response);
                     },

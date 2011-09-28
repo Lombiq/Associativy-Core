@@ -16,13 +16,6 @@ namespace Associativy.Migrations
 
         public int Create()
         {
-            //SchemaBuilder.CreateTable("NodePartRecord",
-            //    table => table
-            //        .ContentPartRecord()
-            //        .Column<string>("Label")
-            //    );
-
-
             SchemaBuilder.CreateTable("NotionPartRecord",
                 table => table
                     .ContentPartRecord()
@@ -32,9 +25,12 @@ namespace Associativy.Migrations
             //SchemaBuilder.CreateForeignKey("NodeRecord_Id", 
             SchemaBuilder.CreateTable("NotionToNotionConnectorRecord",
                 table => table
-                    .Column<int>("Id", column => column.PrimaryKey().Identity())
+                    .Column<long>("Id", column => column.PrimaryKey().Identity())
                     .Column<int>("Record1Id")
                     .Column<int>("Record2Id")
+                ).AlterTable("NotionToNotionConnectorRecord",
+                table => table
+                    .CreateIndex("Connection", new string[] { "Record1Id", "Record2Id" }) // EZ JÓ?
                 );
 
             ContentDefinitionManager.AlterTypeDefinition("NotionSearchFormWidget",

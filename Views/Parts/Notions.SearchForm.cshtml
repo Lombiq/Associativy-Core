@@ -3,7 +3,7 @@
 @{
     var viewModel = Model.ViewModel as NotionSearchViewModel;
     Script.Require("AssociativyAutoComplete").AtHead();
-    //Style.Require("FacebookConnect");
+    Style.Require("jQueryUI_Orchard");
 }
 
 
@@ -17,5 +17,5 @@
 }
 
 <script type="text/javascript">
-    $.associativyAutoComplete.terms("Terms");
+    $.associativyAutoComplete.terms("Terms", '@Url.Action("FetchSimilarTerms", new { Controller = "Associations", Area = "Associativy"})');
 </script>

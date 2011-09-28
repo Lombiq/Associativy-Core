@@ -7,10 +7,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy.Notions")]
-    public class NotionToNotionConnectorRecord : INodeToNodeConnectorRecord
+    public class NotionToNotionConnectorRecord : NodeToNodeRecord
     {
-        public virtual int Id { get; set; }
-        public virtual int Record1Id { get; set; }
-        public virtual int Record2Id { get; set; }
     }
 }

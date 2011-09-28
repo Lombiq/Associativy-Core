@@ -77,6 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\AssociativyAutoComplete.js" />
+    <Content Include="Scripts\Dracula\Curry-1.0.1.js" />
+    <Content Include="Scripts\Dracula\dracula_algorithms.js" />
+    <Content Include="Scripts\Dracula\dracula_graffle.js" />
+    <Content Include="Scripts\Dracula\dracula_graph.js" />
+    <Content Include="Scripts\Dracula\raphael-min.js" />
+    <Content Include="Scripts\Dracula\seedrandom.js" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
@@ -101,9 +107,14 @@
     <Compile Include="Handlers\AssociativyHandler.cs" />
     <Compile Include="Handlers\NotionHandler.cs" />
     <Compile Include="Migrations\NotionMigrations.cs" />
+    <Compile Include="Models\INodeParams.cs" />
+    <Compile Include="Models\INode.cs" />
     <Compile Include="Models\INodeToNodeConnectorRecord.cs" />
     <Compile Include="Models\NodePartRecord.cs" />
     <Compile Include="Models\NodePart.cs" />
+    <Compile Include="Models\NodeParams.cs" />
+    <Compile Include="Models\NodeToNodeRecord.cs" />
+    <Compile Include="Models\Notions\NotionParams.cs" />
     <Compile Include="Models\Notions\NotionSearchFormPart.cs" />
     <Compile Include="Models\Notions\NotionToNotionConnectorRecord.cs" />
     <Compile Include="Models\Notions\NotionPart.cs" />
@@ -112,6 +123,7 @@
     <Compile Include="Routes.cs" />
     <Compile Include="Services\AssociativyService.cs" />
     <Compile Include="Services\IAssociativyService.cs" />
+    <Compile Include="ViewModels\GraphEdgeViewModel.cs" />
     <Compile Include="ViewModels\Notions\NotionSearchViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
