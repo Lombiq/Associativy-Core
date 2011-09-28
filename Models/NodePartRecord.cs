@@ -11,7 +11,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public class NodePartRecord : ContentPartRecord
+    abstract public class NodePartRecord : ContentPartRecord
     {
         public virtual string Label { get; set; }
     }

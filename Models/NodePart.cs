@@ -8,9 +8,8 @@ using Orchard.ContentManagement;
 
 namespace Associativy.Models
 {
-    //public abstract class NodePart<T> : ContentPart<T> where T : NodePartRecord
     [OrchardFeature("Associativy")]
-    public class NodePart : ContentPart<NodePartRecord>, INode
+    abstract public class NodePart<TRecord> : ContentPart<TRecord> where TRecord : NodePartRecord
     {
         [Required]
         public string Label

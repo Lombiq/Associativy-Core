@@ -8,17 +8,23 @@ using Orchard.Data;
 using Orchard.ContentManagement;
 using QuickGraph;
 using System.Threading.Tasks;
+using Orchard.ContentManagement.Records;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyService : IAssociativyService
+    public class AssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+        where TNodePart : NodePart<TNodePartRecord>
+        where TNodePartRecord : NodePartRecord //ContentPartRecord
+        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
+        #region Dependencies
         private readonly IContentManager _contentManager;
-        private readonly IRepository<NodeToNodeRecord> _nodeToNodeRecordRepository;
-        private readonly IRepository<NodePartRecord> _nodePartRecordRepository;
+        private readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
+        private readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
+        #endregion
 
-        public AssociativyService(IContentManager contentManager, IRepository<NodeToNodeRecord> nodeToNodeRecordRepository, IRepository<NodePartRecord> nodePartRecordRepository)
+        public AssociativyService(IContentManager contentManager, IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository, IRepository<TNodePartRecord> nodePartRecordRepository)
         {
             _contentManager = contentManager;
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
@@ -33,16 +39,42 @@ namespace Associativy.Services
         //    //var z = _contentManager.Query<NodePart, NodePartRecord>().Where(node => neighbourIds.Contains(node.Id)).List(); // ez valszeg azért nem megy, mert nem a contentmanagerrel hoztuk létre a node-okat
         //}
 
+        //public TNodePart CreateNode(INode node)
+        //{
+        //    var notion1 = _contentManager.New<TNodePart>("Notion");
+        //    notion1 = node;
+        //    notion1.Label = "forró";
+        //    _contentManager.Create(notion1);
+
+        //    return notion1;
+        //}
+
+        public void AddConnection(TNodePart node1, TNodePart node2)
+        {
+            if (!AreConnected(node1.Id, node2.Id))
+            {
+                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = node1.Id, Record2Id = node2.Id });
+            }
+        }
+
+        public void AddConnection(int nodeId1, int nodeId2)
+        {
+            if (!AreConnected(nodeId1, nodeId2))
+            {
+                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
+            }
+        }
+
         public List<string> GetSimilarTerms(string snippet)
         {
             return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).ToList();
         }
 
         // Valami ContentItem leszármazott legyen a T NodePartRecord helyett?
-        public UndirectedGraph<NodePartRecord, UndirectedEdge<NodePartRecord>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false)
         {
             // Check cache
-            var graph = new UndirectedGraph<NodePartRecord, UndirectedEdge<NodePartRecord>>();
+            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
             //graph.AddVerticesAndEdge(new UndirectedEdge<NodePartRecord>(1, 2));
 
@@ -53,29 +85,32 @@ namespace Associativy.Services
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
             return _nodeToNodeRecordRepository.
-                Fetch(connector => connector.NodeRecord1Id == nodeId || connector.NodeRecord2Id == nodeId).
-                Select(connector => connector.NodeRecord1Id == nodeId ? connector.NodeRecord2Id : connector.NodeRecord1Id).ToList();
+                Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
+                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
         }
 
         private bool AreConnected(int nodeId1, int nodeId2)
         {
             return _nodeToNodeRecordRepository.Count(connector =>
-                connector.NodeRecord1Id == nodeId1 && connector.NodeRecord2Id == nodeId2 ||
-                connector.NodeRecord1Id == nodeId2 && connector.NodeRecord2Id == nodeId1) != 0;
+                connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
+                connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
 
-        private List<NodePartRecord> GetSucceededNodes(List<List<int>> succeededPaths)
+        private int neighbourCount(int nodeId)
+        {
+            return _nodeToNodeRecordRepository.
+                Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
+        }
+
+        private IEnumerable<TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
         {
             var succeededNodeIds = new List<int>();
             succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
-
-            // Esetleg?
-            //_contentManager.Query<NodePart, NodePartRecord>().Where(node => succeededNodeIds.Contains(node.Id)).List();
-            
-            return _nodePartRecordRepository.Fetch(node => succeededNodeIds.Contains(node.Id)).ToList();
+            _contentManager.Query<TNodePart, TNodePartRecord>();
+            return _contentManager.Query<TNodePart, TNodePartRecord>().Where(node => succeededNodeIds.Contains(node.Id)).List();
         }
 
-        #region CalcPaths() classes
+        #region CalculatePaths() auxiliary classes
         private class PathNode
         {
             public int Id { get; set; }
@@ -106,8 +141,9 @@ namespace Associativy.Services
         }
         #endregion
 
-        public List<List<int>> CalcPaths(int startId, int targetId, int maxDepth = 3)
+        public List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3)
         {
+            // Cache itt is.
             var found = false; // Maybe can be removed
             var visitedNodes = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();

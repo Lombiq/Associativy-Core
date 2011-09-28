@@ -1,23 +1,24 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Orchard.ContentManagement.Handlers;
 using Orchard.Data;
-using Associativy.Models;
 using JetBrains.Annotations;
 using Orchard.Localization;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
+using Associativy.Models;
 
 namespace Associativy.Handlers
 {
-    [OrchardFeature("Associativy")]
-    public class NodeHandler : ContentHandler
+    [OrchardFeature("Associativy.Notions")]
+    public class NotionHandler : ContentHandler
     {
-        public NodeHandler(IRepository<NodePartRecord> repository)
+        public NotionHandler(IRepository<NotionPartRecord> repository)
         {
-            //Filters.Add(new ActivatingFilter<NodePart>("Node"));
+            Filters.Add(new ActivatingFilter<NotionPart>("Notion"));
             Filters.Add(StorageFilter.For(repository));
         }
     }
