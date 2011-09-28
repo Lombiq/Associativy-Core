@@ -121,8 +121,14 @@
     <Compile Include="Models\Notions\NotionPartRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Routes.cs" />
-    <Compile Include="Services\AssociativyService.cs" />
-    <Compile Include="Services\IAssociativyService.cs" />
+    <Compile Include="Services\AssociativyServices.cs" />
+    <Compile Include="Services\IAssociativyServices.cs" />
+    <Compile Include="Services\INodeManager.cs" />
+    <Compile Include="Services\IMind.cs" />
+    <Compile Include="Services\Mind.cs" />
+    <Compile Include="Services\NodeManager.cs" />
+    <Compile Include="Services\Notions\AssociativyNotionsServices.cs" />
+    <Compile Include="Services\Notions\IAssociativyNotionsServices.cs" />
     <Compile Include="ViewModels\GraphEdgeViewModel.cs" />
     <Compile Include="ViewModels\Notions\NotionSearchViewModel.cs" />
   </ItemGroup>

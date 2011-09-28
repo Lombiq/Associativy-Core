@@ -1,5 +1,4 @@
-﻿using System;
-namespace Associativy.Models
+﻿namespace Associativy.Models
 {
     public interface INodeToNodeConnectorRecord
     {

@@ -2,56 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Orchard.Environment.Extensions;
-using Associativy.Models;
-using Orchard.Data;
 using Orchard.ContentManagement;
-using QuickGraph;
-using System.Threading.Tasks;
 using Orchard.ContentManagement.Records;
-using Orchard.Caching;
+using Associativy.Models;
+using QuickGraph;
+using Orchard.Data;
 using Orchard.Services;
+using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
-    public class AssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyService<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         #region Dependencies
         private readonly IContentManager _contentManager;
-        private readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        private readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
+        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _nodeManager;
         private readonly ICacheManager _cacheManager;
         private readonly IClock _clock;
         #endregion
 
-        public AssociativyService(
-            IContentManager contentManager, 
-            IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository, 
-            IRepository<TNodePartRecord> nodePartRecordRepository,
+        public Mind(
+            IContentManager contentManager,
+            INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> nodeManager,
             ICacheManager cacheManager,
             IClock clock)
         {
             _contentManager = contentManager;
-            _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            _nodePartRecordRepository = nodePartRecordRepository;
+            _nodeManager = nodeManager;
             _cacheManager = cacheManager;
             _clock = clock;
         }
 
         private const int CacheLifetimeMin = 0;
-
-        public TNodePart CreateNode<TNodeParams>(TNodeParams nodeParams) where TNodeParams : INodeParams<TNodePart>
-        {
-            var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
-            nodeParams.MapToPart(node);
-            _contentManager.Create(node);
-
-            return node;
-        }
 
         //class GraphToken : IVolatileToken
         //{
@@ -61,16 +46,16 @@ namespace Associativy.Services
         //    }
         //}
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetWholeGraph(int zoomLevel = 0)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0)
         {
             return _cacheManager.Get("Assciativy Whole Graph", ctx =>
             {
                 ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                return GetWholeGraphWithoutCaching(zoomLevel);
+                return GetAllAssociationsWithoutCaching(zoomLevel);
             });
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetWholeGraphWithoutCaching(int zoomLevel = 0)
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociationsWithoutCaching(int zoomLevel = 0)
         {
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
@@ -81,42 +66,18 @@ namespace Associativy.Services
                 graph.AddVertex(node.Value);
             }
 
-            foreach (var connection in _nodeToNodeRecordRepository.Table.ToList())
+            foreach (var connection in _nodeManager.NodeToNodeRecordRepository.Table.ToList())
             {
                 graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
             }
 
             // Leaves out nodes that don't have any neighbours
-            //foreach (var connection in _nodeToNodeRecordRepository.Table.ToList())
+            //foreach (var connection in _nodeManager.NodeToNodeRecordRepository.Table.ToList())
             //{
             //    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
             //}
 
             return graph;
-        }
-
-        public void AddConnection(TNodePart node1, TNodePart node2)
-        {
-            AddConnection(node1.Id, node2.Id);
-        }
-
-        public void AddConnection(int nodeId1, int nodeId2)
-        {
-            //if ()
-            //{
-                
-            //}
-
-            if (!AreConnected(nodeId1, nodeId2))
-            {
-                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
-            }
-        }
-
-        public List<string> GetSimilarTerms(string snippet, int maxCount = 10)
-        {
-            if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
-            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
         public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false)
@@ -135,57 +96,6 @@ namespace Associativy.Services
             //graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(1, 2));
 
             return graph;
-        }
-
-        #region Node CRUD
-        public TNodePart GetNode(int id)
-        {
-            return _contentManager.Get<TNodePart>(id);
-        }
-
-        public void DeleteNode(int id)
-        {
-            // Since there is no cummulative delete...
-            var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
-                connector.Record1Id == id || connector.Record2Id == id).ToList();
-
-            foreach (var connector in connectionsToBeDeleted)
-            {
-                _nodeToNodeRecordRepository.Delete(connector);
-            }
-
-            _contentManager.Remove(_contentManager.Get(id));
-        }
-        #endregion
-
-        // Ezeket esetleg egy leszármaztatott repositoryba?
-        private IList<int> GetNeighbourIds(int nodeId)
-        {
-            // Measure performance with large datasets, as .AsParallel() queries tend to be slower
-            return _nodeToNodeRecordRepository.
-                Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
-                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
-        }
-
-        private bool AreConnected(int nodeId1, int nodeId2)
-        {
-            return _nodeToNodeRecordRepository.Count(connector =>
-                connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
-                connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
-        }
-
-        private int GetNeighbourCount(int nodeId)
-        {
-            return _nodeToNodeRecordRepository.
-                Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
-        }
-
-        private IEnumerable<TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
-        {
-            var succeededNodeIds = new List<int>();
-            succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
-            _contentManager.Query<TNodePart, TNodePartRecord>();
-            return _contentManager.Query<TNodePart, TNodePartRecord>().Where(node => succeededNodeIds.Contains(node.Id)).List();
         }
 
         #region CalculatePaths() auxiliary classes
@@ -247,7 +157,7 @@ namespace Associativy.Services
                 if (currentDepth == maxDepth - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (AreConnected(currentNode.Id, targetId))
+                    if (_nodeManager.AreConnected(currentNode.Id, targetId))
                     {
                         found = true;
                         if (visitedNodes[targetId].MinimumDepth > currentDepth + 1)
@@ -280,7 +190,7 @@ namespace Associativy.Services
                         //        neighbours[neighbourId] = visitedNodes[neighbourId];
                         //    });
 
-                        foreach (var neighbourId in GetNeighbourIds(currentNode.Id))
+                        foreach (var neighbourId in _nodeManager.GetNeighbourIds(currentNode.Id))
                         {
                             if (!visitedNodes.ContainsKey(neighbourId))
                             {

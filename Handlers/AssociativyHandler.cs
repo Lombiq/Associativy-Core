@@ -18,7 +18,9 @@ namespace Associativy.Handlers
         {
             _componentContext = componentContext;
             var builder = new ContainerBuilder();
-            builder.RegisterGeneric(typeof(AssociativyService<,,>)).As(typeof(IAssociativyService<,,>));
+            builder.RegisterGeneric(typeof(AssociativyServices<,,>)).As(typeof(IAssociativyServices<,,>));
+            builder.RegisterGeneric(typeof(Mind<,,>)).As(typeof(IMind<,,>));
+            builder.RegisterGeneric(typeof(NodeManager<,,>)).As(typeof(INodeManager<,,>));
             builder.Update(_componentContext.ComponentRegistry);
         }
     }

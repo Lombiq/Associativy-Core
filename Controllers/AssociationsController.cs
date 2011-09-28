@@ -12,29 +12,26 @@ using Associativy.Models;
 using Associativy.ViewModels;
 using System.Diagnostics;
 using Orchard.Localization;
+using Associativy.Services.Notions;
 
 namespace Associativy.Controllers
 {
     [Themed]
     public class AssociationsController : Controller
     {
-        private readonly IAssociativyService<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> _associativyService;
+        private readonly IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> _associativyService;
         private readonly IOrchardServices _orchardServices;
-
-        private readonly AssociativyService<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> _notionAssociativyService;
 
         public Localizer T { get; set; }
 
         public AssociationsController(
-            IAssociativyService<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> associativyService,
+            IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> associativyService,
             IOrchardServices orchardServices)
         {
             _associativyService = associativyService;
             _orchardServices = orchardServices;
-
+            
             T = NullLocalizer.Instance;
-
-            _notionAssociativyService = associativyService as AssociativyService<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord>;
         }
 
         public ActionResult ShowWholeGraph()
@@ -42,7 +39,7 @@ namespace Associativy.Controllers
             var sw = new Stopwatch();
             sw.Start();
 
-            var graph = _notionAssociativyService.GetWholeGraph();
+            var graph = _associativyService.Mind.GetAllAssociations();
 
             var viewEdges = new List<GraphEdgeViewModel>();
             var edges = graph.Edges.ToList();
@@ -82,7 +79,7 @@ namespace Associativy.Controllers
 
         public JsonResult FetchSimilarTerms(string term)
         {
-            return Json(_notionAssociativyService.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
+            return Json(_associativyService.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
         }
     }
 }
