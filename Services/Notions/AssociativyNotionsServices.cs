@@ -8,11 +8,12 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services.Notions
 {
     [OrchardFeature("Associativy.Notions")]
-    public class AssociativyNotionsServices : AssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord>, IAssociativyNotionsServices
+    public class AssociativyNotionsServices : AssociativyServices<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord>, IAssociativyNotionsServices
     {
         public AssociativyNotionsServices(
-            IMind<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> mind,
-            INodeManager<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> nodeManager) : base(mind, nodeManager)
+            IMind<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord> mind,
+            INodeManager<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord> nodeManager)
+            : base(mind, nodeManager)
         {
         }
     }

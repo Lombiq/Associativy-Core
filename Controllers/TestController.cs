@@ -15,6 +15,7 @@ using Orchard.ContentManagement.MetaData.Builders;
 using Orchard.ContentManagement.MetaData.Models;
 using Orchard.ContentManagement.Records;
 using Autofac;
+using Associativy.Services.Notions;
 
 /*
  * Search().Parse(searchFields, query, false); kell a partial match-hez, wildcarddal (kere*), a false tiltja az escape-elést
@@ -25,13 +26,13 @@ namespace Associativy.Controllers
 {
     public class TestController : Controller
     {
-        private readonly IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> _associativyService;
+        private readonly IAssociativyNotionsServices _associativyService;
         private readonly IContentManager _contentManager;
         private readonly IOrchardServices _orchardServices;
         private readonly IRepository<NotionToNotionConnectorRecord> _repository;
 
         public TestController(
-            IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> associativyService,
+            IAssociativyNotionsServices associativyService,
             IContentManager contentManager,
             IOrchardServices orchardServices,
             IRepository<NotionToNotionConnectorRecord> repository)
@@ -48,72 +49,9 @@ namespace Associativy.Controllers
 
         public ActionResult Index()
         {
-            //var notion2 = _contentManager.New<NotionPart>("Notion");
-            //notion2.Label = "tűzifa";
-            //_contentManager.Create(notion2);
-
-            //notion2 = _contentManager.New<NotionPart>("Notion");
-            //notion2.Label = "tűzőgép";
-            //_contentManager.Create(notion2);
-
-            //var z = _notionAssociativyService.GetSimilarTerms("tű");
-            //var notion1 = _contentManager.New<NotionPart>("Notion");
-            //notion1.Label = "forró";
-            //_contentManager.Create(notion1);
-
-            //var notion2 = _contentManager.New<NotionPart>("Notion");
-            //notion2.Label = "tűz";
-            //_contentManager.Create(notion2);
-
-            //_associativyService.NodeManager.AddConnection(notion1, notion2);
-
-
-            //var g = new UndirectedGraph<int, UndirectedEdge<int>>();
-
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(1, 2));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(1, 3));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(1, 4));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(3, 2));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(2, 5));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(5, 6));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(5, 1));
-            //g.AddVerticesAndEdge(new UndirectedEdge<int>(1, 7));
-            //var y = g.Edges.ToList();
-            //var u = g.ContainsEdge(1, 2);
-
-            //var g = new BidirectionalGraph<int, Edge<int>>();
-
-            //g.AddVerticesAndEdge(new Edge<int>(1, 2));
-            //g.AddVerticesAndEdge(new Edge<int>(1, 3));
-            //g.AddVerticesAndEdge(new Edge<int>(1, 4));
-            //g.AddVerticesAndEdge(new Edge<int>(3, 2));
-            //g.AddVerticesAndEdge(new Edge<int>(2, 5));
-            //g.AddVerticesAndEdge(new Edge<int>(5, 6));
-            //g.AddVerticesAndEdge(new Edge<int>(5, 1));
-            //g.AddVerticesAndEdge(new Edge<int>(1, 7));
-            //var y = g.Edges.ToList();
-            //var u = g.ContainsEdge(2, 1);
-            //var usd = g.ContainsEdge(1, 2);
-
-
-            //var sw = new Stopwatch();
-            //sw.Start();
-            //for (int i = 0; i < 9999; i++)
-            //{
-            //    //((AssociativyService)_associativyService).GetNeighbourIds(i);
-            //}
-            //sw.Stop();
-            //var x = sw.ElapsedMilliseconds;
-
-            //var z = _notionAssociativyService.CalculatePaths(1, 3);
-
-            //var z = _notionAssociativyService.GetNode(556565);
-            //_associativyService.NodeManager.AddConnection(332626, 345355);
-            //_associativyService.NodeManager.AddConnection(27, 66554665);
-
-            //_notionAssociativyService.DeleteNode(33);
-
-            _associativyService.NodeManager.AddConnection(546565, 9999);
+            var node = _contentManager.New<NotionPart>("Notion");
+            node.Label = "kkK";
+            _associativyService.NodeManager.Update(node);
 
             return null;
         }
@@ -123,61 +61,62 @@ namespace Associativy.Controllers
         {
             Dictionary<string, NotionPart> nodes = new Dictionary<string, NotionPart>();
 
-            nodes["jég"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "jég" });
-            nodes["fagyott"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "fagyott" });
-            nodes["fagylalt"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "fagylalt" });
-            nodes["téli fagylalt"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "téli fagylalt" });
-            nodes["tél"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "tél" });
-            nodes["víz"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "víz" });
-            nodes["nyár"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "nyár" });
-            nodes["meleg"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "neleg" });
-            nodes["forró"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "forró" });
-            nodes["tűz"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "tűz" });
-            nodes["tűzhely"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "tűzhely" });
-            nodes["gőz"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "gőz" });
-            nodes["oxigén"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "oxigén" });
-            nodes["levegő"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "levegő" });
-            nodes["folyó"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "folyó" });
-            nodes["nitrogén"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "nitrogén" });
-            nodes["hidrogén"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "hidrogén" });
-            nodes["föld"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "föld" });
-            nodes["út"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "út" });
-            nodes["autó"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "autó" });
-            nodes["téligumi"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "téligumi" });
-            nodes["fagyálló"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "fagyálló" });
-            nodes["sofőr"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "sofőr" });
-            nodes["kerék"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "kerék" });
-            nodes["Audi"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Audi" });
-            nodes["Suzuki"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Suzuki" });
-            nodes["Maserati"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Maserati" });
-            nodes["BMW"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "BMW" });
-            nodes["Mercedes"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Mercedes" });
-            nodes["benzin"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "benzin" });
-            nodes["Volkswagen"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Volkswagen" });
-            nodes["Skoda"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Skoda" });
-            nodes["Honda"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Honda" });
-            nodes["márka"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "márka" });
-            nodes["német"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "német" });
-            nodes["kaiserlich und königlich"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "kaiserlich und königlich" });
-            nodes["kuk"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "kuk" });
-            nodes["mozaikszó"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "mozaikszó" });
-            nodes["OSZK"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "OSZK" });
-            nodes["Országos Széchenyi Könyvtár"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Országos Széchenyi Könyvtár" });
-            nodes["gumi"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "gumi" });
-            nodes["rágógumi"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "rágógumi" });
-            nodes["kaucsuk"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "kaucsuk" });
-            nodes["Japán"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Japán" });
-            nodes["motorbicikli"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "motorbicikli" });
-            nodes["mission accomplished"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "mission accomplished" });
-            nodes["feladat befejezve"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "feladat befejezve" });
-            nodes["Nap"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Nap" });
-            nodes["sárga"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "sárga" });
-            nodes["lila"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "lila" });
-            nodes["orgona"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "orgona" });
-            nodes["virág"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "virág" });
-            nodes["szín"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "szín" });
-            nodes["őselem"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "őselem" });
-            nodes["Prométheusz"] = _associativyService.NodeManager.CreateNode<NotionParams>(new NotionParams { Label = "Prométheusz" });
+            // new NotionParams helyett factory!
+            nodes["jég"] = _associativyService.NodeManager.Create(new NotionParams { Label = "jég" });
+            nodes["fagyott"] = _associativyService.NodeManager.Create(new NotionParams { Label = "fagyott" });
+            nodes["fagylalt"] = _associativyService.NodeManager.Create(new NotionParams { Label = "fagylalt" });
+            nodes["téli fagylalt"] = _associativyService.NodeManager.Create(new NotionParams { Label = "téli fagylalt" });
+            nodes["tél"] = _associativyService.NodeManager.Create(new NotionParams { Label = "tél" });
+            nodes["víz"] = _associativyService.NodeManager.Create(new NotionParams { Label = "víz" });
+            nodes["nyár"] = _associativyService.NodeManager.Create(new NotionParams { Label = "nyár" });
+            nodes["meleg"] = _associativyService.NodeManager.Create(new NotionParams { Label = "neleg" });
+            nodes["forró"] = _associativyService.NodeManager.Create(new NotionParams { Label = "forró" });
+            nodes["tűz"] = _associativyService.NodeManager.Create(new NotionParams { Label = "tűz" });
+            nodes["tűzhely"] = _associativyService.NodeManager.Create(new NotionParams { Label = "tűzhely" });
+            nodes["gőz"] = _associativyService.NodeManager.Create(new NotionParams { Label = "gőz" });
+            nodes["oxigén"] = _associativyService.NodeManager.Create(new NotionParams { Label = "oxigén" });
+            nodes["levegő"] = _associativyService.NodeManager.Create(new NotionParams { Label = "levegő" });
+            nodes["folyó"] = _associativyService.NodeManager.Create(new NotionParams { Label = "folyó" });
+            nodes["nitrogén"] = _associativyService.NodeManager.Create(new NotionParams { Label = "nitrogén" });
+            nodes["hidrogén"] = _associativyService.NodeManager.Create(new NotionParams { Label = "hidrogén" });
+            nodes["föld"] = _associativyService.NodeManager.Create(new NotionParams { Label = "föld" });
+            nodes["út"] = _associativyService.NodeManager.Create(new NotionParams { Label = "út" });
+            nodes["autó"] = _associativyService.NodeManager.Create(new NotionParams { Label = "autó" });
+            nodes["téligumi"] = _associativyService.NodeManager.Create(new NotionParams { Label = "téligumi" });
+            nodes["fagyálló"] = _associativyService.NodeManager.Create(new NotionParams { Label = "fagyálló" });
+            nodes["sofőr"] = _associativyService.NodeManager.Create(new NotionParams { Label = "sofőr" });
+            nodes["kerék"] = _associativyService.NodeManager.Create(new NotionParams { Label = "kerék" });
+            nodes["Audi"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Audi" });
+            nodes["Suzuki"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Suzuki" });
+            nodes["Maserati"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Maserati" });
+            nodes["BMW"] = _associativyService.NodeManager.Create(new NotionParams { Label = "BMW" });
+            nodes["Mercedes"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Mercedes" });
+            nodes["benzin"] = _associativyService.NodeManager.Create(new NotionParams { Label = "benzin" });
+            nodes["Volkswagen"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Volkswagen" });
+            nodes["Skoda"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Skoda" });
+            nodes["Honda"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Honda" });
+            nodes["márka"] = _associativyService.NodeManager.Create(new NotionParams { Label = "márka" });
+            nodes["német"] = _associativyService.NodeManager.Create(new NotionParams { Label = "német" });
+            nodes["kaiserlich und königlich"] = _associativyService.NodeManager.Create(new NotionParams { Label = "kaiserlich und königlich" });
+            nodes["kuk"] = _associativyService.NodeManager.Create(new NotionParams { Label = "kuk" });
+            nodes["mozaikszó"] = _associativyService.NodeManager.Create(new NotionParams { Label = "mozaikszó" });
+            nodes["OSZK"] = _associativyService.NodeManager.Create(new NotionParams { Label = "OSZK" });
+            nodes["Országos Széchenyi Könyvtár"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Országos Széchenyi Könyvtár" });
+            nodes["gumi"] = _associativyService.NodeManager.Create(new NotionParams { Label = "gumi" });
+            nodes["rágógumi"] = _associativyService.NodeManager.Create(new NotionParams { Label = "rágógumi" });
+            nodes["kaucsuk"] = _associativyService.NodeManager.Create(new NotionParams { Label = "kaucsuk" });
+            nodes["Japán"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Japán" });
+            nodes["motorbicikli"] = _associativyService.NodeManager.Create(new NotionParams { Label = "motorbicikli" });
+            nodes["mission accomplished"] = _associativyService.NodeManager.Create(new NotionParams { Label = "mission accomplished" });
+            nodes["feladat befejezve"] = _associativyService.NodeManager.Create(new NotionParams { Label = "feladat befejezve" });
+            nodes["Nap"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Nap" });
+            nodes["sárga"] = _associativyService.NodeManager.Create(new NotionParams { Label = "sárga" });
+            nodes["lila"] = _associativyService.NodeManager.Create(new NotionParams { Label = "lila" });
+            nodes["orgona"] = _associativyService.NodeManager.Create(new NotionParams { Label = "orgona" });
+            nodes["virág"] = _associativyService.NodeManager.Create(new NotionParams { Label = "virág" });
+            nodes["szín"] = _associativyService.NodeManager.Create(new NotionParams { Label = "szín" });
+            nodes["őselem"] = _associativyService.NodeManager.Create(new NotionParams { Label = "őselem" });
+            nodes["Prométheusz"] = _associativyService.NodeManager.Create(new NotionParams { Label = "Prométheusz" });
 
             
             _associativyService.NodeManager.AddConnection(nodes["mission accomplished"], nodes["feladat befejezve"]);

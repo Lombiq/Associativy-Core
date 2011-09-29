@@ -19,13 +19,13 @@ namespace Associativy.Controllers
     [Themed]
     public class AssociationsController : Controller
     {
-        private readonly IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> _associativyService;
+        private readonly IAssociativyNotionsServices _associativyService;
         private readonly IOrchardServices _orchardServices;
 
         public Localizer T { get; set; }
 
         public AssociationsController(
-            IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord> associativyService,
+            IAssociativyNotionsServices associativyService,
             IOrchardServices orchardServices)
         {
             _associativyService = associativyService;

@@ -26,7 +26,7 @@ namespace Associativy.Migrations
             SchemaBuilder.CreateTable("NotionToNotionConnectorRecord",
                 table => table
                     .Column<long>("Id", column => column.PrimaryKey().Identity())
-                    .Column<int>("Record1Id")
+                    .Column<int>("Record1Id") // long, hogy future-proof legyen?
                     .Column<int>("Record2Id")
                 ).AlterTable("NotionToNotionConnectorRecord",
                 table => table

@@ -12,21 +12,22 @@ using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public class Mind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
+        where TNodeParams : INodeParams<TNodePart>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         #region Dependencies
         private readonly IContentManager _contentManager;
-        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _nodeManager;
+        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> _nodeManager;
         private readonly ICacheManager _cacheManager;
         private readonly IClock _clock;
         #endregion
 
         public Mind(
             IContentManager contentManager,
-            INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> nodeManager,
+            INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> nodeManager,
             ICacheManager cacheManager,
             IClock clock)
         {
@@ -42,7 +43,7 @@ namespace Associativy.Services
         //{
         //    public bool IsCurrent
         //    {
-        //        get { valahogy kitalálni, módosult-e a tábla }
+        //        get { valahogy kitalálni, módosult-e a tábla, talán NHibernate.ISession.cs }
         //    }
         //}
 
@@ -59,14 +60,14 @@ namespace Associativy.Services
         {
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
-            var nodes = _contentManager.Query<TNodePart, TNodePartRecord>().List().ToDictionary<TNodePart, int>(node => node.Id);
+            var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
 
-            foreach (var node in _contentManager.Query<TNodePart, TNodePartRecord>().List().ToDictionary<TNodePart, int>(node => node.Id))
+            foreach (var node in _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id))
             {
                 graph.AddVertex(node.Value);
             }
 
-            foreach (var connection in _nodeManager.NodeToNodeRecordRepository.Table.ToList())
+            foreach (var connection in _nodeManager.GetAllConnections())
             {
                 graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
             }
@@ -94,6 +95,11 @@ namespace Associativy.Services
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
             //graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(1, 2));
+
+            var succeededPaths = CalculatePaths(1, 2);
+            var succeededNodeIds = new List<int>();
+            succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
+            var succeededNodes = _nodeManager.ContentQuery.Where(node => succeededNodeIds.Contains(node.Id)).List();
 
             return graph;
         }
@@ -129,7 +135,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3)
+        private List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3)
         {
             // Cache itt is.
             var found = false; // Maybe can be removed

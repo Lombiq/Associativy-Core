@@ -7,6 +7,7 @@
     /// </summary>
     public interface INode
     {
+        int Id { get; }
         string Label { get; set; }
     }
 }

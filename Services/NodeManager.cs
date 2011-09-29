@@ -9,24 +9,15 @@ using Orchard.Data;
 
 namespace Associativy.Services
 {
-    public class NodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public class NodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
+        where TNodeParams : INodeParams<TNodePart>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         private readonly IContentManager _contentManager;
-
         private readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        public IRepository<TNodeToNodeConnectorRecord> NodeToNodeRecordRepository
-        {
-            get { return _nodeToNodeRecordRepository; }
-        }
-
         private readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
-        public IRepository<TNodePartRecord> NodePartRecordRepository
-        {
-            get { return _nodePartRecordRepository; }
-        }
 
         public NodeManager(
             IContentManager contentManager,
@@ -38,6 +29,14 @@ namespace Associativy.Services
             _nodePartRecordRepository = nodePartRecordRepository;
         }
 
+        #region Connection management
+        public bool AreConnected(int nodeId1, int nodeId2)
+        {
+            return _nodeToNodeRecordRepository.Count(connector =>
+                connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
+                connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
+        }
+
         public void AddConnection(TNodePart node1, TNodePart node2)
         {
             AddConnection(node1.Id, node2.Id);
@@ -45,7 +44,7 @@ namespace Associativy.Services
 
         public void AddConnection(int nodeId1, int nodeId2)
         {
-            if (GetNode(nodeId1) == null || GetNode(nodeId2) == null) return; // No such nodes
+            if (Get(nodeId1) == null || Get(nodeId2) == null) return; // No such nodes
 
             if (!AreConnected(nodeId1, nodeId2))
             {
@@ -53,14 +52,39 @@ namespace Associativy.Services
             }
         }
 
-        public List<string> GetSimilarTerms(string snippet, int maxCount = 10)
+        public IList<TNodeToNodeConnectorRecord> GetAllConnections()
+        {
+            return _nodeToNodeRecordRepository.Table.ToList<TNodeToNodeConnectorRecord>();
+        }
+
+        public IList<int> GetNeighbourIds(int nodeId)
+        {
+            // Measure performance with large datasets, as .AsParallel() queries tend to be slower
+            return _nodeToNodeRecordRepository.
+                Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
+                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
+        }
+
+        public int GetNeighbourCount(int nodeId)
+        {
+            return _nodeToNodeRecordRepository.
+                Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
+        }
+        #endregion
+
+        public IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
             return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
         #region Node CRUD
-        public TNodePart CreateNode<TNodeParams>(TNodeParams nodeParams) where TNodeParams : INodeParams<TNodePart>
+        public IContentQuery<TNodePart, TNodePartRecord> ContentQuery
+        {
+            get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
+        }
+
+        public TNodePart Create(TNodeParams nodeParams)
         {
             var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
             nodeParams.MapToPart(node);
@@ -69,16 +93,35 @@ namespace Associativy.Services
             return node;
         }
 
-        public TNodePart GetNode(int id)
+        public TNodePart Get(int id)
         {
             return _contentManager.Get<TNodePart>(id);
         }
 
-        //public TNodePart UpdateNode()
-        //{
-        //}
+        public TNodePart Update(TNodeParams nodeParams)
+        {
+            if (nodeParams.Id == 0) throw new ArgumentException("When updating a node the Id property of the INodeParams object should be set.");
 
-        public void DeleteNode(int id)
+            var node = Get(nodeParams.Id);
+            if (node != null)
+            {
+                nodeParams.MapToPart(node);
+                _contentManager.Flush();
+            }
+
+            return node;
+        }
+
+        public TNodePart Update(TNodePart node)
+        {
+            if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
+
+            _contentManager.Flush();
+
+            return node;
+        }
+
+        public void Delete(int id)
         {
             // Since there is no cummulative delete...
             var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
@@ -92,35 +135,5 @@ namespace Associativy.Services
             _contentManager.Remove(_contentManager.Get(id));
         }
         #endregion
-
-        // Maybe protected internal?
-        public IList<int> GetNeighbourIds(int nodeId)
-        {
-            // Measure performance with large datasets, as .AsParallel() queries tend to be slower
-            return _nodeToNodeRecordRepository.
-                Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
-                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
-        }
-
-        public bool AreConnected(int nodeId1, int nodeId2)
-        {
-            return _nodeToNodeRecordRepository.Count(connector =>
-                connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
-                connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
-        }
-
-        public int GetNeighbourCount(int nodeId)
-        {
-            return _nodeToNodeRecordRepository.
-                Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
-        }
-
-        public IEnumerable<TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
-        {
-            var succeededNodeIds = new List<int>();
-            succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
-            _contentManager.Query<TNodePart, TNodePartRecord>();
-            return _contentManager.Query<TNodePart, TNodePartRecord>().Where(node => succeededNodeIds.Contains(node.Id)).List();
-        }
     }
 }

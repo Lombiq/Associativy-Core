@@ -12,6 +12,8 @@ namespace Associativy.Models
     [OrchardFeature("Associativy")]
     public abstract class NodeParams<TNodePart> : INodeParams<TNodePart> where TNodePart : INode
     {
+        public int Id { get; set; }
+
         public string Label { get; set; }
 
         public abstract string ContentTypeName { get; }

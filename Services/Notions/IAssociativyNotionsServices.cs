@@ -2,7 +2,7 @@
 
 namespace Associativy.Services.Notions
 {
-    public interface IAssociativyNotionsServices : IAssociativyServices<NotionPart, NotionPartRecord, NotionToNotionConnectorRecord>
+    public interface IAssociativyNotionsServices : IAssociativyServices<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord>
     {
     }
 }

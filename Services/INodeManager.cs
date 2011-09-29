@@ -7,22 +7,30 @@ using Orchard.Data;
 
 namespace Associativy.Services
 {
-    public interface INodeManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IDependency // Maybe ISingletonDependency?
+    public interface INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IDependency // Maybe ISingletonDependency?
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
+        where TNodeParams : INodeParams<TNodePart>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        IRepository<TNodeToNodeConnectorRecord> NodeToNodeRecordRepository { get; }
-        IRepository<TNodePartRecord> NodePartRecordRepository { get; }
+        #region Connection management
+        bool AreConnected(int nodeId1, int nodeId2);
         void AddConnection(int nodeId1, int nodeId2);
         void AddConnection(TNodePart node1, TNodePart node2);
-        bool AreConnected(int nodeId1, int nodeId2);
-        TNodePart CreateNode<TNodeParams>(TNodeParams nodeParams) where TNodeParams : Associativy.Models.INodeParams<TNodePart>;
-        void DeleteNode(int id);
+        IList<TNodeToNodeConnectorRecord> GetAllConnections();
+        IList<int> GetNeighbourIds(int nodeId);
         int GetNeighbourCount(int nodeId);
-        System.Collections.Generic.IList<int> GetNeighbourIds(int nodeId);
-        TNodePart GetNode(int id);
-        List<string> GetSimilarTerms(string snippet, int maxCount = 10);
-        IEnumerable<TNodePart> GetSucceededNodes(List<List<int>> succeededPaths);
+        #endregion
+
+        IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
+        
+        #region Node CRUD
+        IContentQuery<TNodePart, TNodePartRecord> ContentQuery { get; }
+        TNodePart Create(TNodeParams nodeParams);
+        TNodePart Get(int id);
+        TNodePart Update(TNodeParams nodeParams);
+        TNodePart Update(TNodePart node);
+        void Delete(int id);
+        #endregion
     }
 }
