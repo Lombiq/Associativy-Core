@@ -83,7 +83,9 @@
     <Content Include="Scripts\Dracula\dracula_graph.js" />
     <Content Include="Scripts\Dracula\raphael-min.js" />
     <Content Include="Scripts\Dracula\seedrandom.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
@@ -122,6 +124,8 @@
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Routes.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
+    <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />

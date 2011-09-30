@@ -15,23 +15,21 @@ namespace Associativy.Services
     public class Mind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>
+        where TNodeParams : INodeParams<TNodePart>, new()
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        #region Dependencies
-        private readonly IContentManager _contentManager;
-        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> _nodeManager;
+        private readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> _connectionManager;
+        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeParams> _nodeManager;
         private readonly ICacheManager _cacheManager;
         private readonly IClock _clock;
-        #endregion
 
         public Mind(
-            IContentManager contentManager,
-            INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> nodeManager,
+            IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> connectionManager,
+            INodeManager<TNodePart, TNodePartRecord, TNodeParams> nodeManager,
             ICacheManager cacheManager,
             IClock clock)
         {
-            _contentManager = contentManager;
+            _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _cacheManager = cacheManager;
             _clock = clock;
@@ -67,7 +65,7 @@ namespace Associativy.Services
                 graph.AddVertex(node.Value);
             }
 
-            foreach (var connection in _nodeManager.GetAllConnections())
+            foreach (var connection in _connectionManager.GetAll())
             {
                 graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
             }
@@ -163,7 +161,7 @@ namespace Associativy.Services
                 if (currentDepth == maxDepth - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (_nodeManager.AreConnected(currentNode.Id, targetId))
+                    if (_connectionManager.AreConnected(currentNode.Id, targetId))
                     {
                         found = true;
                         if (visitedNodes[targetId].MinimumDepth > currentDepth + 1)
@@ -196,7 +194,7 @@ namespace Associativy.Services
                         //        neighbours[neighbourId] = visitedNodes[neighbourId];
                         //    });
 
-                        foreach (var neighbourId in _nodeManager.GetNeighbourIds(currentNode.Id))
+                        foreach (var neighbourId in _connectionManager.GetNeighbourIds(currentNode.Id))
                         {
                             if (!visitedNodes.ContainsKey(neighbourId))
                             {

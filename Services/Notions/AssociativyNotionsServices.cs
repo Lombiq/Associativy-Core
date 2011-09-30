@@ -11,9 +11,10 @@ namespace Associativy.Services.Notions
     public class AssociativyNotionsServices : AssociativyServices<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord>, IAssociativyNotionsServices
     {
         public AssociativyNotionsServices(
+            IConnectionManager<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord> connectionManager,
             IMind<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord> mind,
-            INodeManager<NotionPart, NotionPartRecord, NotionParams, NotionToNotionConnectorRecord> nodeManager)
-            : base(mind, nodeManager)
+            INodeManager<NotionPart, NotionPartRecord, NotionParams> nodeManager)
+            : base(connectionManager, mind, nodeManager)
         {
         }
     }

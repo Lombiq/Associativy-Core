@@ -7,21 +7,12 @@ using Orchard.Data;
 
 namespace Associativy.Services
 {
-    public interface INodeManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IDependency // Maybe ISingletonDependency?
+    public interface INodeManager<TNodePart, TNodePartRecord, TNodeParams> : IDependency // Maybe ISingletonDependency?
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TNodeParams : INodeParams<TNodePart>, new()
     {
-        #region Connection management
-        bool AreConnected(int nodeId1, int nodeId2);
-        void AddConnection(int nodeId1, int nodeId2);
-        void AddConnection(TNodePart node1, TNodePart node2);
-        IList<TNodeToNodeConnectorRecord> GetAllConnections();
-        IList<int> GetNeighbourIds(int nodeId);
-        int GetNeighbourCount(int nodeId);
-        #endregion
-
+        TNodeParams NodeParamsFactory();
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
         
         #region Node CRUD
@@ -30,7 +21,12 @@ namespace Associativy.Services
         TNodePart Get(int id);
         TNodePart Update(TNodeParams nodeParams);
         TNodePart Update(TNodePart node);
-        void Delete(int id);
+
+        /// <summary>
+        /// Soft deletes the node and leaves connections intact (that means the whole partial graph can be reconstructed)
+        /// </summary>
+        /// <param name="id">Id of the node</param>
+        void Remove(int id);
         #endregion
     }
 }

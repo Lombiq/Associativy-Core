@@ -7,11 +7,6 @@ OrchardVersion: 1.2
 Description: Associativy module.
 Features:
     Associativy:
-		Name: Associativy Base
+		Name: Associativy Core
         Description: Associativy Base
 		Category: Associativy
-	Associativy.Notions:
-		Name: Associativy Notions
-        Description: Associativy Notions database
-		Category: Associativy
-		Dependencies: Associativy

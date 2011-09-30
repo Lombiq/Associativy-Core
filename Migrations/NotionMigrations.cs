@@ -13,13 +13,12 @@ namespace Associativy.Migrations
     [OrchardFeature("Associativy.Notions")]
     public class NotionMigrations : DataMigrationImpl
     {
-
         public int Create()
         {
             SchemaBuilder.CreateTable("NotionPartRecord",
                 table => table
                     .ContentPartRecord()
-                    .Column<string>("Label")
+                    .Column<string>("Label") // Erre index?
                 );
 
             //SchemaBuilder.CreateForeignKey("NodeRecord_Id", 

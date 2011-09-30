@@ -10,7 +10,7 @@ namespace Associativy.Services
     public interface IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IDependency // Maybe ISingletonDependency?
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>
+        where TNodeParams : INodeParams<TNodePart>, new()
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0);
