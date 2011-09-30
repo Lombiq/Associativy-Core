@@ -1,7 +1,7 @@
-﻿@using Associativy.ViewModels.Notions
+﻿@using Associativy.ViewModels
 
 @{
-    var viewModel = Model.ViewModel as NotionSearchViewModel;
+    var viewModel = Model.ViewModel as SearchViewModel;
     Script.Require("AssociativyAutoComplete").AtHead();
     Style.Require("jQueryUI_Orchard");
 }
@@ -17,5 +17,5 @@
 }
 
 <script type="text/javascript">
-    $.associativyAutoComplete.terms("Terms", '@Url.Action("FetchSimilarTerms", new { Controller = "Associations", Area = "Associativy"})');
+    $.associativyAutoComplete.terms("Terms", '@Model.FetchUrl');
 </script>

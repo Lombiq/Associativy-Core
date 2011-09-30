@@ -1,4 +1,3 @@
 ﻿<Placement>
-    <!--Notions-->
-    <Place Parts_Notions_SearchForm="Content:1"/>
+    <Place Parts_SearchForm="Content:1"/>
 </Placement>

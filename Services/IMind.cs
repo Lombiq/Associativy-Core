@@ -14,6 +14,6 @@ namespace Associativy.Services
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0);
-        UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false);
+        UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> terms, bool simpleAlgorithm = false);
     }
 }

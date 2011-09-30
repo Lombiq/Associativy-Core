@@ -6,9 +6,11 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.Models;
 using Orchard.Data;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
+    [OrchardFeature("Associativy")]
     public class ConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode

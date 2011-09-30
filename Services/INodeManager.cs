@@ -19,6 +19,7 @@ namespace Associativy.Services
         IContentQuery<TNodePart, TNodePartRecord> ContentQuery { get; }
         TNodePart Create(TNodeParams nodeParams);
         TNodePart Get(int id);
+        TNodePart Get(string label);
         TNodePart Update(TNodeParams nodeParams);
         TNodePart Update(TNodePart node);
 

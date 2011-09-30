@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Orchard.Environment.Extensions;
 using System.ComponentModel.DataAnnotations;
-using Orchard.Environment.Extensions;
+using System;
+using System.Linq;
 
-namespace Associativy.ViewModels.Notions
+namespace Associativy.ViewModels
 {
-    [OrchardFeature("Associativy.Notions")]
-    public class NotionSearchViewModel
+    [OrchardFeature("Associativy")]
+    public class SearchViewModel
     {
         [Required]
         public string Terms { get; set; }

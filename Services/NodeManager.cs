@@ -6,9 +6,11 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.Models;
 using Orchard.Data;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
+    [OrchardFeature("Associativy")]
     public class NodeManager<TNodePart, TNodePartRecord, TNodeParams> : INodeManager<TNodePart, TNodePartRecord, TNodeParams>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -54,6 +56,11 @@ namespace Associativy.Services
         public TNodePart Get(int id)
         {
             return _contentManager.Get<TNodePart>(id);
+        }
+
+        public TNodePart Get(string label)
+        {
+            return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
         }
 
         public TNodePart Update(TNodeParams nodeParams)

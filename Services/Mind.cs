@@ -9,9 +9,11 @@ using QuickGraph;
 using Orchard.Data;
 using Orchard.Services;
 using Orchard.Caching;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
+    [OrchardFeature("Associativy")]
     public class Mind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -79,25 +81,49 @@ namespace Associativy.Services
             return graph;
         }
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<string> terms, bool simpleAlgorithm = false)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> searchedNodes, bool simpleAlgorithm = false)
         {
             return _cacheManager.Get("Assciativy Whole Graph", ctx =>
             {
                 ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                return MakeAssociationsWithoutCaching(terms, simpleAlgorithm);
+                return MakeAssociationsWithoutCaching(searchedNodes, simpleAlgorithm);
             });
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociationsWithoutCaching(IList<string> terms, bool simpleAlgorithm = false)
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociationsWithoutCaching(IList<TNodePart> searchedNodes, bool simpleAlgorithm = false)
         {
+            if (searchedNodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
+            if (searchedNodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
+
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
-            //graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(1, 2));
 
-            var succeededPaths = CalculatePaths(1, 2);
-            var succeededNodeIds = new List<int>();
-            succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
-            var succeededNodes = _nodeManager.ContentQuery.Where(node => succeededNodeIds.Contains(node.Id)).List();
+            if (searchedNodes.Count == 1)
+            {
+                graph.AddVertex(searchedNodes[0]);
+
+                var neighbourIds = _connectionManager.GetNeighbourIds(searchedNodes[0].Id);
+                foreach (var node in _nodeManager.ContentQuery.Where(node => neighbourIds.Contains(node.Id)).List())
+                {
+                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(searchedNodes[0], node));
+                }
+            }
+            else if (simpleAlgorithm)
+            {
+                
+            }
+            else if (searchedNodes.Count == 2)
+            {
+                var succeededPaths = CalculatePaths(1, 2);
+                var succeededNodeIds = new List<int>();
+                succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList());
+                var succeededNodes = _nodeManager.ContentQuery.Where(node => succeededNodeIds.Contains(node.Id)).List();
+            }
+            else if (searchedNodes.Count > 2)
+            {
+
+            }
+
 
             return graph;
         }
