@@ -10,14 +10,18 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
+    /// <summary>
+    /// All suitable methods protected to aid inheritence.
+    /// </summary>
+    /// <typeparam name="TNodePart"></typeparam>
+    /// <typeparam name="TNodePartRecord"></typeparam>
     [OrchardFeature("Associativy")]
-    public class NodeManager<TNodePart, TNodePartRecord, TNodeParams> : INodeManager<TNodePart, TNodePartRecord, TNodeParams>
+    public class NodeManager<TNodePart, TNodePartRecord> : INodeManager<TNodePart, TNodePartRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>, new()
     {
-        private readonly IContentManager _contentManager;
-        private readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
+        protected readonly IContentManager _contentManager;
+        protected readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
 
         public NodeManager(
             IContentManager contentManager,
@@ -33,18 +37,13 @@ namespace Associativy.Services
             return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
-        public TNodeParams NodeParamsFactory()
-        {
-            return new TNodeParams();
-        }
-
         #region Node CRUD
         public IContentQuery<TNodePart, TNodePartRecord> ContentQuery
         {
             get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
         }
 
-        public TNodePart Create(TNodeParams nodeParams)
+        public TNodePart Create(INodeParams<TNodePart> nodeParams)
         {
             var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
             nodeParams.MapToPart(node);
@@ -60,10 +59,16 @@ namespace Associativy.Services
 
         public TNodePart Get(string label)
         {
+            // inkább LIKE-kal?
             return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
         }
 
-        public TNodePart Update(TNodeParams nodeParams)
+        public IList<TNodePart> GetMany(IList<int> ids)
+        {
+            return ContentQuery.Where(node => ids.Contains(node.Id)).List().ToList();
+        }
+
+        public TNodePart Update(INodeParams<TNodePart> nodeParams)
         {
             if (nodeParams.Id == 0) throw new ArgumentException("When updating a node the Id property of the INodeParams object should be set.");
 

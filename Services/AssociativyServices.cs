@@ -10,34 +10,33 @@ using Associativy.Models;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IAssociativyServices<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
+    public class AssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>, new()
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        private readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> _connectionManager;
-        public IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> ConnectionManager
+        private readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
+        public IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> ConnectionManager
         {
             get { return _connectionManager; }
         }
 
-        private readonly IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> _mind;
-        public IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> Mind
+        private readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _mind;
+        public IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind
         {
             get { return _mind; }
         }
 
-        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeParams> _nodeManager;
-        public INodeManager<TNodePart, TNodePartRecord, TNodeParams> NodeManager
+        private readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        public INodeManager<TNodePart, TNodePartRecord> NodeManager
         {
             get { return _nodeManager; }
         }
 
         public AssociativyServices(
-            IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> connectionManager,
-            IMind<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> mind,
-            INodeManager<TNodePart, TNodePartRecord, TNodeParams> nodeManager)
+            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
+            IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
+            INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;

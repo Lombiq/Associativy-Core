@@ -4,10 +4,10 @@
     var viewModel = Model.ViewModel as SearchViewModel;
     Script.Require("AssociativyAutoComplete").AtHead();
     Style.Require("jQueryUI_Orchard");
+    var route = (RouteValueDictionary)Model.PostRouteValueDictionary;
 }
 
-
-@using (Html.BeginForm("ShowAssociations", "Associations", new { area = "Associativy" }, FormMethod.Get, new { @id = "notions-search-form" }))
+@using (Html.BeginForm(route["action"].ToString(), route["controller"].ToString(), new { Area = route["area"]}, FormMethod.Get, new { @id = "notions-search-form" }))
 {
 @*    @Html.AntiForgeryTokenOrchard()*@
     <fieldset>

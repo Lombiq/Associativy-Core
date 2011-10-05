@@ -7,20 +7,19 @@ using Orchard.Data;
 
 namespace Associativy.Services
 {
-    public interface INodeManager<TNodePart, TNodePartRecord, TNodeParams> : IDependency // Maybe ISingletonDependency?
+    public interface INodeManager<TNodePart, TNodePartRecord> : IDependency // Maybe ISingletonDependency?
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>, new()
     {
-        TNodeParams NodeParamsFactory();
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
         
         #region Node CRUD
         IContentQuery<TNodePart, TNodePartRecord> ContentQuery { get; }
-        TNodePart Create(TNodeParams nodeParams);
+        TNodePart Create(INodeParams<TNodePart> nodeParams);
         TNodePart Get(int id);
         TNodePart Get(string label);
-        TNodePart Update(TNodeParams nodeParams);
+        IList<TNodePart> GetMany(IList<int> ids);
+        TNodePart Update(INodeParams<TNodePart> nodeParams);
         TNodePart Update(TNodePart node);
 
         /// <summary>

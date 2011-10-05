@@ -10,19 +10,24 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
+    /// <summary>
+    /// All suitable methods protected to aid inheritence.
+    /// </summary>
+    /// <typeparam name="TNodePart"></typeparam>
+    /// <typeparam name="TNodePartRecord"></typeparam>
+    /// <typeparam name="TNodeToNodeConnectorRecord"></typeparam>
     [OrchardFeature("Associativy")]
-    public class ConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord> : IConnectionManager<TNodePart, TNodePartRecord, TNodeParams, TNodeToNodeConnectorRecord>
+    public class ConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
-        where TNodeParams : INodeParams<TNodePart>, new()
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        private readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        private readonly INodeManager<TNodePart, TNodePartRecord, TNodeParams> _nodeManager;
+        protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            INodeManager<TNodePart, TNodePartRecord, TNodeParams> nodeManager)
+            INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _nodeManager = nodeManager;
