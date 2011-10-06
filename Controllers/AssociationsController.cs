@@ -52,7 +52,7 @@ namespace Associativy.Controllers
 
             orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
-            return GraphResultShape(
+            return GraphResult(
                         SearchFormShape(
                             new SearchViewModel()
                         ),
@@ -94,7 +94,7 @@ namespace Associativy.Controllers
                 {
                     orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
-                    return GraphResultShape(
+                    return GraphResult(
                         SearchFormShape(viewModel), 
                         GraphShape<TGraphNodeViewModel>(associationsGraph)
                         );
@@ -137,16 +137,18 @@ namespace Associativy.Controllers
             return null;
         }
 
-        protected ShapeResult GraphResultShape(ShapeResult searchFormShape, ShapeResult graphShape)
+        protected ShapeResult GraphResult(dynamic searchFormShape, dynamic graphShape)
         {
-            return new ShapeResult(this, 
+            // Ezt view nélkül jó lenne esetleg, bár nem biztos
+            return new ShapeResult(this,
                 orchardServices.New.Graphs_Result(
-                SearchForm: searchFormShape,
-                Graph: graphShape)
+                    SearchForm: searchFormShape,
+                    Graph: graphShape
+                    )
                 );
         }
 
-        protected ShapeResult GraphShape<TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
+        protected dynamic GraphShape<TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
             where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
         {
             var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
@@ -175,7 +177,8 @@ namespace Associativy.Controllers
 
             // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
             // plugin gráfmegjelenítőknek? Delegate?
-            return new ShapeResult(this, orchardServices.New.Graphs_Dracula(Nodes: nodes));
+            return orchardServices.New.Graphs_Dracula(Nodes: nodes);
+            //return new ShapeResult(this, orchardServices.New.Graphs_Dracula(Nodes: nodes));
 
             //var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
             //var searchForm = orchardServices.ContentManager.BuildDisplay(
@@ -185,16 +188,20 @@ namespace Associativy.Controllers
             //return new ShapeResult(this, orchardServices.New.Graphs_Default(SearchForm: searchForm, Nodes: nodes));
         }
 
-        protected ShapeResult SearchFormShape(SearchViewModel searchViewModel)
+        protected dynamic SearchFormShape(SearchViewModel searchViewModel)
         {
             var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
             searchFormPart.Terms = searchViewModel.Terms;
 
-            return new ShapeResult(this, 
-                orchardServices.ContentManager.BuildDisplay(
+            return orchardServices.ContentManager.BuildDisplay(
                     searchFormPart
-                    )
-                );
+                    );
+
+            //return new ShapeResult(this, 
+            //    orchardServices.ContentManager.BuildDisplay(
+            //        searchFormPart
+            //        )
+            //    );
         }
     }
 }

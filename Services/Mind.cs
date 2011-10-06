@@ -280,7 +280,7 @@ namespace Associativy.Services
                 return cacheManager.Get(startId.ToString() + targetId.ToString() + maxDepth.ToString(), ctx =>
                 {
                     ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                    return CalculatePaths(startId, targetId, maxDepth, useCache);
+                    return CalculatePaths(startId, targetId, maxDepth, false);
                 });
             }
 
