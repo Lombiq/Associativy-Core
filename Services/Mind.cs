@@ -248,14 +248,14 @@ namespace Associativy.Services
             public int Id { get; set; }
             public int MinimumDepth { get; set; }
             public bool IsDeadEnd { get; set; }
-            public Dictionary<int, PathNode> Neighbours { get; set; }
+            public List<PathNode> Neighbours { get; set; }
 
             public PathNode(int id)
             {
                 Id = id;
                 MinimumDepth = int.MaxValue;
                 IsDeadEnd = false;
-                Neighbours = new Dictionary<int, PathNode>();
+                Neighbours = new List<PathNode>();
             }
         }
 
@@ -317,7 +317,7 @@ namespace Associativy.Services
                             visitedNodes[targetId].MinimumDepth = currentDepth + 1;
                         }
 
-                        currentNode.Neighbours[targetId] = visitedNodes[targetId];
+                        currentNode.Neighbours.Add(visitedNodes[targetId]);
                         currentPath.Add(targetId);
                         succeededPaths.Add(currentPath);
                         // if ($this->debugMode) echo "##found from ".$node->loadById($currentNode->id)->notion."\n";
@@ -327,8 +327,6 @@ namespace Associativy.Services
                 // We can traverse the graph further
                 else if (!currentNode.IsDeadEnd)
                 {
-                    var neighbours = new Dictionary<int, PathNode>();
-
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
@@ -339,28 +337,26 @@ namespace Associativy.Services
                         //        {
                         //            visitedNodes[neighbourId] = new GraphNode(neighbourId);
                         //        }
-                        //        neighbours[neighbourId] = visitedNodes[neighbourId];
+                        //        neighbours.Add(visitedNodes[neighbourId]);
                         //    });
 
-                        foreach (var neighbourId in connectionManager.GetNeighbourIds(currentNode.Id))
+                        var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id);
+                        currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
+                        foreach (var neighbourId in neighbourIds)
                         {
                             if (!visitedNodes.ContainsKey(neighbourId))
                             {
                                 visitedNodes[neighbourId] = new PathNode(neighbourId);
                             }
-                            neighbours[neighbourId] = visitedNodes[neighbourId];
+                            currentNode.Neighbours.Add(visitedNodes[neighbourId]);
                         }
 
                         // The only path to this node is where we have come from
-                        if (neighbours.Count == 1)
+                        if (currentNode.Neighbours.Count == 1)
                         {
                             currentNode.IsDeadEnd = true;
                             // if ($this->debugMode) echo "///dead end\n";
                         }
-                    }
-                    else
-                    {
-                        neighbours = visitedNodes[currentNode.Id].Neighbours;
                     }
 
                     if (!currentNode.IsDeadEnd)
@@ -394,11 +390,8 @@ namespace Associativy.Services
                         //            neighbour.MinimumDepth = currentDepth + 1;
                         //        }
                         //    });
-                        foreach (var neighbourItem in neighbours)
+                        foreach (var neighbour in currentNode.Neighbours)
                         {
-                            var neighbour = neighbourItem.Value;
-                            currentNode.Neighbours[neighbour.Id] = neighbour;
-
                             // Target is a neighbour
                             if (neighbour.Id == targetId)
                             {

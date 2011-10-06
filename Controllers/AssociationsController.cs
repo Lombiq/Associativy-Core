@@ -118,7 +118,11 @@ namespace Associativy.Controllers
 
         protected ActionResult AssociationsNotFound(SearchViewModel viewModel)
         {
-            return new ShapeResult(this, orchardServices.New.Graphs_NotFound(ViewModel: viewModel));
+            return GraphResult(
+                    SearchFormShape(viewModel),
+                    orchardServices.New.Graphs_NotFound(ViewModel: viewModel)
+                );
+            //return new ShapeResult(this, orchardServices.New.Graphs_NotFound(ViewModel: viewModel));
         }
 
         public JsonResult FetchSimilarTerms(string term)
@@ -137,13 +141,13 @@ namespace Associativy.Controllers
             return null;
         }
 
-        protected ShapeResult GraphResult(dynamic searchFormShape, dynamic graphShape)
+        protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
         {
             // Ezt view nélkül jó lenne esetleg, bár nem biztos
             return new ShapeResult(this,
                 orchardServices.New.Graphs_Result(
                     SearchForm: searchFormShape,
-                    Graph: graphShape
+                    Result: resultShape
                     )
                 );
         }
