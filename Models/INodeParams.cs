@@ -3,6 +3,6 @@
     public interface INodeParams<TNodePart> : INode where TNodePart : INode
     {
         string ContentTypeName { get; }
-        TNodePart MapToPart(TNodePart part);
+        TNodePart MapToNode(TNodePart part);
     }
 }

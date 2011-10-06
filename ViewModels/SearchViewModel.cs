@@ -8,19 +8,33 @@ namespace Associativy.ViewModels
     [OrchardFeature("Associativy")]
     public class SearchViewModel
     {
-        [Required]
-        public string Terms { get; set; }
+        private string terms;
 
+        [Required]
+        public string Terms
+        {
+            get
+            {
+                return terms;
+            }
+
+            set
+            {
+                if (value != null)
+                {
+                    termsArray = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    termsArray = (from p in termsArray select p.Trim()).ToArray();
+                }
+                terms = value;
+            }
+        }
+
+
+        private string[] termsArray;
         public string[] TermsArray
         {
             get
             {
-                string[] termsArray = new string[0];
-                if (Terms != null)
-                {
-                    termsArray = Terms.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    termsArray = (from p in termsArray select p.Trim()).ToArray();
-                }
                 return termsArray;
             }
         }

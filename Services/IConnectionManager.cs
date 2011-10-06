@@ -12,7 +12,7 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        bool AreConnected(int nodeId1, int nodeId2);
+        bool AreNeighbours(int nodeId1, int nodeId2);
         void Add(int nodeId1, int nodeId2);
         void Add(TNodePart node1, TNodePart node2);
         void DeleteMany(int nodeId);

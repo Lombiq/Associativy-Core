@@ -10,7 +10,7 @@ namespace Associativy.Models
     /// Abstract implementation of INodeParams for further use
     /// </summary>
     [OrchardFeature("Associativy")]
-    public abstract class NodeParams<TNodePart> : INodeParams<TNodePart> where TNodePart : INode
+    public abstract class NodeParams<TNode> : INodeParams<TNode> where TNode : INode
     {
         public int Id { get; set; }
 
@@ -18,11 +18,11 @@ namespace Associativy.Models
 
         public abstract string ContentTypeName { get; }
 
-        public TNodePart MapToPart(TNodePart part)
+        public virtual TNode MapToNode(TNode node)
         {
-            part.Label = Label;
+            node.Label = Label;
 
-            return part;
+            return node;
         }
     }
 }

@@ -3,10 +3,10 @@ AntiForgery: enabled
 Author: Piedone
 Website: http://orchardproject.net
 Version: 1.0
-OrchardVersion: 1.2
+OrchardVersion: 1.3
 Description: Associativy module.
 Features:
     Associativy:
 		Name: Associativy Core
-        Description: Associativy Base
+        Description: Associativy Core
 		Category: Associativy

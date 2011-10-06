@@ -25,10 +25,10 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
-        protected readonly ICacheManager _cacheManager;
-        protected readonly IClock _clock;
+        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
+        protected readonly ICacheManager cacheManager;
+        protected readonly IClock clock;
 
         public Mind(
             IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
@@ -36,10 +36,10 @@ namespace Associativy.Services
             ICacheManager cacheManager,
             IClock clock)
         {
-            _connectionManager = connectionManager;
-            _nodeManager = nodeManager;
-            _cacheManager = cacheManager;
-            _clock = clock;
+            this.connectionManager = connectionManager;
+            this.nodeManager = nodeManager;
+            this.cacheManager = cacheManager;
+            this.clock = clock;
         }
 
         protected const int CacheLifetimeMin = 0;
@@ -52,27 +52,27 @@ namespace Associativy.Services
         //    }
         //}
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
         {
-            return _cacheManager.Get("Assciativy Whole Graph", ctx =>
+            if (useCache)
             {
-                ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                return GetAllAssociationsWithoutCaching(zoomLevel);
-            });
-        }
+                return cacheManager.Get("Assciativy Whole Graph", ctx =>
+                    {
+                        ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                        return GetAllAssociations(zoomLevel, false);
+                    }); 
+            }
 
-        protected UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociationsWithoutCaching(int zoomLevel = 0)
-        {
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
-            var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
+            var nodes = nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
 
-            foreach (var node in _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id))
+            foreach (var node in nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id))
             {
                 graph.AddVertex(node.Value);
             }
 
-            foreach (var connection in _connectionManager.GetAll())
+            foreach (var connection in connectionManager.GetAll())
             {
                 graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
             }
@@ -86,17 +86,19 @@ namespace Associativy.Services
             return graph;
         }
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, bool simpleAlgorithm = false, int zoomLevel = 0)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, bool simpleAlgorithm = false, int zoomLevel = 0, bool useCache = true)
         {
-            return _cacheManager.Get("Assciativy Whole Graph", ctx =>
+            if (useCache)
             {
-                ctx.Monitor(_clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                return MakeAssociationsWithoutCaching(nodes, simpleAlgorithm);
-            });
-        }
+                string cacheKey = "";
+                nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
+                return cacheManager.Get(cacheKey, ctx =>
+                    {
+                        ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                        return MakeAssociations(nodes, simpleAlgorithm, zoomLevel, false);
+                    }); 
+            }
 
-        protected UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociationsWithoutCaching(IList<TNodePart> nodes, bool simpleAlgorithm = false, int zoomLevel = 0)
-        {
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
             if (nodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
@@ -117,13 +119,13 @@ namespace Associativy.Services
             }
         }
 
-        protected UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
         {
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
             graph.AddVertex(node);
 
-            foreach (var currentNode in _nodeManager.GetMany(_connectionManager.GetNeighbourIds(node.Id)))
+            foreach (var currentNode in nodeManager.GetMany(connectionManager.GetNeighbourIds(node.Id)))
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, currentNode));
             }
@@ -131,22 +133,23 @@ namespace Associativy.Services
             return graph;
         }
 
-        protected UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
         {
+            // Simply calculate the intersection of the neighbours of the nodes
+
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
 
-            // Simply calculate the intersection of the neighbours of the nodes
-            var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes[0].Id);
+            var commonNeighbourIds = connectionManager.GetNeighbourIds(nodes[0].Id);
             var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
             foreach (var node in remainingNodes)
             {
-                commonNeighbourIds = commonNeighbourIds.Intersect(_connectionManager.GetNeighbourIds(node.Id)).ToList();
+                commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
             }
 
             if (commonNeighbourIds.Count == 0) return null;
 
-            var commonNeighbours = _nodeManager.GetMany(commonNeighbourIds);
+            var commonNeighbours = nodeManager.GetMany(commonNeighbourIds);
 
             foreach (var node in nodes)
             {
@@ -159,70 +162,88 @@ namespace Associativy.Services
             return graph;
         }
 
-        protected UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes)
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes)
         {
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
             var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            List<List<int>> succeededPaths;
+            
+            var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
+
+            if (allPairSucceededPaths.Count == 0) return null;
+
 
             if (nodes.Count == 2)
             {
-                var succeededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
-                if (succeededPaths.Count == 0) return null;
-
-                var succeededNodes = GetSucceededNodes(succeededPaths);
-
-                foreach (var path in succeededPaths)  // To parallel?
-                {
-                    for (int i = 1; i < path.Count; i++)
-                    {
-                        graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(succeededNodes[path[i - 1]], succeededNodes[path[i]]));
-                    }
-                }
+                succeededPaths = allPairSucceededPaths;
             }
             // Calculate the routes between every nodes pair, then calculate the intersection of the routes
-            else if (nodes.Count > 2)
+            else
             {
-                //var allPairSucceededPaths = new List<List<int>>();
-                //var succeededNodeIds = new List<int>(); // Without those nodes that were not present in all paths
+                // We have to preserve the searched node ids in the succeeded paths despite the intersections
+                var searchedNodeIds = new List<int>(nodes.Count);
+                nodes.ToList().ForEach(
+                        node => searchedNodeIds.Add(node.Id)
+                    );
+                var commonSucceededNodeIds = GetSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
 
-                //for (int i = 0; i < nodes.Count - 1; i++)
-                //{
-                //    for (int n = i + 1; n < nodes.Count; n++)
-                //    {
-                //        var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id);
-                //        succeededNodeIds = 
-                //        allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
-                //    }
-                //}
 
-                //if (allPairSucceededPaths.Count == 0) return null;
+                int n;
+                for (int i = 0; i < nodes.Count - 1; i++)
+                {
+                    n = i + 1;
+                    if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
 
-                //var allSucceededNodeIds = GetSucceededNodeIds(allPairSucceededPaths);
+                    while (n < nodes.Count)
+                    {
+                        var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id);
+                        commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
+                        allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
-                //var succeededPaths = new List<List<int>>(); 
-                //succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList()); // To parallel?
+                        n++;
+                    }
+                }
 
-                int z;
+                if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return null;
+
+                succeededPaths = new List<List<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
+                foreach (var path in allPairSucceededPaths)
+                {
+                    var succeededPath = path.Intersect(commonSucceededNodeIds);
+                    if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath.ToList()); // Only paths where intersecting nodes are present
+                }
+                if (succeededPaths.Count == 0) return null;
+            }
+
+
+            var succeededNodes = GetSucceededNodes(succeededPaths);
+
+            foreach (var path in succeededPaths)
+            {
+                for (int i = 1; i < path.Count; i++)
+                {
+                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(succeededNodes[path[i - 1]], succeededNodes[path[i]]));
+                }
             }
 
             return graph;
         }
 
-        protected Dictionary<int, TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
+        private Dictionary<int, TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
         {
-            return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary<TNodePart, int>(node => node.Id);
+            return nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary<TNodePart, int>(node => node.Id);
         }
 
-        protected List<int> GetSucceededNodeIds(List<List<int>> succeededPaths)
+        private List<int> GetSucceededNodeIds(List<List<int>> succeededPaths)
         {
-            var succeededNodeIds = new List<int>();
+            var succeededNodeIds = new List<int>(succeededPaths.Count); // An incorrect estimate, but enhaces performance
             succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList()); // To parallel?
             return succeededNodeIds;
         }
 
         #region CalculatePaths() auxiliary classes
-        protected class PathNode
+        private class PathNode
         {
             public int Id { get; set; }
             public int MinimumDepth { get; set; }
@@ -238,7 +259,7 @@ namespace Associativy.Services
             }
         }
 
-        protected class StackItem
+        private class StackItem
         {
             public int Depth { get; set; }
             public List<int> Path { get; set; }
@@ -252,10 +273,18 @@ namespace Associativy.Services
         }
         #endregion
 
-        protected List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3)
+        private List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3, bool useCache = true)
         {
-            // Cache itt is.
-            var found = false; // Maybe can be removed
+            if (useCache)
+            {
+                return cacheManager.Get(startId.ToString() + targetId.ToString() + maxDepth.ToString(), ctx =>
+                {
+                    ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                    return CalculatePaths(startId, targetId, maxDepth, useCache);
+                });
+            }
+
+            var found = false; // Maybe can be removed?
             var visitedNodes = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
             var stack = new Stack<StackItem>();
@@ -280,7 +309,7 @@ namespace Associativy.Services
                 if (currentDepth == maxDepth - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (_connectionManager.AreConnected(currentNode.Id, targetId))
+                    if (connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
                         found = true;
                         if (visitedNodes[targetId].MinimumDepth > currentDepth + 1)
@@ -313,7 +342,7 @@ namespace Associativy.Services
                         //        neighbours[neighbourId] = visitedNodes[neighbourId];
                         //    });
 
-                        foreach (var neighbourId in _connectionManager.GetNeighbourIds(currentNode.Id))
+                        foreach (var neighbourId in connectionManager.GetNeighbourIds(currentNode.Id))
                         {
                             if (!visitedNodes.ContainsKey(neighbourId))
                             {

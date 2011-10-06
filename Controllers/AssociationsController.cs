@@ -41,7 +41,8 @@ namespace Associativy.Controllers
             T = NullLocalizer.Instance;
         }
 
-        public ActionResult ShowWholeGraph()
+        protected ActionResult ShowWholeGraph<TGraphNodeViewModel>()
+            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -58,21 +59,22 @@ namespace Associativy.Controllers
 
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
-            return GraphShape(_associativyServices.Mind.GetAllAssociations());
+            return GraphShape<TGraphNodeViewModel>(_associativyServices.Mind.GetAllAssociations());
         }
 
         //[HttpPost]
-        public ActionResult ShowAssociations()
+        protected ActionResult ShowAssociations<TGraphNodeViewModel>()
+            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
         {
             var useSimpleAlgorithm = false;
 
             var viewModel = new SearchViewModel();
             TryUpdateModel<SearchViewModel>(viewModel);
 
-            //if (ModelState.IsValid)
-            if (true)
+            if (ModelState.IsValid)
+            //if (true)
             {
-                var searched = new List<TNodePart>();
+                var searched = new List<TNodePart>(viewModel.TermsArray.Length);
                 foreach (var term in viewModel.TermsArray)
                 {
                     var node = _associativyServices.NodeManager.Get(term);
@@ -80,18 +82,18 @@ namespace Associativy.Controllers
                     searched.Add(node);
                 }
 
-                searched.Add(_associativyServices.NodeManager.Get("tűz")); // 26
-                searched.Add(_associativyServices.NodeManager.Get("víz")); // 22
+                //searched.Add(_associativyServices.NodeManager.Get("tűz")); // 26
+                //searched.Add(_associativyServices.NodeManager.Get("víz")); // 22
+                //searched.Add(_associativyServices.NodeManager.Get("levegő")); // 30
                 //searched.Add(_associativyServices.NodeManager.Get("autó")); // 36
 
                 var associationsGraph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
 
                 if (associationsGraph != null)
                 {
-                    var terms = String.Join<string>(", ", viewModel.TermsArray);
-                    _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", terms).ToString();
+                    _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
-                    return GraphShape(_associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm));
+                    return GraphShape<TGraphNodeViewModel>(_associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm));
                 }
                 else
                 {
@@ -119,18 +121,48 @@ namespace Associativy.Controllers
             return Json(_associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
         }
 
-        protected ShapeResult GraphShape(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
+        // No performance loss because the solution is cached after ShowAssociations()
+        public JsonResult FetchAssociations()
         {
-            var viewEdges = new List<GraphEdgeViewModel>();
+            //var z = new List<GraphNodeViewModel>();
+            //z.Add(new GraphNodeViewModel() { Id = 2, Label = "kkk", NeighbourIds = new List<int>() { 9, 5 } });
+            //z.Add(new GraphNodeViewModel() { Id = 5, Label = "sdafsdfdsf", NeighbourIds = new List<int>() { 9, 2 } });
+            //return Json(z, JsonRequestBehavior.AllowGet);
+            return null;
+        }
+
+        protected ShapeResult GraphShape<TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
+            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
+        {
+            var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
+
             var edges = graph.Edges.ToList();
             foreach (var edge in edges)
             {
-                viewEdges.Add(new GraphEdgeViewModel { SourceLabel = edge.Source.Label, TargetLabel = edge.Target.Label });
+                if (!viewNodes.ContainsKey(edge.Source.Id))
+                {
+                    viewNodes[edge.Source.Id] = new TGraphNodeViewModel();
+                    viewNodes[edge.Source.Id].MapFromNode(edge.Source);
+                }
+                viewNodes[edge.Source.Id].NeighbourIds.Add(edge.Target.Id);
+
+                if (!viewNodes.ContainsKey(edge.Target.Id))
+                {
+                    viewNodes[edge.Target.Id] = new TGraphNodeViewModel();
+                    viewNodes[edge.Target.Id].MapFromNode(edge.Target);
+                }
+                viewNodes[edge.Target.Id].NeighbourIds.Add(edge.Source.Id);
             }
 
-            var viewNodes = graph.Vertices.Select(node => node.Label).ToList<string>();
 
-            return new ShapeResult(this, _orchardServices.New.AssociationsGraph(Nodes: viewNodes, Edges: viewEdges));
+            var z = new GraphNodeViewModel<TNodePart>();
+            var s = z as IGraphNodeViewModel;
+
+            var cc = new Dictionary<int, GraphNodeViewModel<TNodePart>>(graph.VertexCount);
+            var sfasf = (Dictionary<int, IGraphNodeViewModel>)cc;
+            var sdf = viewNodes as Dictionary<int, IGraphNodeViewModel>;
+
+            return new ShapeResult(this, _orchardServices.New.AssociationsGraph(Nodes: viewNodes));
         }
     }
 }

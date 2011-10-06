@@ -15,22 +15,22 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        private readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
+        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
         public IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> ConnectionManager
         {
-            get { return _connectionManager; }
+            get { return connectionManager; }
         }
 
-        private readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _mind;
+        protected readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind;
         public IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind
         {
-            get { return _mind; }
+            get { return mind; }
         }
 
-        private readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
         public INodeManager<TNodePart, TNodePartRecord> NodeManager
         {
-            get { return _nodeManager; }
+            get { return nodeManager; }
         }
 
         public AssociativyServices(
@@ -38,9 +38,9 @@ namespace Associativy.Services
             IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
-            _connectionManager = connectionManager;
-            _nodeManager = nodeManager;
-            _mind = mind;
+            this.connectionManager = connectionManager;
+            this.nodeManager = nodeManager;
+            this.mind = mind;
         }
     }
 }

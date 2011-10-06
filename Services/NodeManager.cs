@@ -20,41 +20,41 @@ namespace Associativy.Services
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
     {
-        protected readonly IContentManager _contentManager;
-        protected readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
+        protected readonly IContentManager contentManager;
+        protected readonly IRepository<TNodePartRecord> nodePartRecordRepository;
 
         public NodeManager(
             IContentManager contentManager,
             IRepository<TNodePartRecord> nodePartRecordRepository)
         {
-            _contentManager = contentManager;
-            _nodePartRecordRepository = nodePartRecordRepository;
+            this.contentManager = contentManager;
+            this.nodePartRecordRepository = nodePartRecordRepository;
         }
 
         public IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
-            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
+            return nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
         #region Node CRUD
         public IContentQuery<TNodePart, TNodePartRecord> ContentQuery
         {
-            get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
+            get { return contentManager.Query<TNodePart, TNodePartRecord>(); }
         }
 
         public TNodePart Create(INodeParams<TNodePart> nodeParams)
         {
-            var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
-            nodeParams.MapToPart(node);
-            _contentManager.Create(node);
+            var node = contentManager.New<TNodePart>(nodeParams.ContentTypeName);
+            nodeParams.MapToNode(node);
+            contentManager.Create(node);
 
             return node;
         }
 
         public TNodePart Get(int id)
         {
-            return _contentManager.Get<TNodePart>(id);
+            return contentManager.Get<TNodePart>(id);
         }
 
         public TNodePart Get(string label)
@@ -75,8 +75,8 @@ namespace Associativy.Services
             var node = Get(nodeParams.Id);
             if (node != null)
             {
-                nodeParams.MapToPart(node);
-                _contentManager.Flush();
+                nodeParams.MapToNode(node);
+                contentManager.Flush();
             }
 
             return node;
@@ -86,7 +86,7 @@ namespace Associativy.Services
         {
             if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
 
-            _contentManager.Flush();
+            contentManager.Flush();
 
             return node;
         }
@@ -95,7 +95,7 @@ namespace Associativy.Services
         {
             // delete connection
 
-            _contentManager.Remove(_contentManager.Get(id));
+            contentManager.Remove(contentManager.Get(id));
         }
         #endregion
     }

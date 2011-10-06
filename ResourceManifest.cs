@@ -1,7 +1,8 @@
 using Orchard.UI.Resources;
 using Orchard.Environment.Extensions;
 
-namespace Piedone.Facebook.Suite {
+namespace Associativy
+{
     [OrchardFeature("Associativy")]
     public class ResourceManifest : IResourceManifestProvider {
         public void BuildManifests(ResourceManifestBuilder builder) {
