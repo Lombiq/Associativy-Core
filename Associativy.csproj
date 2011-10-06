@@ -129,10 +129,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Placement.info" />
-    <Content Include="Views\DraculaAssociationsGraph.cshtml" />
+    <Content Include="Views\Graphs.Dracula.cshtml" />
+    <Content Include="Views\Graphs.JIT.cshtml" />
+    <Content Include="Views\Graphs.NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\AssociationsGraph.cshtml" />
+    <Content Include="Views\Graphs.Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\SearchForm.cshtml" />

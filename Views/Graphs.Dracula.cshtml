@@ -1,21 +1,32 @@
 ﻿@{
     Script.Require("Dracula").AtHead();
+
     var nodes = Model.Nodes as Dictionary<int, Associativy.ViewModels.IGraphNodeViewModel>;
+    
+    // It is necessary to keep track of added edges so an edge is added only in one direction
+    var edgeRegister = new Dictionary<string, bool>(nodes.Count);
+    string edges = "";
 }
 
 <script type="text/javascript">
 $(document).ready(function(){
 	var g = new Graph();
-
     @foreach (var nodeItem in nodes)
     {
         var node = nodeItem.Value;
         @: g.addNode("@node.Id", { label : "@Html.Raw(node.Label)" }); @*Without Html.Raw() the output would be encoded, non-ASCII characters too*@
         foreach (var id in node.NeighbourIds)
         {
-            @: g.addEdge("@node.Id", "@id");
+            var key = Math.Min(node.Id, id).ToString() + " " + Math.Max(node.Id, id).ToString();
+            if (!edgeRegister.ContainsKey(key))
+            {
+                edgeRegister[key] = true;
+                edges += "g.addEdge(\"" + node.Id + "\", \"" + id + "\");";
+            }
         }
     }
+
+    @Html.Raw(edges);
 	
 	var layouter = new Graph.Layout.Spring(g);
 	layouter.layout();

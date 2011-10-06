@@ -17,7 +17,7 @@ namespace Associativy.Drivers
         {
             return ContentShape("Parts_SearchForm",
                                 () => shapeHelper.Parts_SearchForm(
-                                                                ViewModel: new SearchViewModel()));
+                                                                ViewModel: new SearchViewModel() { Terms = part.Terms }));
         }
     }
 }

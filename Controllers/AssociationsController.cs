@@ -26,8 +26,8 @@ namespace Associativy.Controllers
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        private readonly TAssocociativyServices _associativyServices;
-        private readonly IOrchardServices _orchardServices;
+        protected readonly TAssocociativyServices associativyServices;
+        protected readonly IOrchardServices orchardServices;
 
         public Localizer T { get; set; }
 
@@ -35,8 +35,8 @@ namespace Associativy.Controllers
             TAssocociativyServices associativyService,
             IOrchardServices orchardServices)
         {
-            _associativyServices = associativyService;
-            _orchardServices = orchardServices;
+            this.associativyServices = associativyService;
+            this.orchardServices = orchardServices;
 
             T = NullLocalizer.Instance;
         }
@@ -47,22 +47,23 @@ namespace Associativy.Controllers
             var sw = new Stopwatch();
             sw.Start();
 
-            // Vagy lehetne egyszerűen átadni az egész gráfot? A generics miatt bajos lehet
-            //foreach (var edge in graph.Edges)
-            //{
-            //    edge.Source.Label
-            //        edge.Target.Label
-            //}
-
             sw.Stop();
             var x = sw.ElapsedMilliseconds;
 
-            _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
+            orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
-            return GraphShape<TGraphNodeViewModel>(_associativyServices.Mind.GetAllAssociations());
+            return GraphResultShape(
+                        SearchFormShape(
+                            new SearchViewModel()
+                        ),
+                        GraphShape<TGraphNodeViewModel>(
+                            associativyServices.Mind.GetAllAssociations()
+                        )
+                        );
+
+            //return GraphShape<TGraphNodeViewModel>(associativyServices.Mind.GetAllAssociations());
         }
 
-        //[HttpPost]
         protected ActionResult ShowAssociations<TGraphNodeViewModel>()
             where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
         {
@@ -77,8 +78,8 @@ namespace Associativy.Controllers
                 var searched = new List<TNodePart>(viewModel.TermsArray.Length);
                 foreach (var term in viewModel.TermsArray)
                 {
-                    var node = _associativyServices.NodeManager.Get(term);
-                    if (node == null) return AssociationsNotFound();
+                    var node = associativyServices.NodeManager.Get(term);
+                    if (node == null) return AssociationsNotFound(viewModel);
                     searched.Add(node);
                 }
 
@@ -87,17 +88,21 @@ namespace Associativy.Controllers
                 //searched.Add(_associativyServices.NodeManager.Get("levegő")); // 30
                 //searched.Add(_associativyServices.NodeManager.Get("autó")); // 36
 
-                var associationsGraph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
+                var associationsGraph = associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
 
                 if (associationsGraph != null)
                 {
-                    _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
+                    orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
-                    return GraphShape<TGraphNodeViewModel>(_associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm));
+                    return GraphResultShape(
+                        SearchFormShape(viewModel), 
+                        GraphShape<TGraphNodeViewModel>(associationsGraph)
+                        );
+                    //return GraphShape<TGraphNodeViewModel>(associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm));
                 }
                 else
                 {
-                    return AssociationsNotFound();
+                    return AssociationsNotFound(viewModel);
                 }
             }
             else
@@ -111,17 +116,18 @@ namespace Associativy.Controllers
             }
         }
 
-        protected ActionResult AssociationsNotFound()
+        protected ActionResult AssociationsNotFound(SearchViewModel viewModel)
         {
-            return null;
+            return new ShapeResult(this, orchardServices.New.Graphs_NotFound(ViewModel: viewModel));
         }
 
         public JsonResult FetchSimilarTerms(string term)
         {
-            return Json(_associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
+            return Json(associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
         }
 
-        // No performance loss because the solution is cached after ShowAssociations()
+        // No performance loss if with the same params as ShowAssociations because the solution 
+        // is cached after ShowAssociations()
         public JsonResult FetchAssociations()
         {
             //var z = new List<GraphNodeViewModel>();
@@ -129,6 +135,15 @@ namespace Associativy.Controllers
             //z.Add(new GraphNodeViewModel() { Id = 5, Label = "sdafsdfdsf", NeighbourIds = new List<int>() { 9, 2 } });
             //return Json(z, JsonRequestBehavior.AllowGet);
             return null;
+        }
+
+        protected ShapeResult GraphResultShape(ShapeResult searchFormShape, ShapeResult graphShape)
+        {
+            return new ShapeResult(this, 
+                orchardServices.New.Graphs_Result(
+                SearchForm: searchFormShape,
+                Graph: graphShape)
+                );
         }
 
         protected ShapeResult GraphShape<TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
@@ -154,15 +169,32 @@ namespace Associativy.Controllers
                 viewNodes[edge.Target.Id].NeighbourIds.Add(edge.Source.Id);
             }
 
+            // Necessary as shapes and views can't be generic. The nodes can be casted to the
+            // appropriate type as necessary.
+            var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
 
-            var z = new GraphNodeViewModel<TNodePart>();
-            var s = z as IGraphNodeViewModel;
+            // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
+            // plugin gráfmegjelenítőknek? Delegate?
+            return new ShapeResult(this, orchardServices.New.Graphs_Dracula(Nodes: nodes));
 
-            var cc = new Dictionary<int, GraphNodeViewModel<TNodePart>>(graph.VertexCount);
-            var sfasf = (Dictionary<int, IGraphNodeViewModel>)cc;
-            var sdf = viewNodes as Dictionary<int, IGraphNodeViewModel>;
+            //var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
+            //var searchForm = orchardServices.ContentManager.BuildDisplay(
+            //    searchFormPart
+            //    );
 
-            return new ShapeResult(this, _orchardServices.New.AssociationsGraph(Nodes: viewNodes));
+            //return new ShapeResult(this, orchardServices.New.Graphs_Default(SearchForm: searchForm, Nodes: nodes));
+        }
+
+        protected ShapeResult SearchFormShape(SearchViewModel searchViewModel)
+        {
+            var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
+            searchFormPart.Terms = searchViewModel.Terms;
+
+            return new ShapeResult(this, 
+                orchardServices.ContentManager.BuildDisplay(
+                    searchFormPart
+                    )
+                );
         }
     }
 }
