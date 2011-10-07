@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Orchard.Themes;
 using Orchard;
@@ -31,7 +30,7 @@ namespace Associativy.Controllers
 
         public Localizer T { get; set; }
 
-        public AssociationsController(
+        protected AssociationsController(
             TAssocociativyServices associativyService,
             IOrchardServices orchardServices)
         {
@@ -44,24 +43,16 @@ namespace Associativy.Controllers
         protected ActionResult ShowWholeGraph<TGraphNodeViewModel>()
             where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-
-            sw.Stop();
-            var x = sw.ElapsedMilliseconds;
-
             orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
             return GraphResult(
-                        SearchFormShape(
-                            new SearchViewModel()
-                        ),
-                        GraphShape<TGraphNodeViewModel>(
-                            associativyServices.Mind.GetAllAssociations()
-                        )
-                        );
-
-            //return GraphShape<TGraphNodeViewModel>(associativyServices.Mind.GetAllAssociations());
+                    SearchFormShape(
+                        new SearchViewModel()
+                    ),
+                    GraphShape<TGraphNodeViewModel>(
+                        associativyServices.Mind.GetAllAssociations()
+                    )
+                );
         }
 
         protected ActionResult ShowAssociations<TGraphNodeViewModel>()
@@ -70,7 +61,7 @@ namespace Associativy.Controllers
             var useSimpleAlgorithm = false;
 
             var viewModel = new SearchViewModel();
-            TryUpdateModel<SearchViewModel>(viewModel);
+            TryUpdateModel(viewModel);
 
             if (ModelState.IsValid)
             //if (true)
@@ -87,18 +78,20 @@ namespace Associativy.Controllers
                 //searched.Add(_associativyServices.NodeManager.Get("víz")); // 22
                 //searched.Add(_associativyServices.NodeManager.Get("levegő")); // 30
                 //searched.Add(_associativyServices.NodeManager.Get("autó")); // 36
-
+                var sw = new Stopwatch();
+                sw.Start();
                 var associationsGraph = associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
+                sw.Stop();
+                var x = sw.ElapsedMilliseconds;
 
                 if (associationsGraph != null)
                 {
                     orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
                     return GraphResult(
-                        SearchFormShape(viewModel), 
+                        SearchFormShape(viewModel),
                         GraphShape<TGraphNodeViewModel>(associationsGraph)
                         );
-                    //return GraphShape<TGraphNodeViewModel>(associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm));
                 }
                 else
                 {
@@ -122,7 +115,6 @@ namespace Associativy.Controllers
                     SearchFormShape(viewModel),
                     orchardServices.New.Graphs_NotFound(ViewModel: viewModel)
                 );
-            //return new ShapeResult(this, orchardServices.New.Graphs_NotFound(ViewModel: viewModel));
         }
 
         public JsonResult FetchSimilarTerms(string term)
@@ -143,7 +135,6 @@ namespace Associativy.Controllers
 
         protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
         {
-            // Ezt view nélkül jó lenne esetleg, bár nem biztos
             return new ShapeResult(this,
                 orchardServices.New.Graphs_Result(
                     SearchForm: searchFormShape,

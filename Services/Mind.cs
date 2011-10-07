@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.Models;
 using QuickGraph;
-using Orchard.Data;
 using Orchard.Services;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
@@ -67,7 +65,7 @@ namespace Associativy.Services
 
             var nodes = nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
 
-            foreach (var node in nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id))
+            foreach (var node in nodeManager.ContentQuery.List().ToDictionary(node => node.Id))
             {
                 graph.AddVertex(node.Value);
             }
@@ -142,10 +140,12 @@ namespace Associativy.Services
             var commonNeighbourIds = connectionManager.GetNeighbourIds(nodes[0].Id);
             var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
-            foreach (var node in remainingNodes)
-            {
-                commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
-            }
+            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList());
+            // Same as
+            //foreach (var node in remainingNodes)
+            //{
+            //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
+            //}
 
             if (commonNeighbourIds.Count == 0) return null;
 
@@ -170,9 +170,8 @@ namespace Associativy.Services
             List<List<int>> succeededPaths;
             
             var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
-
+            
             if (allPairSucceededPaths.Count == 0) return null;
-
 
             if (nodes.Count == 2)
             {
@@ -186,13 +185,12 @@ namespace Associativy.Services
                 nodes.ToList().ForEach(
                         node => searchedNodeIds.Add(node.Id)
                     );
+
                 var commonSucceededNodeIds = GetSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
 
-
-                int n;
                 for (int i = 0; i < nodes.Count - 1; i++)
                 {
-                    n = i + 1;
+                    int n = i + 1;
                     if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
 
                     while (n < nodes.Count)
@@ -232,7 +230,7 @@ namespace Associativy.Services
 
         private Dictionary<int, TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
         {
-            return nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary<TNodePart, int>(node => node.Id);
+            return nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
         }
 
         private List<int> GetSucceededNodeIds(List<List<int>> succeededPaths)
@@ -245,7 +243,7 @@ namespace Associativy.Services
         #region CalculatePaths() auxiliary classes
         private class PathNode
         {
-            public int Id { get; set; }
+            public int Id { get; private set; }
             public int MinimumDepth { get; set; }
             public bool IsDeadEnd { get; set; }
             public List<PathNode> Neighbours { get; set; }
@@ -396,8 +394,7 @@ namespace Associativy.Services
                             if (neighbour.Id == targetId)
                             {
                                 found = true;
-                                var succeededPath = new List<int>(currentPath); // Since we will use currentPath in further iterations too
-                                succeededPath.Add(targetId);
+                                var succeededPath = new List<int>(currentPath) { targetId }; // Since we will use currentPath in further iterations too
                                 succeededPaths.Add(succeededPath);
                                 // if ($this->debugMode) echo "##found from ".$node->loadById($currentNode->id)->notion."\n";
                             }
