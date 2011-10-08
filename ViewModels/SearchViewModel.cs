@@ -23,7 +23,7 @@ namespace Associativy.ViewModels
                 if (value != null)
                 {
                     termsArray = value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    termsArray = (from p in termsArray select p.Trim()).ToArray();
+                    termsArray = (from p in termsArray where p.Trim() != "" select p.Trim()).ToArray();
                 }
                 terms = value;
             }

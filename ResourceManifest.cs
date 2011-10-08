@@ -11,8 +11,7 @@ namespace Associativy
             
             manifest.DefineScript("Raphael").SetUrl("Dracula/raphael-min.js");
             manifest.DefineScript("DraculaGraffle").SetUrl("Dracula/dracula_graffle.js");
-            manifest.DefineScript("DraculaGraph").SetUrl("Dracula/dracula_graph.js");
-            manifest.DefineScript("Dracula").SetDependencies(new string[] {"jQuery", "Raphael", "DraculaGraffle", "DraculaGraph"});
+            manifest.DefineScript("Dracula").SetUrl("Dracula/dracula_graph.js").SetDependencies(new string[] { "jQuery", "Raphael", "DraculaGraffle" });
         }
     }
 }
