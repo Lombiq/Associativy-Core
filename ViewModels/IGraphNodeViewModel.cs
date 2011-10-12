@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
-using Associativy.Models;
+﻿using System;
 
 namespace Associativy.ViewModels
 {
-    public interface IGraphNodeViewModel: INode
+    public interface IGraphNodeViewModel
     {
-        IList<int> NeighbourIds { get; set; }
+        int Id { get; set; }
+        string Label { get; set; }
+        System.Collections.Generic.IList<int> NeighbourIds { get; set; }
+    }
+
+    public interface IGraphNodeViewModel<TNode> : IGraphNodeViewModel
+     where TNode : Associativy.Models.INode
+    {
+        TNode Node { get; set; }
+        void MapFromNode(TNode node);
     }
 }

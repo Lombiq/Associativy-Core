@@ -121,9 +121,10 @@
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
-    <Compile Include="ViewModels\GraphEdgeViewModel.cs" />
     <Compile Include="ViewModels\GraphNodeViewModel.cs" />
+    <Compile Include="ViewModels\GraphResultViewModel.cs" />
     <Compile Include="ViewModels\IGraphNodeViewModel.cs" />
+    <Compile Include="ViewModels\IGraphResultViewModel.cs" />
     <Compile Include="ViewModels\JITGraphNodeViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
   </ItemGroup>

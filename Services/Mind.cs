@@ -58,21 +58,22 @@ namespace Associativy.Services
                     {
                         ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
                         return GetAllAssociations(zoomLevel, false);
-                    }); 
+                    });
             }
 
-            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            var graph = GraphFactory();
 
             var nodes = nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
 
-            foreach (var node in nodeManager.ContentQuery.List().ToDictionary(node => node.Id))
+            foreach (var node in nodes)
             {
                 graph.AddVertex(node.Value);
             }
 
-            foreach (var connection in connectionManager.GetAll())
+            var connections = connectionManager.GetAll();
+            for (int i = 0; i < connections.Count; i++)
             {
-                graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
+                graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connections[i].Record1Id], nodes[connections[i].Record2Id]));
             }
 
             // Leaves out nodes that don't have any neighbours
@@ -94,7 +95,7 @@ namespace Associativy.Services
                     {
                         ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
                         return MakeAssociations(nodes, simpleAlgorithm, zoomLevel, false);
-                    }); 
+                    });
             }
 
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
@@ -119,13 +120,14 @@ namespace Associativy.Services
 
         private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
         {
-            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            var graph = GraphFactory();
 
             graph.AddVertex(node);
 
-            foreach (var currentNode in nodeManager.GetMany(connectionManager.GetNeighbourIds(node.Id)))
+            var nodes = nodeManager.GetMany(connectionManager.GetNeighbourIds(node.Id));
+            for (int i = 0; i < nodes.Count; i++)
             {
-                graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, currentNode));
+                graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, nodes[i]));
             }
 
             return graph;
@@ -135,7 +137,7 @@ namespace Associativy.Services
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
-            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            var graph = GraphFactory();
 
             var commonNeighbourIds = connectionManager.GetNeighbourIds(nodes[0].Id);
             var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
@@ -151,11 +153,11 @@ namespace Associativy.Services
 
             var commonNeighbours = nodeManager.GetMany(commonNeighbourIds);
 
-            foreach (var node in nodes)
+            for (int i = 0; i < nodes.Count; i++)
             {
-                foreach (var neighbour in commonNeighbours)
+                for (int n = 0; n < commonNeighbours.Count; n++)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, neighbour));
+                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(nodes[i], commonNeighbours[n]));
                 }
             }
 
@@ -166,11 +168,11 @@ namespace Associativy.Services
         {
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
-            var graph = new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            var graph = GraphFactory();
             List<List<int>> succeededPaths;
-            
+
             var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
-            
+
             if (allPairSucceededPaths.Count == 0) return null;
 
             if (nodes.Count == 2)
@@ -206,11 +208,13 @@ namespace Associativy.Services
                 if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return null;
 
                 succeededPaths = new List<List<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
+
                 foreach (var path in allPairSucceededPaths)
                 {
                     var succeededPath = path.Intersect(commonSucceededNodeIds);
                     if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath.ToList()); // Only paths where intersecting nodes are present
                 }
+
                 if (succeededPaths.Count == 0) return null;
             }
 
@@ -420,6 +424,11 @@ namespace Associativy.Services
 
 
             return succeededPaths;
+        }
+
+        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GraphFactory()
+        {
+            return new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
         }
     }
 }

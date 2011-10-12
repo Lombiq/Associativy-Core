@@ -8,12 +8,12 @@ using Orchard.Mvc;
 using Associativy.Services;
 using Associativy.Models;
 using Associativy.ViewModels;
-using System.Diagnostics;
 using Orchard.Localization;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 using QuickGraph;
+using Orchard.DisplayManagement;
 
 namespace Associativy.Controllers
 {
@@ -29,19 +29,23 @@ namespace Associativy.Controllers
         protected readonly IOrchardServices orchardServices;
 
         public Localizer T { get; set; }
+        dynamic Shape { get; set; }
 
         protected AssociationsController(
             TAssocociativyServices associativyService,
-            IOrchardServices orchardServices)
+            IOrchardServices orchardServices,
+            IShapeFactory shapeFactory)
         {
             this.associativyServices = associativyService;
             this.orchardServices = orchardServices;
 
             T = NullLocalizer.Instance;
+            Shape = shapeFactory;
         }
 
-        protected ActionResult ShowWholeGraph<TGraphNodeViewModel>()
-            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
+        protected ActionResult ShowWholeGraph<TGraphResultViewModel, TGraphNodeViewModel>()
+            where TGraphResultViewModel : IGraphResultViewModel, new()
+            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
         {
             orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
@@ -49,14 +53,15 @@ namespace Associativy.Controllers
                     SearchFormShape(
                         new SearchViewModel()
                     ),
-                    GraphShape<TGraphNodeViewModel>(
+                    GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(
                         associativyServices.Mind.GetAllAssociations()
                     )
                 );
         }
 
-        protected ActionResult ShowAssociations<TGraphNodeViewModel>()
-            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
+        protected ActionResult ShowAssociations<TGraphResultViewModel, TGraphNodeViewModel>()
+            where TGraphResultViewModel : IGraphResultViewModel, new()
+            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
         {
             var useSimpleAlgorithm = false;
 
@@ -74,15 +79,7 @@ namespace Associativy.Controllers
                     searched.Add(node);
                 }
 
-                //searched.Add(_associativyServices.NodeManager.Get("tűz")); // 26
-                //searched.Add(_associativyServices.NodeManager.Get("víz")); // 22
-                //searched.Add(_associativyServices.NodeManager.Get("levegő")); // 30
-                //searched.Add(_associativyServices.NodeManager.Get("autó")); // 36
-                var sw = new Stopwatch();
-                sw.Start();
                 var associationsGraph = associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
-                sw.Stop();
-                var x = sw.ElapsedMilliseconds;
 
                 if (associationsGraph != null)
                 {
@@ -90,7 +87,7 @@ namespace Associativy.Controllers
 
                     return GraphResult(
                         SearchFormShape(viewModel),
-                        GraphShape<TGraphNodeViewModel>(associationsGraph)
+                        GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(associationsGraph)
                         );
                 }
                 else
@@ -143,8 +140,9 @@ namespace Associativy.Controllers
                 );
         }
 
-        protected dynamic GraphShape<TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
-            where TGraphNodeViewModel : GraphNodeViewModel<TNodePart>, new()
+        protected dynamic GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
+            where TGraphResultViewModel : IGraphResultViewModel, new()
+            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
         {
             var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
 
@@ -168,11 +166,16 @@ namespace Associativy.Controllers
 
             // Necessary as shapes and views can't be generic. The nodes can be casted to the
             // appropriate type as necessary.
+
+            viewNodes.Cast<IGraphNodeViewModel>(); // Ez jó????????
+
             var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
 
             // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
             // plugin gráfmegjelenítőknek? Delegate?
-            return orchardServices.New.Graphs_Dracula(Nodes: nodes);
+            //return orchardServices.New.Graphs_Dracula(Nodes: nodes);
+            return Shape.Partial(TemplateName: "Graphs.Dracula", Model: new TGraphResultViewModel() { Nodes = nodes }, Prefix: null);
+
             //return new ShapeResult(this, orchardServices.New.Graphs_Dracula(Nodes: nodes));
 
             //var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");

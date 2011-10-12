@@ -5,12 +5,13 @@ using Orchard.Environment.Extensions;
 namespace Associativy.ViewModels
 {
     [OrchardFeature("Associativy")]
-    public class GraphNodeViewModel<TNode> : IGraphNodeViewModel // Ha ez mégsem lesz, akkor ide az INode kell
+    public class GraphNodeViewModel<TNode> : Associativy.ViewModels.IGraphNodeViewModel<TNode>
          where TNode : INode
     {
         public int Id { get; set; }
         public string Label { get; set; }
         public IList<int> NeighbourIds { get; set; }
+        public TNode Node { get; set; }
 
         public GraphNodeViewModel()
         {
