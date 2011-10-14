@@ -250,14 +250,12 @@ namespace Associativy.Services
         {
             public int Id { get; private set; }
             public int MinimumDepth { get; set; }
-            public bool IsDeadEnd { get; set; }
             public List<PathNode> Neighbours { get; set; }
 
             public PathNode(int id)
             {
                 Id = id;
                 MinimumDepth = int.MaxValue;
-                IsDeadEnd = false;
                 Neighbours = new List<PathNode>();
             }
         }
@@ -287,22 +285,21 @@ namespace Associativy.Services
                 });
             }
 
-            var found = false; // Maybe can be removed?
             var visitedNodes = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
-            var stack = new Stack<StackItem>();
+            var frontier = new Stack<StackItem>();
 
             visitedNodes[startId] = new PathNode(startId) { MinimumDepth = 0 };
-            stack.Push(new StackItem { Node = visitedNodes[startId] });
+            frontier.Push(new StackItem { Node = visitedNodes[startId] });
             visitedNodes[targetId] = new PathNode(targetId);
 
             StackItem stackItem;
             PathNode currentNode;
             List<int> currentPath;
             int currentDepth;
-            while (stack.Count != 0)
+            while (frontier.Count != 0)
             {
-                stackItem = stack.Pop();
+                stackItem = frontier.Pop();
                 currentNode = stackItem.Node;
                 currentPath = stackItem.Path;
                 currentPath.Add(currentNode.Id);
@@ -314,7 +311,6 @@ namespace Associativy.Services
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
-                        found = true;
                         if (visitedNodes[targetId].MinimumDepth > currentDepth + 1)
                         {
                             visitedNodes[targetId].MinimumDepth = currentDepth + 1;
@@ -323,26 +319,14 @@ namespace Associativy.Services
                         currentNode.Neighbours.Add(visitedNodes[targetId]);
                         currentPath.Add(targetId);
                         succeededPaths.Add(currentPath);
-                        // if ($this->debugMode) echo "##found from ".$node->loadById($currentNode->id)->notion."\n";
                     }
-                    // else if ($this->debugMode) echo "<<-maxdepth backtrack (not found in neighbours)\n";
                 }
                 // We can traverse the graph further
-                else if (!currentNode.IsDeadEnd)
+                else
                 {
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        // Measure performance with large datasets, as Parallel.ForEach tends to be slower
-                        //Parallel.ForEach(GetNeighbourIds(currentNode.Id), neighbourId =>
-                        //    {
-                        //        if (!visitedNodes.ContainsKey(neighbourId))
-                        //        {
-                        //            visitedNodes[neighbourId] = new GraphNode(neighbourId);
-                        //        }
-                        //        neighbours.Add(visitedNodes[neighbourId]);
-                        //    });
-
                         var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
                         foreach (var neighbourId in neighbourIds)
@@ -353,74 +337,31 @@ namespace Associativy.Services
                             }
                             currentNode.Neighbours.Add(visitedNodes[neighbourId]);
                         }
-
-                        // The only path to this node is where we have come from
-                        if (currentNode.Neighbours.Count == 1)
-                        {
-                            currentNode.IsDeadEnd = true;
-                            // if ($this->debugMode) echo "///dead end\n";
-                        }
                     }
 
-                    if (!currentNode.IsDeadEnd)
+                    foreach (var neighbour in currentNode.Neighbours)
                     {
-                        // Measure performance with large datasets, as Parallel.ForEach tends to be slower
-                        //Parallel.ForEach(neighbours, neighbourItem =>
-                        //    {
-                        //        var neighbour = neighbourItem.Value;
-                        //        currentNode.Neighbours[neighbour.Id] = neighbour;
-
-                        //        // Target is a neighbour
-                        //        if (neighbour.Id == targetId)
-                        //        {
-                        //            found = true;
-                        //            var succeededPath = new List<int>(currentPath); // Since we will use currentPath in further iterations too
-                        //            succeededPath.Add(targetId);
-                        //            succeededPaths.Add(succeededPath);
-                        //            // if ($this->debugMode) echo "##found from ".$node->loadById($currentNode->id)->notion."\n";
-                        //        }
-                        //        // We can traverse further, push the neighbour onto the stack
-                        //        else if (neighbour.Id != startId &&
-                        //            currentDepth + 1 + visitedNodes[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
-                        //        {
-                        //            neighbour.MinimumDepth = currentDepth + 1;
-                        //            stack.Push(new StackItem { Depth = currentDepth + 1, Path = currentPath, Node = neighbour });
-                        //        }
-
-                        //        // If this is the shortest path to the node, overwrite its minDepth
-                        //        if (neighbour.Id != startId && neighbour.MinimumDepth > currentDepth + 1)
-                        //        {
-                        //            neighbour.MinimumDepth = currentDepth + 1;
-                        //        }
-                        //    });
-                        foreach (var neighbour in currentNode.Neighbours)
+                        // Target is a neighbour
+                        if (neighbour.Id == targetId)
                         {
-                            // Target is a neighbour
-                            if (neighbour.Id == targetId)
-                            {
-                                found = true;
-                                var succeededPath = new List<int>(currentPath) { targetId }; // Since we will use currentPath in further iterations too
-                                succeededPaths.Add(succeededPath);
-                                // if ($this->debugMode) echo "##found from ".$node->loadById($currentNode->id)->notion."\n";
-                            }
-                            // We can traverse further, push the neighbour onto the stack
-                            else if (neighbour.Id != startId &&
-                                currentDepth + 1 + visitedNodes[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
-                            {
-                                neighbour.MinimumDepth = currentDepth + 1;
-                                stack.Push(new StackItem { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
-                            }
+                            var succeededPath = new List<int>(currentPath) { targetId }; // Since we will use currentPath in further iterations too
+                            succeededPaths.Add(succeededPath);
+                        }
+                        // We can traverse further, push the neighbour onto the stack
+                        else if (neighbour.Id != startId &&
+                            currentDepth + 1 + visitedNodes[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
+                        {
+                            neighbour.MinimumDepth = currentDepth + 1;
+                            frontier.Push(new StackItem { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
+                        }
 
-                            // If this is the shortest path to the node, overwrite its minDepth
-                            if (neighbour.Id != startId && neighbour.MinimumDepth > currentDepth + 1)
-                            {
-                                neighbour.MinimumDepth = currentDepth + 1;
-                            }
+                        // If this is the shortest path to the node, overwrite its minDepth
+                        if (neighbour.Id != startId && neighbour.MinimumDepth > currentDepth + 1)
+                        {
+                            neighbour.MinimumDepth = currentDepth + 1;
                         }
                     }
-
                 }
-                // else if ($this->debugMode) echo "///was a dead end\n";
             }
 
 
