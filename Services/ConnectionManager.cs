@@ -15,6 +15,7 @@ namespace Associativy.Services
     /// <typeparam name="TNodePartRecord"></typeparam>
     /// <typeparam name="TNodeToNodeConnectorRecord"></typeparam>
     [OrchardFeature("Associativy")]
+    // Önmagában nem kellene a TNodePartRecord és a TNodePart is csak az Add-nél
     public class ConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode

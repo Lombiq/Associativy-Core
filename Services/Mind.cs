@@ -18,6 +18,7 @@ namespace Associativy.Services
     /// <typeparam name="TNodePartRecord"></typeparam>
     /// <typeparam name="TNodeToNodeConnectorRecord"></typeparam>
     [OrchardFeature("Associativy")]
+    // Önmagában csak a TNodePart kellene
     public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode

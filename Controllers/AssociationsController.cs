@@ -132,11 +132,19 @@ namespace Associativy.Controllers
 
         protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
         {
+            dynamic model = new ExpandoObject();
+            model.SearchForm = searchFormShape;
+            model.Result = resultShape;
+
             return new ShapeResult(this,
-                orchardServices.New.Graphs_Result(
-                    SearchForm: searchFormShape,
-                    Result: resultShape
-                    )
+                Shape.DisplayTemplate(
+                    TemplateName: "Graphs/Result", 
+                    Model: model, 
+                    Prefix: null)
+                //orchardServices.New.Graphs_Result(
+                //    SearchForm: searchFormShape,
+                //    Result: resultShape
+                //    )
                 );
         }
 
@@ -166,24 +174,12 @@ namespace Associativy.Controllers
 
             // Necessary as shapes and views can't be generic. The nodes can be casted to the
             // appropriate type as necessary.
-
-            viewNodes.Cast<IGraphNodeViewModel>(); // Ez jó????????
-
             var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
 
             // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
             // plugin gráfmegjelenítőknek? Delegate?
             //return orchardServices.New.Graphs_Dracula(Nodes: nodes);
-            return Shape.Partial(TemplateName: "Graphs.Dracula", Model: new TGraphResultViewModel() { Nodes = nodes }, Prefix: null);
-
-            //return new ShapeResult(this, orchardServices.New.Graphs_Dracula(Nodes: nodes));
-
-            //var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
-            //var searchForm = orchardServices.ContentManager.BuildDisplay(
-            //    searchFormPart
-            //    );
-
-            //return new ShapeResult(this, orchardServices.New.Graphs_Default(SearchForm: searchForm, Nodes: nodes));
+            return Shape.DisplayTemplate(TemplateName: "Graphs/DisplayEngines/Dracula", Model: new TGraphResultViewModel() { Nodes = nodes }, Prefix: null);
         }
 
         protected dynamic SearchFormShape(SearchViewModel searchViewModel)
@@ -194,12 +190,6 @@ namespace Associativy.Controllers
             return orchardServices.ContentManager.BuildDisplay(
                     searchFormPart
                     );
-
-            //return new ShapeResult(this, 
-            //    orchardServices.ContentManager.BuildDisplay(
-            //        searchFormPart
-            //        )
-            //    );
         }
     }
 }
