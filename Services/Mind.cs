@@ -291,19 +291,19 @@ namespace Associativy.Services
 
             explored[startId] = new PathNode(startId) { MinDistance = 0 };
             frontier.Push(new FrontierNode { Node = explored[startId] });
-            explored[targetId] = new PathNode(targetId);
+            explored[targetId] = new PathNode(targetId); // Theoretically incorrect, but convenient, as we don't have to add the target later
 
-            FrontierNode stackItem;
+            FrontierNode frontierNode;
             PathNode currentNode;
             List<int> currentPath;
             int currentDepth;
             while (frontier.Count != 0)
             {
-                stackItem = frontier.Pop();
-                currentNode = stackItem.Node;
-                currentPath = stackItem.Path;
+                frontierNode = frontier.Pop();
+                currentNode = frontierNode.Node;
+                currentPath = frontierNode.Path;
                 currentPath.Add(currentNode.Id);
-                currentDepth = stackItem.Depth;
+                currentDepth = frontierNode.Depth;
 
                 // We can't traverse the graph further
                 if (currentDepth == maxDistance - 1)
