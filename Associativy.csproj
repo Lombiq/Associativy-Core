@@ -133,6 +133,7 @@
     <Content Include="Views\DisplayTemplates\Graphs\DisplayEngines\Dracula.cshtml" />
     <Content Include="Views\DisplayTemplates\Graphs\DisplayEngines\JIT.cshtml" />
     <Content Include="Views\DisplayTemplates\Graphs\NotFound.cshtml" />
+    <Content Include="Views\Graphs.Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\Graphs\Result.cshtml" />

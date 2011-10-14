@@ -132,19 +132,19 @@ namespace Associativy.Controllers
 
         protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
         {
-            dynamic model = new ExpandoObject();
-            model.SearchForm = searchFormShape;
-            model.Result = resultShape;
+            //dynamic model = new ExpandoObject();
+            //model.SearchForm = searchFormShape;
+            //model.Result = resultShape;
 
             return new ShapeResult(this,
-                Shape.DisplayTemplate(
-                    TemplateName: "Graphs/Result", 
-                    Model: model, 
-                    Prefix: null)
-                //orchardServices.New.Graphs_Result(
-                //    SearchForm: searchFormShape,
-                //    Result: resultShape
-                //    )
+                //Shape.DisplayTemplate(
+                //    TemplateName: "Graphs/Result", 
+                //    Model: model, 
+                //    Prefix: null)
+                orchardServices.New.Graphs_Result(
+                    SearchForm: searchFormShape,
+                    Result: resultShape
+                    )
                 );
         }
 
