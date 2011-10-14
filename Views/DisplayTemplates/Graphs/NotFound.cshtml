@@ -1,5 +1,3 @@
-﻿@{
-    var viewModel = Model.ViewModel as Associativy.ViewModels.SearchViewModel;
-}
+﻿@model Associativy.ViewModels.ISearchViewModel
 
-@T("No associations found for {0}", viewModel.Terms)
+@T("No associations found for {0}", Model.Terms)

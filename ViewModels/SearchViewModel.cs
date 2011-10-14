@@ -2,11 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System;
 using System.Linq;
+using System.Web.Routing;
 
 namespace Associativy.ViewModels
 {
     [OrchardFeature("Associativy")]
-    public class SearchViewModel
+    public class SearchViewModel : ISearchViewModel
     {
         private string terms;
 
@@ -38,5 +39,8 @@ namespace Associativy.ViewModels
                 return termsArray;
             }
         }
+
+        public RouteValueDictionary PostRouteValueDictionary { get; set; }
+        public string FetchUrl { get; set; }
     }
 }

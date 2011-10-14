@@ -125,6 +125,7 @@
     <Compile Include="ViewModels\GraphResultViewModel.cs" />
     <Compile Include="ViewModels\IGraphNodeViewModel.cs" />
     <Compile Include="ViewModels\IGraphResultViewModel.cs" />
+    <Compile Include="ViewModels\ISearchViewModel.cs" />
     <Compile Include="ViewModels\JITGraphNodeViewModel.cs" />
     <Compile Include="ViewModels\SearchViewModel.cs" />
   </ItemGroup>
@@ -134,9 +135,6 @@
     <Content Include="Views\DisplayTemplates\Graphs\DisplayEngines\JIT.cshtml" />
     <Content Include="Views\DisplayTemplates\Graphs\NotFound.cshtml" />
     <Content Include="Views\Graphs.Result.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\DisplayTemplates\Graphs\Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\SearchForm.cshtml" />
