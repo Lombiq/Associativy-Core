@@ -291,7 +291,6 @@ namespace Associativy.Services
 
             explored[startId] = new PathNode(startId) { MinDistance = 0 };
             frontier.Push(new FrontierNode { Node = explored[startId] });
-            explored[targetId] = new PathNode(targetId); // Theoretically incorrect, but convenient, as we don't have to add the target later
 
             FrontierNode frontierNode;
             PathNode currentNode;
