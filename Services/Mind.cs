@@ -249,24 +249,24 @@ namespace Associativy.Services
         private class PathNode
         {
             public int Id { get; private set; }
-            public int MinimumDepth { get; set; }
+            public int MinDistance { get; set; }
             public List<PathNode> Neighbours { get; set; }
 
             public PathNode(int id)
             {
                 Id = id;
-                MinimumDepth = int.MaxValue;
+                MinDistance = int.MaxValue;
                 Neighbours = new List<PathNode>();
             }
         }
 
-        private class StackItem
+        private class FrontierNode
         {
             public int Depth { get; set; }
             public List<int> Path { get; set; }
             public PathNode Node { get; set; }
 
-            public StackItem()
+            public FrontierNode()
             {
                 Depth = 0;
                 Path = new List<int>();
@@ -274,26 +274,26 @@ namespace Associativy.Services
         }
         #endregion
 
-        private List<List<int>> CalculatePaths(int startId, int targetId, int maxDepth = 3, bool useCache = true)
+        private List<List<int>> CalculatePaths(int startId, int targetId, int maxDistance = 3, bool useCache = true)
         {
             if (useCache)
             {
-                return cacheManager.Get(startId.ToString() + targetId.ToString() + maxDepth.ToString(), ctx =>
+                return cacheManager.Get(startId.ToString() + targetId.ToString() + maxDistance.ToString(), ctx =>
                 {
                     ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
-                    return CalculatePaths(startId, targetId, maxDepth, false);
+                    return CalculatePaths(startId, targetId, maxDistance, false);
                 });
             }
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
-            var frontier = new Stack<StackItem>();
+            var frontier = new Stack<FrontierNode>();
 
-            explored[startId] = new PathNode(startId) { MinimumDepth = 0 };
-            frontier.Push(new StackItem { Node = explored[startId] });
+            explored[startId] = new PathNode(startId) { MinDistance = 0 };
+            frontier.Push(new FrontierNode { Node = explored[startId] });
             explored[targetId] = new PathNode(targetId);
 
-            StackItem stackItem;
+            FrontierNode stackItem;
             PathNode currentNode;
             List<int> currentPath;
             int currentDepth;
@@ -306,14 +306,14 @@ namespace Associativy.Services
                 currentDepth = stackItem.Depth;
 
                 // We can't traverse the graph further
-                if (currentDepth == maxDepth - 1)
+                if (currentDepth == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
-                        if (explored[targetId].MinimumDepth > currentDepth + 1)
+                        if (explored[targetId].MinDistance > currentDepth + 1)
                         {
-                            explored[targetId].MinimumDepth = currentDepth + 1;
+                            explored[targetId].MinDistance = currentDepth + 1;
                         }
 
                         currentNode.Neighbours.Add(explored[targetId]);
@@ -349,16 +349,16 @@ namespace Associativy.Services
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startId &&
-                            currentDepth + 1 + explored[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
+                            currentDepth + 1 + explored[targetId].MinDistance - currentNode.MinDistance <= maxDistance)
                         {
-                            neighbour.MinimumDepth = currentDepth + 1;
-                            frontier.Push(new StackItem { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
+                            neighbour.MinDistance = currentDepth + 1;
+                            frontier.Push(new FrontierNode { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
                         }
 
                         // If this is the shortest path to the node, overwrite its minDepth
-                        if (neighbour.Id != startId && neighbour.MinimumDepth > currentDepth + 1)
+                        if (neighbour.Id != startId && neighbour.MinDistance > currentDepth + 1)
                         {
-                            neighbour.MinimumDepth = currentDepth + 1;
+                            neighbour.MinDistance = currentDepth + 1;
                         }
                     }
                 }
