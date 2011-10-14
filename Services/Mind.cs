@@ -285,13 +285,13 @@ namespace Associativy.Services
                 });
             }
 
-            var visitedNodes = new Dictionary<int, PathNode>();
+            var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
             var frontier = new Stack<StackItem>();
 
-            visitedNodes[startId] = new PathNode(startId) { MinimumDepth = 0 };
-            frontier.Push(new StackItem { Node = visitedNodes[startId] });
-            visitedNodes[targetId] = new PathNode(targetId);
+            explored[startId] = new PathNode(startId) { MinimumDepth = 0 };
+            frontier.Push(new StackItem { Node = explored[startId] });
+            explored[targetId] = new PathNode(targetId);
 
             StackItem stackItem;
             PathNode currentNode;
@@ -311,12 +311,12 @@ namespace Associativy.Services
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
-                        if (visitedNodes[targetId].MinimumDepth > currentDepth + 1)
+                        if (explored[targetId].MinimumDepth > currentDepth + 1)
                         {
-                            visitedNodes[targetId].MinimumDepth = currentDepth + 1;
+                            explored[targetId].MinimumDepth = currentDepth + 1;
                         }
 
-                        currentNode.Neighbours.Add(visitedNodes[targetId]);
+                        currentNode.Neighbours.Add(explored[targetId]);
                         currentPath.Add(targetId);
                         succeededPaths.Add(currentPath);
                     }
@@ -331,11 +331,11 @@ namespace Associativy.Services
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
                         foreach (var neighbourId in neighbourIds)
                         {
-                            if (!visitedNodes.ContainsKey(neighbourId))
+                            if (!explored.ContainsKey(neighbourId))
                             {
-                                visitedNodes[neighbourId] = new PathNode(neighbourId);
+                                explored[neighbourId] = new PathNode(neighbourId);
                             }
-                            currentNode.Neighbours.Add(visitedNodes[neighbourId]);
+                            currentNode.Neighbours.Add(explored[neighbourId]);
                         }
                     }
 
@@ -349,7 +349,7 @@ namespace Associativy.Services
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startId &&
-                            currentDepth + 1 + visitedNodes[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
+                            currentDepth + 1 + explored[targetId].MinimumDepth - currentNode.MinimumDepth <= maxDepth)
                         {
                             neighbour.MinimumDepth = currentDepth + 1;
                             frontier.Push(new StackItem { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
