@@ -1,0 +1,20 @@
+﻿@model Associativy.ViewModels.ISearchViewModel
+
+@{
+    Script.Require("AssociativyAutoComplete").AtHead();
+    Style.Require("jQueryUI_Orchard");
+    var route = Model.PostRouteValueDictionary;
+}
+
+@using (Html.BeginForm(route["action"].ToString(), Model.PostRouteValueDictionary["controller"].ToString(), new { Area = route["area"]}, FormMethod.Get, new { @id = "notions-search-form" }))
+{
+@*    @Html.AntiForgeryTokenOrchard()*@
+    <fieldset>
+        @Html.TextBox("Terms", Model.Terms)
+        <button type="submit">@T("Find associations")</button>
+    </fieldset>
+}
+
+<script type="text/javascript">
+    $.associativyAutoComplete.terms("Terms", '@Model.FetchUrl');
+</script>

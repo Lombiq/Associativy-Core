@@ -71,7 +71,6 @@ namespace Associativy.Controllers
             TryUpdateModel(viewModel);
 
             if (ModelState.IsValid)
-            //if (true)
             {
                 var searched = new List<TNodePart>(viewModel.TermsArray.Length);
                 foreach (var term in viewModel.TermsArray)
@@ -185,12 +184,14 @@ namespace Associativy.Controllers
         protected dynamic SearchFormShape<TSearchViewModel>(TSearchViewModel searchViewModel)
             where TSearchViewModel : class, ISearchViewModel, new()
         {
-            var searchFormPart = orchardServices.ContentManager.New<SearchFormPart>("NotionSearchFormWidget");
-            searchFormPart.Terms = searchViewModel.Terms;
-
-            return orchardServices.ContentManager.BuildDisplay(
-                    searchFormPart
-                    );
+            var model = new TSearchViewModel();
+            return orchardServices.New.SearchForm(
+                ViewModel: model,
+                SearchFormShape: shapeFactory.DisplayTemplate(
+                    TemplateName: "Graphs/SearchForm",
+                    Model: model,
+                    Prefix: null)
+                );
         }
     }
 }
