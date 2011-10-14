@@ -262,13 +262,13 @@ namespace Associativy.Services
 
         private class FrontierNode
         {
-            public int Depth { get; set; }
+            public int Distance { get; set; }
             public List<int> Path { get; set; }
             public PathNode Node { get; set; }
 
             public FrontierNode()
             {
-                Depth = 0;
+                Distance = 0;
                 Path = new List<int>();
             }
         }
@@ -296,24 +296,25 @@ namespace Associativy.Services
             FrontierNode frontierNode;
             PathNode currentNode;
             List<int> currentPath;
-            int currentDepth;
+            int currentDistance;
             while (frontier.Count != 0)
             {
                 frontierNode = frontier.Pop();
                 currentNode = frontierNode.Node;
                 currentPath = frontierNode.Path;
                 currentPath.Add(currentNode.Id);
-                currentDepth = frontierNode.Depth;
+                currentDistance = frontierNode.Distance;
 
                 // We can't traverse the graph further
-                if (currentDepth == maxDistance - 1)
+                if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
-                        if (explored[targetId].MinDistance > currentDepth + 1)
+                        if (!explored.ContainsKey(targetId)) explored[targetId] = new PathNode(targetId);
+                        if (explored[targetId].MinDistance > currentDistance + 1)
                         {
-                            explored[targetId].MinDistance = currentDepth + 1;
+                            explored[targetId].MinDistance = currentDistance + 1;
                         }
 
                         currentNode.Neighbours.Add(explored[targetId]);
@@ -348,17 +349,16 @@ namespace Associativy.Services
                             succeededPaths.Add(succeededPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
-                        else if (neighbour.Id != startId &&
-                            currentDepth + 1 + explored[targetId].MinDistance - currentNode.MinDistance <= maxDistance)
+                        else if (neighbour.Id != startId)
                         {
-                            neighbour.MinDistance = currentDepth + 1;
-                            frontier.Push(new FrontierNode { Depth = currentDepth + 1, Path = new List<int>(currentPath), Node = neighbour });
+                            neighbour.MinDistance = currentDistance + 1;
+                            frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
                         }
 
                         // If this is the shortest path to the node, overwrite its minDepth
-                        if (neighbour.Id != startId && neighbour.MinDistance > currentDepth + 1)
+                        if (neighbour.Id != startId && neighbour.MinDistance > currentDistance + 1)
                         {
-                            neighbour.MinDistance = currentDepth + 1;
+                            neighbour.MinDistance = currentDistance + 1;
                         }
                     }
                 }
