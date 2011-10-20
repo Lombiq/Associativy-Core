@@ -198,6 +198,7 @@ namespace Associativy.Services
 
                     while (n < nodes.Count)
                     {
+                        // Itt lehetne multithreading
                         var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id);
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
