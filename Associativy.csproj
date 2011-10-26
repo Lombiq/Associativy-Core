@@ -73,6 +73,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Feladatok.txt" />
     <Content Include="Scripts\AssociativyAutoComplete.js" />
     <Content Include="Scripts\Dracula\Curry-1.0.1.js" />
     <Content Include="Scripts\Dracula\dracula_algorithms.js" />
