@@ -28,8 +28,6 @@ namespace Associativy.Services
         protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
         
-        protected readonly IClock clock;
-
         #region Caching fields
         protected readonly ICacheManager cacheManager;
         protected readonly ISignals signals;
@@ -41,15 +39,13 @@ namespace Associativy.Services
             IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
             ICacheManager cacheManager,
-            ISignals signals,
-            IClock clock)
+            ISignals signals)
         {
             this.connectionManager = connectionManager;
             this.nodeManager = nodeManager;
 
             this.cacheManager = cacheManager;
             this.signals = signals;
-            this.clock = clock;
 
             nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
@@ -61,7 +57,6 @@ namespace Associativy.Services
                 return cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        //ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
                         return GetAllAssociations(zoomLevel, false);
                     });
             }
