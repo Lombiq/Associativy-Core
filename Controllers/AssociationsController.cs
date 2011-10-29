@@ -55,7 +55,7 @@ namespace Associativy.Controllers
                         new TSearchViewModel()
                     ),
                     GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(
-                        associativyServices.Mind.GetAllAssociations()
+                        associativyServices.Mind.GetAllAssociations(useCache: true)
                     )
                 );
         }
@@ -113,7 +113,7 @@ namespace Associativy.Controllers
             return GraphResult(
                     SearchFormShape<TSearchViewModel>(viewModel),
                     shapeFactory.DisplayTemplate(
-                        TemplateName: "Graphs/NotFound", 
+                        TemplateName: "Graphs/NotFound",
                         Model: viewModel,
                         Prefix: null)
                 );
@@ -176,8 +176,8 @@ namespace Associativy.Controllers
             // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
             // plugin gráfmegjelenítőknek? Delegate?
             return shapeFactory.DisplayTemplate(
-                TemplateName: "Graphs/DisplayEngines/Dracula", 
-                Model: new TGraphResultViewModel() { Nodes = nodes }, 
+                TemplateName: "Graphs/DisplayEngines/Dracula",
+                Model: new TGraphResultViewModel() { Nodes = nodes },
                 Prefix: null);
         }
 

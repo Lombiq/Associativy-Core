@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Associativy.Services
 {
-    public interface IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IDependency // Maybe ISingletonDependency?
+    public interface IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IDependency
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()

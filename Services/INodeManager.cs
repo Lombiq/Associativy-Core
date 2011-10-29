@@ -3,13 +3,17 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.Models;
 using System.Collections.Generic;
+using Associativy.Events;
+using System;
 
 namespace Associativy.Services
 {
-    public interface INodeManager<TNodePart, TNodePartRecord> : IDependency // Maybe ISingletonDependency?
+    public interface INodeManager<TNodePart, TNodePartRecord> : IDependency
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
     {
+        event EventHandler<GraphEventArgs> GraphChanged;
+
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
         
         #region Node CRUD

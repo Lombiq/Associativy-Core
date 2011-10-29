@@ -8,6 +8,7 @@ using QuickGraph;
 using Orchard.Services;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
+using Associativy.Events;
 
 namespace Associativy.Services
 {
@@ -26,38 +27,41 @@ namespace Associativy.Services
     {
         protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
-        protected readonly ICacheManager cacheManager;
+        
         protected readonly IClock clock;
+
+        #region Caching fields
+        protected readonly ICacheManager cacheManager;
+        protected readonly ISignals signals;
+        protected readonly string CachePrefix = "Associativy." + typeof(TNodePart).Name;
+        protected readonly string GraphSignal = "Associativy.Graph." + typeof(TNodePart).Name;
+        #endregion
 
         public Mind(
             IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
             ICacheManager cacheManager,
+            ISignals signals,
             IClock clock)
         {
             this.connectionManager = connectionManager;
             this.nodeManager = nodeManager;
+
             this.cacheManager = cacheManager;
+            this.signals = signals;
             this.clock = clock;
+
+            nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
-
-        protected const int CacheLifetimeMin = 0;
-
-        //class GraphToken : IVolatileToken
-        //{
-        //    public bool IsCurrent
-        //    {
-        //        get { valahogy kitalálni, módosult-e a tábla, talán NHibernate.ISession.cs }
-        //    }
-        //}
 
         public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
         {
             if (useCache)
             {
-                return cacheManager.Get("Assciativy Whole Graph", ctx =>
+                return cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                     {
-                        ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                        MonitorGraphChangedSignal(ctx);
+                        //ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
                         return GetAllAssociations(zoomLevel, false);
                     });
             }
@@ -86,15 +90,19 @@ namespace Associativy.Services
             return graph;
         }
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, bool simpleAlgorithm = false, int zoomLevel = 0, bool useCache = true)
+        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(
+            IList<TNodePart> nodes, 
+            bool simpleAlgorithm = false, 
+            int zoomLevel = 0, 
+            bool useCache = true)
         {
             if (useCache)
             {
                 string cacheKey = "";
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-                return cacheManager.Get(cacheKey, ctx =>
+                return cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
                     {
-                        ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                        MonitorGraphChangedSignal(ctx);
                         return MakeAssociations(nodes, simpleAlgorithm, zoomLevel, false);
                     });
             }
@@ -279,9 +287,9 @@ namespace Associativy.Services
         {
             if (useCache)
             {
-                return cacheManager.Get(startId.ToString() + targetId.ToString() + maxDistance.ToString(), ctx =>
+                return cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString() + maxDistance.ToString()), ctx =>
                 {
-                    ctx.Monitor(clock.When(TimeSpan.FromMinutes(CacheLifetimeMin)));
+                    MonitorGraphChangedSignal(ctx);
                     return CalculatePaths(startId, targetId, maxDistance, false);
                 });
             }
@@ -366,6 +374,21 @@ namespace Associativy.Services
 
 
             return succeededPaths;
+        }
+
+        private void MonitorGraphChangedSignal(AcquireContext<string> ctx)
+        {
+            ctx.Monitor(signals.When(GraphSignal));
+        }
+
+        private void TriggerGraphChangedSignal(object sender, GraphEventArgs e)
+        {
+            signals.Trigger(GraphSignal);
+        }
+
+        private string MakeCacheKey(string name)
+        {
+            return CachePrefix + name;
         }
 
         private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GraphFactory()

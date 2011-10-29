@@ -6,6 +6,7 @@ using Orchard.ContentManagement.Records;
 using Associativy.Models;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
+using Associativy.Events;
 
 namespace Associativy.Services
 {
@@ -21,6 +22,8 @@ namespace Associativy.Services
     {
         protected readonly IContentManager contentManager;
         protected readonly IRepository<TNodePartRecord> nodePartRecordRepository;
+
+        public event EventHandler<GraphEventArgs> GraphChanged;
 
         public NodeManager(
             IContentManager contentManager,
@@ -47,6 +50,8 @@ namespace Associativy.Services
             var node = contentManager.New<TNodePart>(nodeParams.ContentTypeName);
             nodeParams.MapToNode(node);
             contentManager.Create(node);
+
+            OnGraphChanged();
 
             return node;
         }
@@ -76,6 +81,8 @@ namespace Associativy.Services
             {
                 nodeParams.MapToNode(node);
                 contentManager.Flush();
+
+                OnGraphChanged();
             }
 
             return node;
@@ -87,13 +94,25 @@ namespace Associativy.Services
 
             contentManager.Flush();
 
+            OnGraphChanged();
+
             return node;
         }
 
         public void Remove(int id)
         {
             contentManager.Remove(contentManager.Get(id));
+
+            OnGraphChanged();
         }
         #endregion
+
+        private void OnGraphChanged()
+        {
+            if (GraphChanged != null)
+            {
+                GraphChanged(this, new GraphEventArgs()); 
+            }
+        }
     }
 }
