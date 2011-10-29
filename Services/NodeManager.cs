@@ -92,8 +92,6 @@ namespace Associativy.Services
 
         public void Remove(int id)
         {
-            // delete connection
-
             contentManager.Remove(contentManager.Get(id));
         }
         #endregion
