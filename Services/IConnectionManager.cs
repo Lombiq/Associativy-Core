@@ -1,8 +1,8 @@
-﻿using Orchard;
+﻿using System.Collections.Generic;
+using Associativy.Models;
+using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
-using Associativy.Models;
-using System.Collections.Generic;
 
 namespace Associativy.Services
 {

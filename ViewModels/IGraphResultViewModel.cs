@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Associativy.ViewModels
 {
     public interface IGraphResultViewModel

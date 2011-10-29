@@ -1,7 +1,7 @@
-﻿using Orchard.Environment.Extensions;
+﻿using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
-using Associativy.Models;
+using Orchard.Environment.Extensions;
 
 // If circular dependencies should happen, use property injection:
 // http://www.szmyd.com.pl/blog/di-property-injection-in-orchard

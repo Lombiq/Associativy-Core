@@ -1,6 +1,6 @@
-﻿using Orchard.Environment.Extensions;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Orchard.ContentManagement;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Models
 {

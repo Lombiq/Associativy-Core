@@ -1,10 +1,10 @@
-﻿using Orchard;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using Associativy.Models;
+﻿using System;
 using System.Collections.Generic;
 using Associativy.Events;
-using System;
+using Associativy.Models;
+using Orchard;
+using Orchard.ContentManagement;
+using Orchard.ContentManagement.Records;
 
 namespace Associativy.Services
 {

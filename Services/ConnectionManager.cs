@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
-using Associativy.Models;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
 

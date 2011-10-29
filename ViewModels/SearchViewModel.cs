@@ -1,8 +1,8 @@
-﻿using Orchard.Environment.Extensions;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System;
 using System.Linq;
 using System.Web.Routing;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.ViewModels
 {

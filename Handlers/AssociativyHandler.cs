@@ -1,7 +1,7 @@
-﻿using Orchard.ContentManagement.Handlers;
-using Orchard.Environment.Extensions;
+﻿using Associativy.Services;
 using Autofac;
-using Associativy.Services;
+using Orchard.ContentManagement.Handlers;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Handlers
 {

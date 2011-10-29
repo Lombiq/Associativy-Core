@@ -1,7 +1,7 @@
-﻿using Orchard;
+﻿using Associativy.Models;
+using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
-using Associativy.Models;
 
 namespace Associativy.Services
 {
