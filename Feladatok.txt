@@ -1,2 +1,0 @@
-﻿- Átírni, hogy ContentItem-et adjon vissza minden. Kérdés, van-e értelme? Majd kiderül. Sokkal lassabb lenne, ha
-mindegyiket kellene castolni (.As<>()) vagy a display drivert hivogatni
