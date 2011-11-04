@@ -12,7 +12,9 @@
                     return split(term).pop();
                 }
 
-                $('#' + textboxId).bind('keydown', function (event) {
+                var textBox = $('#' + textboxId);
+
+                textBox.bind('keydown', function (event) {
                     // don't navigate away from the field on tab when selecting an item
                     if (event.keyCode === $.ui.keyCode.TAB &&
                 $(this).data('autocomplete').menu.active) {
@@ -24,6 +26,7 @@
                             term: extractLast(request.term)
                         }, response);
                     },
+                    appendTo: textBox.parent(),
                     search: function () {
                         // custom minLength
                         var term = extractLast(this.value);
