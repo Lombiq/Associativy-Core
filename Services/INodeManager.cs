@@ -17,12 +17,53 @@ namespace Associativy.Services
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
         
         #region Node CRUD
+        /// <summary>
+        /// Query for customized retrieving of nodes
+        /// </summary>
         IContentQuery<TNodePart, TNodePartRecord> ContentQuery { get; }
+
+        /// <summary>
+        /// Creates a new content item that has TNodePart attached to it with the specified params
+        /// </summary>
+        /// <param name="nodeParams">The INodeParams object filled with the node's params</param>
         TNodePart Create(INodeParams<TNodePart> nodeParams);
+
+        /// <summary>
+        /// Creates a new content item that has TNodePart attached to it
+        /// </summary>
+        /// <param name="contentType">A suitable content type's name, that has TNodePart attached</param>
+        TNodePart New(string contentType);
+
+        /// <summary>
+        /// Creates a new node content item
+        /// </summary>
+        /// <param name="node">The content item</param>
+        void Create(ContentItem node);
+
+        /// <summary>
+        /// Gets the node with the specified id
+        /// </summary>
         TNodePart Get(int id);
+
+        /// <summary>
+        /// Gets the node with the specified label
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
         TNodePart Get(string label);
+
+        /// <summary>
+        /// Gets the nodes with the specified ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         IList<TNodePart> GetMany(IList<int> ids);
         TNodePart Update(INodeParams<TNodePart> nodeParams);
+
+        /// <summary>
+        /// Updates a node content item
+        /// </summary>
+        /// <param name="node">The TNodePart attached to the content item</param>
         TNodePart Update(TNodePart node);
 
         /// <summary>

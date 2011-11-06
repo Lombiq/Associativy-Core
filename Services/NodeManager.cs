@@ -56,6 +56,17 @@ namespace Associativy.Services
             return node;
         }
 
+        public TNodePart New(string contentType)
+        {
+            return contentManager.New<TNodePart>(contentType);
+        }
+
+        public void Create(ContentItem node)
+        {
+            contentManager.Create(node);
+            OnGraphChanged();
+        }
+
         public TNodePart Get(int id)
         {
             return contentManager.Get<TNodePart>(id);
@@ -69,6 +80,7 @@ namespace Associativy.Services
 
         public IList<TNodePart> GetMany(IList<int> ids)
         {
+            //? contentManager.GetMany<TNodePart>(ids, VersionOptions.AllVersions, new QueryHints().ExpandParts<TNodePart>());
             return ContentQuery.Where(node => ids.Contains(node.Id)).List().ToList();
         }
 
@@ -90,6 +102,7 @@ namespace Associativy.Services
 
         public TNodePart Update(TNodePart node)
         {
+            // What should happen with other parts?
             if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
 
             contentManager.Flush();
