@@ -11,8 +11,10 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     /// <summary>
-    /// All suitable methods protected to aid inheritence.
     /// </summary>
+    /// <remarks>
+    /// All suitable methods protected to aid inheritence.
+    /// </remarks>
     /// <typeparam name="TNodePart"></typeparam>
     /// <typeparam name="TNodePartRecord"></typeparam>
     [OrchardFeature("Associativy")]
@@ -120,6 +122,7 @@ namespace Associativy.Services
         }
         #endregion
 
+        // TODO: refactor to DRY (see ConnectionManager with the same)
         private void OnGraphChanged()
         {
             if (GraphChanged != null)

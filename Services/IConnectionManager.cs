@@ -3,6 +3,8 @@ using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
+using System;
+using Associativy.Events;
 
 namespace Associativy.Services
 {
@@ -11,6 +13,8 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
+        event EventHandler<GraphEventArgs> GraphChanged;
+
         bool AreNeighbours(int nodeId1, int nodeId2);
         void Add(int nodeId1, int nodeId2);
         void Add(TNodePart node1, TNodePart node2);
