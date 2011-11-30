@@ -90,10 +90,10 @@
     <Content Include="Module.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociationsController.cs" />
     <Compile Include="Events\GraphEventArgs.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
-    <Compile Include="Handlers\AssociativyHandler.cs" />
     <Compile Include="Models\INodeParams.cs" />
     <Compile Include="Models\INode.cs" />
     <Compile Include="Models\INodeToNodeConnectorRecord.cs" />
