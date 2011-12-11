@@ -25,12 +25,12 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
+        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
         
         #region Caching fields
-        protected readonly ICacheManager cacheManager;
-        protected readonly ISignals signals;
+        protected readonly ICacheManager _cacheManager;
+        protected readonly ISignals _signals;
         protected readonly string CachePrefix = "Associativy." + typeof(TNodePart).Name;
         protected readonly string GraphSignal = "Associativy.Graph." + typeof(TNodePart).Name;
         #endregion
@@ -41,11 +41,11 @@ namespace Associativy.Services
             ICacheManager cacheManager,
             ISignals signals)
         {
-            this.connectionManager = connectionManager;
-            this.nodeManager = nodeManager;
+            this._connectionManager = connectionManager;
+            this._nodeManager = nodeManager;
 
-            this.cacheManager = cacheManager;
-            this.signals = signals;
+            this._cacheManager = cacheManager;
+            this._signals = signals;
 
             connectionManager.GraphChanged += TriggerGraphChangedSignal;
             nodeManager.GraphChanged += TriggerGraphChangedSignal;
@@ -55,7 +55,7 @@ namespace Associativy.Services
         {
             if (useCache)
             {
-                return cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
+                return _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
                         return GetAllAssociations(zoomLevel, false);
@@ -64,14 +64,14 @@ namespace Associativy.Services
 
             var graph = GraphFactory();
 
-            var nodes = nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
+            var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
 
             foreach (var node in nodes)
             {
                 graph.AddVertex(node.Value);
             }
 
-            var connections = connectionManager.GetAll();
+            var connections = _connectionManager.GetAll();
             for (int i = 0; i < connections.Count; i++)
             {
                 graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connections[i].Record1Id], nodes[connections[i].Record2Id]));
@@ -96,7 +96,7 @@ namespace Associativy.Services
             {
                 string cacheKey = "";
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-                return cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
+                return _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
                         return MakeAssociations(nodes, simpleAlgorithm, zoomLevel, false);
@@ -129,7 +129,7 @@ namespace Associativy.Services
 
             graph.AddVertex(node);
 
-            var nodes = nodeManager.GetMany(connectionManager.GetNeighbourIds(node.Id));
+            var nodes = _nodeManager.GetMany(_connectionManager.GetNeighbourIds(node.Id));
             for (int i = 0; i < nodes.Count; i++)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, nodes[i]));
@@ -144,10 +144,10 @@ namespace Associativy.Services
 
             var graph = GraphFactory();
 
-            var commonNeighbourIds = connectionManager.GetNeighbourIds(nodes[0].Id);
+            var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes[0].Id);
             var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
-            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList());
+            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_connectionManager.GetNeighbourIds(node.Id)).ToList());
             // Same as
             //foreach (var node in remainingNodes)
             //{
@@ -156,7 +156,7 @@ namespace Associativy.Services
 
             if (commonNeighbourIds.Count == 0) return null;
 
-            var commonNeighbours = nodeManager.GetMany(commonNeighbourIds);
+            var commonNeighbours = _nodeManager.GetMany(commonNeighbourIds);
 
             for (int i = 0; i < nodes.Count; i++)
             {
@@ -240,7 +240,7 @@ namespace Associativy.Services
 
         private Dictionary<int, TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
         {
-            return nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
+            return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
         }
 
         private List<int> GetSucceededNodeIds(List<List<int>> succeededPaths)
@@ -283,7 +283,7 @@ namespace Associativy.Services
         {
             if (useCache)
             {
-                return cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString() + maxDistance.ToString()), ctx =>
+                return _cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString() + maxDistance.ToString()), ctx =>
                 {
                     MonitorGraphChangedSignal(ctx);
                     return CalculatePaths(startId, targetId, maxDistance, false);
@@ -313,7 +313,7 @@ namespace Associativy.Services
                 if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (connectionManager.AreNeighbours(currentNode.Id, targetId))
+                    if (_connectionManager.AreNeighbours(currentNode.Id, targetId))
                     {
                         if (!explored.ContainsKey(targetId)) explored[targetId] = new PathNode(targetId);
                         if (explored[targetId].MinDistance > currentDistance + 1)
@@ -332,7 +332,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id);
+                        var neighbourIds = _connectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
                         foreach (var neighbourId in neighbourIds)
                         {
@@ -374,12 +374,12 @@ namespace Associativy.Services
 
         private void MonitorGraphChangedSignal(AcquireContext<string> ctx)
         {
-            ctx.Monitor(signals.When(GraphSignal));
+            ctx.Monitor(_signals.When(GraphSignal));
         }
 
         private void TriggerGraphChangedSignal(object sender, GraphEventArgs e)
         {
-            signals.Trigger(GraphSignal);
+            _signals.Trigger(GraphSignal);
         }
 
         private string MakeCacheKey(string name)

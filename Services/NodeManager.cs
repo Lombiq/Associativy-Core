@@ -22,8 +22,8 @@ namespace Associativy.Services
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
     {
-        protected readonly IContentManager contentManager;
-        protected readonly IRepository<TNodePartRecord> nodePartRecordRepository;
+        protected readonly IContentManager _contentManager;
+        protected readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
 
         public event EventHandler<GraphEventArgs> GraphChanged;
 
@@ -31,27 +31,27 @@ namespace Associativy.Services
             IContentManager contentManager,
             IRepository<TNodePartRecord> nodePartRecordRepository)
         {
-            this.contentManager = contentManager;
-            this.nodePartRecordRepository = nodePartRecordRepository;
+            this._contentManager = contentManager;
+            this._nodePartRecordRepository = nodePartRecordRepository;
         }
 
         public IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
-            return nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
+            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
         }
 
         #region Node CRUD
         public IContentQuery<TNodePart, TNodePartRecord> ContentQuery
         {
-            get { return contentManager.Query<TNodePart, TNodePartRecord>(); }
+            get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
         }
 
         public TNodePart Create(INodeParams<TNodePart> nodeParams)
         {
-            var node = contentManager.New<TNodePart>(nodeParams.ContentTypeName);
+            var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
             nodeParams.MapToNode(node);
-            contentManager.Create(node);
+            _contentManager.Create(node);
 
             OnGraphChanged();
 
@@ -60,18 +60,18 @@ namespace Associativy.Services
 
         public TNodePart New(string contentType)
         {
-            return contentManager.New<TNodePart>(contentType);
+            return _contentManager.New<TNodePart>(contentType);
         }
 
         public void Create(ContentItem node)
         {
-            contentManager.Create(node);
+            _contentManager.Create(node);
             OnGraphChanged();
         }
 
         public TNodePart Get(int id)
         {
-            return contentManager.Get<TNodePart>(id);
+            return _contentManager.Get<TNodePart>(id);
         }
 
         public TNodePart Get(string label)
@@ -94,7 +94,7 @@ namespace Associativy.Services
             if (node != null)
             {
                 nodeParams.MapToNode(node);
-                contentManager.Flush();
+                _contentManager.Flush();
 
                 OnGraphChanged();
             }
@@ -107,7 +107,7 @@ namespace Associativy.Services
             // What should happen with other parts?
             if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
 
-            contentManager.Flush();
+            _contentManager.Flush();
 
             OnGraphChanged();
 
@@ -116,7 +116,7 @@ namespace Associativy.Services
 
         public void Remove(int id)
         {
-            contentManager.Remove(contentManager.Get(id));
+            _contentManager.Remove(_contentManager.Get(id));
 
             OnGraphChanged();
         }

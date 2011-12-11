@@ -15,32 +15,32 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager;
+        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
         public IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> ConnectionManager
         {
-            get { return connectionManager; }
+            get { return _connectionManager; }
         }
 
-        protected readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind;
+        protected readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _mind;
         public IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind
         {
-            get { return mind; }
+            get { return _mind; }
         }
 
-        protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
         public INodeManager<TNodePart, TNodePartRecord> NodeManager
         {
-            get { return nodeManager; }
+            get { return _nodeManager; }
         }
 
         public AssociativyServices(
-            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
+            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager,
             IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
-            this.connectionManager = connectionManager;
-            this.nodeManager = nodeManager;
-            this.mind = mind;
+            _connectionManager = _connectionManager;
+            _nodeManager = nodeManager;
+            _mind = mind;
         }
     }
 }

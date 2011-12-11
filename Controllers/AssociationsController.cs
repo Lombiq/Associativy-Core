@@ -25,9 +25,9 @@ namespace Associativy.Controllers
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly TAssocociativyServices associativyServices;
-        protected readonly IOrchardServices orchardServices;
-        protected dynamic shapeFactory;
+        protected readonly TAssocociativyServices _associativyServices;
+        protected readonly IOrchardServices _orchardServices;
+        protected dynamic _shapeFactory;
 
         public Localizer T { get; set; }
 
@@ -36,9 +36,9 @@ namespace Associativy.Controllers
             IOrchardServices orchardServices,
             IShapeFactory shapeFactory)
         {
-            this.associativyServices = associativyService;
-            this.orchardServices = orchardServices;
-            this.shapeFactory = shapeFactory;
+            _associativyServices = associativyService;
+            _orchardServices = orchardServices;
+            _shapeFactory = shapeFactory;
 
             T = NullLocalizer.Instance;
         }
@@ -48,14 +48,14 @@ namespace Associativy.Controllers
             where TGraphResultViewModel : IGraphResultViewModel, new()
             where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
         {
-            orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
+            _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
             return GraphResult(
                     SearchFormShape(
                         new TSearchViewModel()
                     ),
                     GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(
-                        associativyServices.Mind.GetAllAssociations(useCache: true)
+                        _associativyServices.Mind.GetAllAssociations(useCache: true)
                     )
                 );
         }
@@ -75,16 +75,16 @@ namespace Associativy.Controllers
                 var searched = new List<TNodePart>(viewModel.TermsArray.Length);
                 foreach (var term in viewModel.TermsArray)
                 {
-                    var node = associativyServices.NodeManager.Get(term);
+                    var node = _associativyServices.NodeManager.Get(term);
                     if (node == null) return AssociationsNotFound<TSearchViewModel>(viewModel);
                     searched.Add(node);
                 }
 
-                var associationsGraph = associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
+                var associationsGraph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
 
                 if (associationsGraph != null)
                 {
-                    orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
+                    _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
                     return GraphResult(
                         SearchFormShape<TSearchViewModel>(viewModel),
@@ -112,7 +112,7 @@ namespace Associativy.Controllers
         {
             return GraphResult(
                     SearchFormShape<TSearchViewModel>(viewModel),
-                    shapeFactory.DisplayTemplate(
+                    _shapeFactory.DisplayTemplate(
                         TemplateName: "Graphs/NotFound",
                         Model: viewModel,
                         Prefix: null)
@@ -121,7 +121,7 @@ namespace Associativy.Controllers
 
         public JsonResult FetchSimilarTerms(string term)
         {
-            return Json(associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
+            return Json(_associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
         }
 
         // No performance loss if with the same params as ShowAssociations because the solution 
@@ -138,7 +138,7 @@ namespace Associativy.Controllers
         protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
         {
             return new ShapeResult(this,
-                orchardServices.New.Graphs_Result(
+                _orchardServices.New.Graphs_Result(
                     SearchForm: searchFormShape,
                     Result: resultShape
                     )
@@ -175,7 +175,7 @@ namespace Associativy.Controllers
 
             // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
             // plugin gráfmegjelenítőknek? Delegate?
-            return shapeFactory.DisplayTemplate(
+            return _shapeFactory.DisplayTemplate(
                 TemplateName: "Graphs/DisplayEngines/Dracula",
                 Model: new TGraphResultViewModel() { Nodes = nodes },
                 Prefix: null);
@@ -185,9 +185,9 @@ namespace Associativy.Controllers
             where TSearchViewModel : class, ISearchViewModel, new()
         {
             var model = new TSearchViewModel();
-            return orchardServices.New.SearchForm(
+            return _orchardServices.New.SearchForm(
                 ViewModel: model,
-                SearchFormShape: shapeFactory.DisplayTemplate(
+                SearchFormShape: _shapeFactory.DisplayTemplate(
                     TemplateName: "Graphs/SearchForm",
                     Model: model,
                     Prefix: null)

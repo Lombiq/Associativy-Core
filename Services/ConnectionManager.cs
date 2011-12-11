@@ -24,8 +24,8 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> nodeManager;
+        protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
+        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
 
         public event EventHandler<GraphEventArgs> GraphChanged;
 
@@ -33,13 +33,13 @@ namespace Associativy.Services
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
-            this.nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            this.nodeManager = nodeManager;
+            this._nodeToNodeRecordRepository = nodeToNodeRecordRepository;
+            this._nodeManager = nodeManager;
         }
 
         public bool AreNeighbours(int nodeId1, int nodeId2)
         {
-            return nodeToNodeRecordRepository.Count(connector =>
+            return _nodeToNodeRecordRepository.Count(connector =>
                 connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
                 connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
@@ -51,11 +51,11 @@ namespace Associativy.Services
 
         public void Add(int nodeId1, int nodeId2)
         {
-            if (nodeManager.Get(nodeId1) == null || nodeManager.Get(nodeId2) == null) return; // No such nodes
+            if (_nodeManager.Get(nodeId1) == null || _nodeManager.Get(nodeId2) == null) return; // No such nodes
 
             if (!AreNeighbours(nodeId1, nodeId2))
             {
-                nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
+                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
             }
 
             OnGraphChanged();
@@ -64,12 +64,12 @@ namespace Associativy.Services
         public void DeleteMany(int nodeId)
         {
             // Since there is no cummulative delete...
-            var connectionsToBeDeleted = nodeToNodeRecordRepository.Fetch(connector =>
+            var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
                 connector.Record1Id == nodeId || connector.Record2Id == nodeId).ToList();
 
             foreach (var connector in connectionsToBeDeleted)
             {
-                nodeToNodeRecordRepository.Delete(connector);
+                _nodeToNodeRecordRepository.Delete(connector);
             }
 
             OnGraphChanged();
@@ -77,27 +77,27 @@ namespace Associativy.Services
 
         public void Delete(int id)
         {
-            nodeToNodeRecordRepository.Delete(nodeToNodeRecordRepository.Get(id));
+            _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
             OnGraphChanged();
         }
 
         public IList<TNodeToNodeConnectorRecord> GetAll()
         {
-            return nodeToNodeRecordRepository.Table.ToList();
+            return _nodeToNodeRecordRepository.Table.ToList();
         }
 
         public IList<int> GetNeighbourIds(int nodeId)
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
-            return nodeToNodeRecordRepository.
+            return _nodeToNodeRecordRepository.
                 Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
                 Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
         }
 
         public int GetNeighbourCount(int nodeId)
         {
-            return nodeToNodeRecordRepository.
+            return _nodeToNodeRecordRepository.
                 Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
         }
 
