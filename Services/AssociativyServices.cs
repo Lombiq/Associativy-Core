@@ -15,8 +15,8 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
-        public IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> ConnectionManager
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
+        public IConnectionManager<TNodeToNodeConnectorRecord> ConnectionManager
         {
             get { return _connectionManager; }
         }
@@ -34,7 +34,7 @@ namespace Associativy.Services
         }
 
         public AssociativyServices(
-            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
+            IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {

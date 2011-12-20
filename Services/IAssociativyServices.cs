@@ -16,7 +16,7 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> ConnectionManager { get; }
+        IConnectionManager<TNodeToNodeConnectorRecord> ConnectionManager { get; }
         IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind { get; }
         INodeManager<TNodePart, TNodePartRecord> NodeManager { get; }
     }

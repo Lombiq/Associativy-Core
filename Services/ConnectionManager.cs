@@ -18,23 +18,20 @@ namespace Associativy.Services
     /// <typeparam name="TNodePart"></typeparam>
     /// <typeparam name="TNodePartRecord"></typeparam>
     [OrchardFeature("Associativy")]
-    // Önmagában nem kellene a TNodePartRecord és a TNodePart is csak az Add-nél
-    public class ConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class ConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        protected readonly IContentManager _contentManager;
 
         public event EventHandler<GraphEventArgs> GraphChanged;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            INodeManager<TNodePart, TNodePartRecord> nodeManager)
+            IContentManager contentManager)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            _nodeManager = nodeManager;
+            _contentManager = contentManager;
         }
 
         public bool AreNeighbours(int nodeId1, int nodeId2)
@@ -44,14 +41,16 @@ namespace Associativy.Services
                 connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
 
-        public void Add(TNodePart node1, TNodePart node2)
+        public void Add(INode node1, INode node2)
         {
             Add(node1.Id, node2.Id);
         }
 
         public void Add(int nodeId1, int nodeId2)
         {
-            if (_nodeManager.Get(nodeId1) == null || _nodeManager.Get(nodeId2) == null) return; // No such nodes
+            // This check is not perfect, as all content items are counted.
+            // Good enough.
+            if (_contentManager.Get(nodeId1) == null || _contentManager.Get(nodeId2) == null) return; // No such nodes exist
 
             if (!AreNeighbours(nodeId1, nodeId2))
             {

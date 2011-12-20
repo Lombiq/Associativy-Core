@@ -14,7 +14,7 @@ namespace Associativy
         {
             var builder = new ContainerBuilder();
             builder.RegisterGeneric(typeof(AssociativyServices<,,>)).As(typeof(IAssociativyServices<,,>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(ConnectionManager<,,>)).As(typeof(IConnectionManager<,,>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(ConnectionManager<>)).As(typeof(IConnectionManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(Mind<,,>)).As(typeof(IMind<,,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(NodeManager<,>)).As(typeof(INodeManager<,>)).InstancePerLifetimeScope();
 

@@ -8,16 +8,14 @@ using Associativy.Events;
 
 namespace Associativy.Services
 {
-    public interface IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IDependency
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public interface IConnectionManager<TNodeToNodeConnectorRecord> : IDependency
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         event EventHandler<GraphEventArgs> GraphChanged;
 
         bool AreNeighbours(int nodeId1, int nodeId2);
         void Add(int nodeId1, int nodeId2);
-        void Add(TNodePart node1, TNodePart node2);
+        void Add(INode node1, INode node2);
         void DeleteMany(int nodeId);
         void Delete(int id);
         IList<TNodeToNodeConnectorRecord> GetAll();

@@ -25,7 +25,7 @@ namespace Associativy.Services
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager;
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
         
         #region Caching fields
@@ -36,7 +36,7 @@ namespace Associativy.Services
         #endregion
 
         public Mind(
-            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
+            IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
             ICacheManager cacheManager,
             ISignals signals)
