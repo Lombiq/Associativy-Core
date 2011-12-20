@@ -34,11 +34,11 @@ namespace Associativy.Services
         }
 
         public AssociativyServices(
-            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _connectionManager,
+            IConnectionManager<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> connectionManager,
             IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
-            _connectionManager = _connectionManager;
+            _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _mind = mind;
         }

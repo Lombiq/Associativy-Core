@@ -41,8 +41,8 @@ namespace Associativy.Services
             ICacheManager cacheManager,
             ISignals signals)
         {
-            this._connectionManager = connectionManager;
-            this._nodeManager = nodeManager;
+            _connectionManager = connectionManager;
+            _nodeManager = nodeManager;
 
             _cacheManager = cacheManager;
             _signals = signals;
