@@ -35,8 +35,8 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="nodeId1"></param>
         /// <param name="nodeId2"></param>
-        void Add(int nodeId1, int nodeId2);
-        void Add(INode node1, INode node2);
+        void Connect(int nodeId1, int nodeId2);
+        void Connect(INode node1, INode node2);
         void DeleteMany(int nodeId);
         void Delete(int id);
         IList<TNodeToNodeConnectorRecord> GetAll();

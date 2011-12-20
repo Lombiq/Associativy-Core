@@ -34,12 +34,12 @@ namespace Associativy.Services
                 connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
 
-        public void Add(INode node1, INode node2)
+        public void Connect(INode node1, INode node2)
         {
-            Add(node1.Id, node2.Id);
+            Connect(node1.Id, node2.Id);
         }
 
-        public void Add(int nodeId1, int nodeId2)
+        public void Connect(int nodeId1, int nodeId2)
         {
             // This check is not perfect, as all content items are counted.
             // Good enough.
