@@ -92,6 +92,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociationsController.cs" />
+    <Compile Include="Events\GraphChangedEventArgs.cs" />
     <Compile Include="Events\GraphEventArgs.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Models\INodeParams.cs" />

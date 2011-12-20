@@ -15,7 +15,7 @@ namespace Associativy.Services
         /// <summary>
         /// Event handler that is triggered when something changes in the graph
         /// </summary>
-        event EventHandler<GraphEventArgs> GraphChanged;
+        event EventHandler<GraphChangedEventArgs> GraphChanged;
 
 
         /// <summary>
