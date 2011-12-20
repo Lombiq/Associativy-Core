@@ -53,7 +53,12 @@ namespace Associativy.Services
             OnGraphChanged();
         }
 
-        public void DeleteMany(int nodeId)
+        public void DeleteFromNode(INode node)
+        {
+            DeleteFromNode(node.Id);
+        }
+
+        public void DeleteFromNode(int nodeId)
         {
             // Since there is no cummulative delete...
             var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
