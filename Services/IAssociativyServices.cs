@@ -22,9 +22,13 @@ namespace Associativy.Services
         IConnectionManager<TNodeToNodeConnectorRecord> ConnectionManager { get; }
 
         /// <summary>
-        /// Service for handling nodes
+        /// Service for generating associations
         /// </summary>
         IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind { get; }
+
+        /// <summary>
+        /// Service for handling nodes
+        /// </summary>
         INodeManager<TNodePart, TNodePartRecord> NodeManager { get; }
     }
 }

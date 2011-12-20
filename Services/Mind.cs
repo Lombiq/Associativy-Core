@@ -13,7 +13,6 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    // Önmagában csak a TNodePart kellene
     public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -41,8 +40,8 @@ namespace Associativy.Services
             _cacheManager = cacheManager;
             _signals = signals;
 
-            connectionManager.GraphChanged += TriggerGraphChangedSignal;
-            nodeManager.GraphChanged += TriggerGraphChangedSignal;
+            _connectionManager.GraphChanged += TriggerGraphChangedSignal;
+            _nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
 
         public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
