@@ -8,6 +8,11 @@ using Orchard.ContentManagement.Records;
 
 namespace Associativy.Services
 {
+    /// <summary>
+    /// Service for handling nodes
+    /// </summary>
+    /// <typeparam name="TNodePart">Content part type for nodes</typeparam>
+    /// <typeparam name="TNodePartRecord">Content part record type for nodes</typeparam>
     public interface INodeManager<TNodePart, TNodePartRecord> : IDependency
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -25,6 +30,7 @@ namespace Associativy.Services
         /// <param name="maxCount">Maximal number of items returned</param>
         /// <returns>Terms similar to the snippet</returns>
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
+
         
         #region Node CRUD
         /// <summary>
