@@ -44,8 +44,8 @@ namespace Associativy.Services
             this._connectionManager = connectionManager;
             this._nodeManager = nodeManager;
 
-            this._cacheManager = cacheManager;
-            this._signals = signals;
+            _cacheManager = cacheManager;
+            _signals = signals;
 
             connectionManager.GraphChanged += TriggerGraphChangedSignal;
             nodeManager.GraphChanged += TriggerGraphChangedSignal;

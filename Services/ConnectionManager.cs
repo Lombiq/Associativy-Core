@@ -33,8 +33,8 @@ namespace Associativy.Services
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             INodeManager<TNodePart, TNodePartRecord> nodeManager)
         {
-            this._nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            this._nodeManager = nodeManager;
+            _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
+            _nodeManager = nodeManager;
         }
 
         public bool AreNeighbours(int nodeId1, int nodeId2)

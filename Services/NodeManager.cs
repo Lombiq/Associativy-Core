@@ -31,8 +31,8 @@ namespace Associativy.Services
             IContentManager contentManager,
             IRepository<TNodePartRecord> nodePartRecordRepository)
         {
-            this._contentManager = contentManager;
-            this._nodePartRecordRepository = nodePartRecordRepository;
+            _contentManager = contentManager;
+            _nodePartRecordRepository = nodePartRecordRepository;
         }
 
         public IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
