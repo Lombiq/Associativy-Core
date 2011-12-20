@@ -12,12 +12,6 @@ using QuickGraph;
 
 namespace Associativy.Services
 {
-    /// <summary>
-    /// All suitable methods protected to aid inheritence.
-    /// </summary>
-    /// <typeparam name="TNodePart"></typeparam>
-    /// <typeparam name="TNodePartRecord"></typeparam>
-    /// <typeparam name="TNodeToNodeConnectorRecord"></typeparam>
     [OrchardFeature("Associativy")]
     // Önmagában csak a TNodePart kellene
     public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>

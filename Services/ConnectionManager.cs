@@ -10,13 +10,6 @@ using System;
 
 namespace Associativy.Services
 {
-    /// <summary>
-    /// </summary>
-    /// <remarks>
-    /// All suitable methods protected to aid inheritence.
-    /// </remarks>
-    /// <typeparam name="TNodePart"></typeparam>
-    /// <typeparam name="TNodePartRecord"></typeparam>
     [OrchardFeature("Associativy")]
     public class ConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
@@ -100,7 +93,6 @@ namespace Associativy.Services
                 Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
         }
 
-        // TODO: refactor to DRY (see NodeManager with the same)
         private void OnGraphChanged()
         {
             if (GraphChanged != null)

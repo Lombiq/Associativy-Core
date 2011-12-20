@@ -10,13 +10,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
-    /// <summary>
-    /// </summary>
-    /// <remarks>
-    /// All suitable methods protected to aid inheritence.
-    /// </remarks>
-    /// <typeparam name="TNodePart"></typeparam>
-    /// <typeparam name="TNodePartRecord"></typeparam>
     [OrchardFeature("Associativy")]
     public class NodeManager<TNodePart, TNodePartRecord> : INodeManager<TNodePart, TNodePartRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
@@ -76,7 +69,7 @@ namespace Associativy.Services
 
         public TNodePart Get(string label)
         {
-            // inkább LIKE-kal?
+            // Maybe rather as something like with a LIKE query?
             return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
         }
 
@@ -122,7 +115,6 @@ namespace Associativy.Services
         }
         #endregion
 
-        // TODO: refactor to DRY (see ConnectionManager with the same)
         private void OnGraphChanged()
         {
             if (GraphChanged != null)

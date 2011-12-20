@@ -12,8 +12,18 @@ namespace Associativy.Services
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
     {
+        /// <summary>
+        /// Event handler that is triggered when something changes in the graph
+        /// </summary>
         event EventHandler<GraphEventArgs> GraphChanged;
 
+
+        /// <summary>
+        /// Lists terms similar to the snippet
+        /// </summary>
+        /// <param name="snippet">The snippet to search for</param>
+        /// <param name="maxCount">Maximal number of items returned</param>
+        /// <returns>Terms similar to the snippet</returns>
         IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
         
         #region Node CRUD
