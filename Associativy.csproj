@@ -45,6 +45,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\lib\autofac\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="ClaySharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\ClaySharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="QuickGraph">
       <HintPath>bin\QuickGraph\QuickGraph.dll</HintPath>
@@ -73,13 +77,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\AssociativyAutoComplete.js" />
-    <Content Include="Scripts\Dracula\Curry-1.0.1.js" />
-    <Content Include="Scripts\Dracula\dracula_algorithms.js" />
-    <Content Include="Scripts\Dracula\dracula_graffle.js" />
-    <Content Include="Scripts\Dracula\dracula_graph.js" />
-    <Content Include="Scripts\Dracula\raphael-min.js" />
-    <Content Include="Scripts\Dracula\seedrandom.js" />
+    <Content Include="Scripts\FrontendEngines\AssociativyAutoComplete.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\Curry-1.0.1.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_algorithms.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graffle.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graph.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -92,9 +96,14 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\FrontendEngineDriver.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\DraculaDriver.cs" />
+    <Compile Include="FrontendEngines\FrontendEngineDriverLocator.cs" />
     <Compile Include="Events\GraphChangedEventArgs.cs" />
     <Compile Include="Events\GraphEventArgs.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
+    <Compile Include="FrontendEngines\IFrontendEngineDriver.cs" />
+    <Compile Include="FrontendEngines\IFrontendEngineDriverLocator.cs" />
     <Compile Include="Models\INodeParams.cs" />
     <Compile Include="Models\INode.cs" />
     <Compile Include="Models\INodeToNodeConnectorRecord.cs" />
@@ -112,22 +121,21 @@
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
-    <Compile Include="ViewModels\GraphNodeViewModel.cs" />
-    <Compile Include="ViewModels\GraphResultViewModel.cs" />
-    <Compile Include="ViewModels\IGraphNodeViewModel.cs" />
-    <Compile Include="ViewModels\IGraphResultViewModel.cs" />
-    <Compile Include="ViewModels\ISearchViewModel.cs" />
-    <Compile Include="ViewModels\JITGraphNodeViewModel.cs" />
-    <Compile Include="ViewModels\SearchViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\GraphNodeViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\GraphResultViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\IGraphNodeViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\IGraphResultViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\ISearchViewModel.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\JITGraphNodeViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\SearchViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\DisplayTemplates\Graphs\DisplayEngines\Dracula.cshtml" />
-    <Content Include="Views\DisplayTemplates\Graphs\DisplayEngines\JIT.cshtml" />
-    <Content Include="Views\DisplayTemplates\Graphs\NotFound.cshtml" />
-    <Content Include="Views\Graphs.Result.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Graph.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\NotFound.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Result.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\DisplayTemplates\Graphs\SearchForm.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\SearchForm.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Orchard\Orchard.Framework.csproj">
@@ -138,6 +146,9 @@
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

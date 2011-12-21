@@ -14,12 +14,14 @@ using Orchard.Localization;
 using Orchard.Mvc;
 using Orchard.Themes;
 using QuickGraph;
+using Associativy.FrontendEngines.ViewModels;
+using Associativy.FrontendEngines;
 
 namespace Associativy.Controllers
 {
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller
+    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller, IUpdateModel
         where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -27,48 +29,37 @@ namespace Associativy.Controllers
     {
         protected readonly TAssocociativyServices _associativyServices;
         protected readonly IOrchardServices _orchardServices;
-        protected dynamic _shapeFactory;
+        protected IFrontendEngineDriver<TNodePart> _frontendEngineDriver;
 
         public Localizer T { get; set; }
 
         protected AssociationsController(
             TAssocociativyServices associativyService,
             IOrchardServices orchardServices,
-            IShapeFactory shapeFactory)
+            IFrontendEngineDriverLocator<TNodePart> frontendEngineDriverLocator)
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _shapeFactory = shapeFactory;
+            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
 
             T = NullLocalizer.Instance;
         }
 
-        protected ActionResult ShowWholeGraph<TSearchViewModel, TGraphResultViewModel, TGraphNodeViewModel>()
-            where TSearchViewModel : class, ISearchViewModel, new()
-            where TGraphResultViewModel : IGraphResultViewModel, new()
-            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
+        public ActionResult ShowWholeGraph()
         {
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
-            return GraphResult(
-                    SearchFormShape(
-                        new TSearchViewModel()
-                    ),
-                    GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(
-                        _associativyServices.Mind.GetAllAssociations(useCache: true)
-                    )
+            return new ShapeResult(
+                    this,
+                    _frontendEngineDriver.GraphResultShape(_associativyServices.Mind.GetAllAssociations(useCache: true))
                 );
         }
 
-        protected ActionResult ShowAssociations<TSearchViewModel, TGraphResultViewModel, TGraphNodeViewModel>()
-            where TSearchViewModel : class, ISearchViewModel, new()
-            where TGraphResultViewModel : IGraphResultViewModel, new()
-            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
+        public ActionResult ShowAssociations()
         {
             var useSimpleAlgorithm = false;
 
-            var viewModel = new TSearchViewModel();
-            TryUpdateModel(viewModel);
+            var searchFormShape = _frontendEngineDriver.SearchFormShape(updater: this);
 
             if (ModelState.IsValid)
             {
@@ -86,10 +77,9 @@ namespace Associativy.Controllers
                 {
                     _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
 
-                    return GraphResult(
-                        SearchFormShape<TSearchViewModel>(viewModel),
-                        GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(associationsGraph)
-                        );
+                    return _frontendEngineDriver.GraphResultShape(
+                        searchFormShape,
+                        _frontendEngineDriver.GraphShape(associationsGraph));
                 }
                 else
                 {
@@ -105,18 +95,6 @@ namespace Associativy.Controllers
 
                 return null;
             }
-        }
-
-        protected ActionResult AssociationsNotFound<TSearchViewModel>(TSearchViewModel viewModel)
-            where TSearchViewModel : class, ISearchViewModel, new()
-        {
-            return GraphResult(
-                    SearchFormShape<TSearchViewModel>(viewModel),
-                    _shapeFactory.DisplayTemplate(
-                        TemplateName: "Graphs/NotFound",
-                        Model: viewModel,
-                        Prefix: null)
-                );
         }
 
         public JsonResult FetchSimilarTerms(string term)
@@ -135,63 +113,14 @@ namespace Associativy.Controllers
             return null;
         }
 
-        protected ShapeResult GraphResult(dynamic searchFormShape, dynamic resultShape)
+        bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties)
         {
-            return new ShapeResult(this,
-                _orchardServices.New.Graphs_Result(
-                    SearchForm: searchFormShape,
-                    Result: resultShape
-                    )
-                );
+            return TryUpdateModel(model, prefix, includeProperties, excludeProperties);
         }
 
-        protected dynamic GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> graph)
-            where TGraphResultViewModel : IGraphResultViewModel, new()
-            where TGraphNodeViewModel : IGraphNodeViewModel<TNodePart>, new()
+        void IUpdateModel.AddModelError(string key, LocalizedString errorMessage)
         {
-            var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
-
-            var edges = graph.Edges.ToList();
-            foreach (var edge in edges)
-            {
-                if (!viewNodes.ContainsKey(edge.Source.Id))
-                {
-                    viewNodes[edge.Source.Id] = new TGraphNodeViewModel();
-                    viewNodes[edge.Source.Id].MapFromNode(edge.Source);
-                }
-                viewNodes[edge.Source.Id].NeighbourIds.Add(edge.Target.Id);
-
-                if (!viewNodes.ContainsKey(edge.Target.Id))
-                {
-                    viewNodes[edge.Target.Id] = new TGraphNodeViewModel();
-                    viewNodes[edge.Target.Id].MapFromNode(edge.Target);
-                }
-                viewNodes[edge.Target.Id].NeighbourIds.Add(edge.Source.Id);
-            }
-
-            // Necessary as shapes and views can't be generic. The nodes can be casted to the
-            // appropriate type as necessary.
-            var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
-
-            // !!!!!!!!!! orchardServices.New["dkdk-2"] = "jjJ";
-            // plugin gráfmegjelenítőknek? Delegate?
-            return _shapeFactory.DisplayTemplate(
-                TemplateName: "Graphs/DisplayEngines/Dracula",
-                Model: new TGraphResultViewModel() { Nodes = nodes },
-                Prefix: null);
-        }
-
-        protected dynamic SearchFormShape<TSearchViewModel>(TSearchViewModel searchViewModel)
-            where TSearchViewModel : class, ISearchViewModel, new()
-        {
-            var model = new TSearchViewModel();
-            return _orchardServices.New.SearchForm(
-                ViewModel: model,
-                SearchFormShape: _shapeFactory.DisplayTemplate(
-                    TemplateName: "Graphs/SearchForm",
-                    Model: model,
-                    Prefix: null)
-                );
+            ModelState.AddModelError(key, errorMessage.ToString());
         }
     }
 }

@@ -370,7 +370,7 @@ namespace Associativy.Services
             ctx.Monitor(_signals.When(GraphSignal));
         }
 
-        private void TriggerGraphChangedSignal(object sender, GraphEventArgs e)
+        private void TriggerGraphChangedSignal(object sender, GraphChangedEventArgs e)
         {
             _signals.Trigger(GraphSignal);
         }

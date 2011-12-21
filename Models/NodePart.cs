@@ -8,7 +8,8 @@ namespace Associativy.Models
     /// Abstract implementation of INode as a part for further use
     /// </summary>
     [OrchardFeature("Associativy")]
-    public abstract class NodePart<TRecord> :  ContentPart<TRecord>, INode where TRecord : NodePartRecord
+    public abstract class NodePart<TRecord> :  ContentPart<TRecord>, INode
+        where TRecord : NodePartRecord
     {
         [Required]
         public string Label

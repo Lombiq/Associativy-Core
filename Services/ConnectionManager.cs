@@ -17,7 +17,7 @@ namespace Associativy.Services
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
 
-        public event EventHandler<GraphEventArgs> GraphChanged;
+        public event EventHandler<GraphChangedEventArgs> GraphChanged;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
@@ -102,7 +102,7 @@ namespace Associativy.Services
         {
             if (GraphChanged != null)
             {
-                GraphChanged(this, new GraphEventArgs());
+                GraphChanged(this, new GraphChangedEventArgs());
             }
         }
     }
