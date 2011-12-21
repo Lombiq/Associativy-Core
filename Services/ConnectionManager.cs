@@ -26,19 +26,19 @@ namespace Associativy.Services
             _contentManager = contentManager;
         }
 
-        public bool AreNeighbours(int nodeId1, int nodeId2)
+        public virtual bool AreNeighbours(int nodeId1, int nodeId2)
         {
             return _nodeToNodeRecordRepository.Count(connector =>
                 connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
                 connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
         }
 
-        public void Connect(INode node1, INode node2)
+        public virtual void Connect(INode node1, INode node2)
         {
             Connect(node1.Id, node2.Id);
         }
 
-        public void Connect(int nodeId1, int nodeId2)
+        public virtual void Connect(int nodeId1, int nodeId2)
         {
             // This check is not perfect, as all content items are counted.
             // Good enough.
@@ -52,12 +52,12 @@ namespace Associativy.Services
             OnGraphChanged();
         }
 
-        public void DeleteFromNode(INode node)
+        public virtual void DeleteFromNode(INode node)
         {
             DeleteFromNode(node.Id);
         }
 
-        public void DeleteFromNode(int nodeId)
+        public virtual void DeleteFromNode(int nodeId)
         {
             // Since there is no cummulative delete...
             var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
@@ -71,19 +71,19 @@ namespace Associativy.Services
             OnGraphChanged();
         }
 
-        public void Delete(int id)
+        public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
             OnGraphChanged();
         }
 
-        public IList<TNodeToNodeConnectorRecord> GetAll()
+        public virtual IList<TNodeToNodeConnectorRecord> GetAll()
         {
             return _nodeToNodeRecordRepository.Table.ToList();
         }
 
-        public IList<int> GetNeighbourIds(int nodeId)
+        public virtual IList<int> GetNeighbourIds(int nodeId)
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
             return _nodeToNodeRecordRepository.
@@ -91,7 +91,7 @@ namespace Associativy.Services
                 Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
         }
 
-        public int GetNeighbourCount(int nodeId)
+        public virtual int GetNeighbourCount(int nodeId)
         {
             return _nodeToNodeRecordRepository.
                 Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);

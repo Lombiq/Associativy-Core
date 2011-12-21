@@ -28,7 +28,7 @@ namespace Associativy.Services
             _nodePartRecordRepository = nodePartRecordRepository;
         }
 
-        public IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
+        public virtual IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
             return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
@@ -40,7 +40,7 @@ namespace Associativy.Services
             get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
         }
 
-        public TNodePart Create(INodeParams<TNodePart> nodeParams)
+        public virtual TNodePart Create(INodeParams<TNodePart> nodeParams)
         {
             var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
             nodeParams.MapToNode(node);
@@ -51,35 +51,35 @@ namespace Associativy.Services
             return node;
         }
 
-        public TNodePart New(string contentType)
+        public virtual TNodePart New(string contentType)
         {
             return _contentManager.New<TNodePart>(contentType);
         }
 
-        public void Create(ContentItem node)
+        public virtual void Create(ContentItem node)
         {
             _contentManager.Create(node);
             OnGraphChanged();
         }
 
-        public TNodePart Get(int id)
+        public virtual TNodePart Get(int id)
         {
             return _contentManager.Get<TNodePart>(id);
         }
 
-        public TNodePart Get(string label)
+        public virtual TNodePart Get(string label)
         {
             // Maybe rather as something like with a LIKE query?
             return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
         }
 
-        public IList<TNodePart> GetMany(IList<int> ids)
+        public virtual IList<TNodePart> GetMany(IList<int> ids)
         {
             //? contentManager.GetMany<TNodePart>(ids, VersionOptions.AllVersions, new QueryHints().ExpandParts<TNodePart>());
             return ContentQuery.Where(node => ids.Contains(node.Id)).List().ToList();
         }
 
-        public TNodePart Update(INodeParams<TNodePart> nodeParams)
+        public virtual TNodePart Update(INodeParams<TNodePart> nodeParams)
         {
             if (nodeParams.Id == 0) throw new ArgumentException("When updating a node the Id property of the INodeParams object should be set.");
 
@@ -95,7 +95,7 @@ namespace Associativy.Services
             return node;
         }
 
-        public TNodePart Update(TNodePart node)
+        public virtual TNodePart Update(TNodePart node)
         {
             // What should happen with other parts?
             if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
@@ -107,7 +107,7 @@ namespace Associativy.Services
             return node;
         }
 
-        public void Remove(int id)
+        public virtual void Remove(int id)
         {
             _contentManager.Remove(_contentManager.Get(id));
 

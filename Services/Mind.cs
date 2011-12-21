@@ -43,7 +43,7 @@ namespace Associativy.Services
             _nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
+        public virtual UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
         {
             if (useCache)
             {
@@ -78,7 +78,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        public UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(
+        public virtual UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(
             IList<TNodePart> nodes, 
             bool simpleAlgorithm = false, 
             int zoomLevel = 0, 
