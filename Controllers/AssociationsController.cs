@@ -59,15 +59,17 @@ namespace Associativy.Controllers
         {
             var useSimpleAlgorithm = false;
 
-            var searchFormShape = _frontendEngineDriver.SearchFormShape(updater: this);
+            var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
 
             if (ModelState.IsValid)
             {
-                var searched = new List<TNodePart>(viewModel.TermsArray.Length);
-                foreach (var term in viewModel.TermsArray)
+                _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchViewModel.Terms).ToString();
+
+                var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
+                foreach (var term in searchViewModel.TermsArray)
                 {
                     var node = _associativyServices.NodeManager.Get(term);
-                    if (node == null) return AssociationsNotFound<TSearchViewModel>(viewModel);
+                    if (node == null) return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFound(searchViewModel));
                     searched.Add(node);
                 }
 
@@ -75,15 +77,16 @@ namespace Associativy.Controllers
 
                 if (associationsGraph != null)
                 {
-                    _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", String.Join<string>(", ", viewModel.TermsArray)).ToString();
-
-                    return _frontendEngineDriver.GraphResultShape(
-                        searchFormShape,
-                        _frontendEngineDriver.GraphShape(associationsGraph));
+                    return new ShapeResult(
+                        this,
+                        _frontendEngineDriver.GraphResultShape(
+                            _frontendEngineDriver.SearchFormShape(searchViewModel),
+                            _frontendEngineDriver.GraphShape(associationsGraph))
+                        );
                 }
                 else
                 {
-                    return AssociationsNotFound<TSearchViewModel>(viewModel);
+                    return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFound(searchViewModel));
                 }
             }
             else

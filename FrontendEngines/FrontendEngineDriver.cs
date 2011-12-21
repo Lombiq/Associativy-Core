@@ -35,10 +35,19 @@ namespace Associativy.FrontendEngines
             _workContextAccessor = workContextAccessor;
         }
 
-        public dynamic SearchFormShape(ISearchViewModel searchViewModel = null, IUpdateModel updater = null)
+        public virtual ISearchViewModel GetSearchViewModel(IUpdateModel updater = null)
         {
-            if (searchViewModel == null) searchViewModel = _workContextAccessor.GetContext().Resolve<ISearchViewModel>();
+            var searchViewModel = _workContextAccessor.GetContext().Resolve<ISearchViewModel>();
+
             if (updater != null) updater.TryUpdateModel(searchViewModel, null, null, null);
+
+            return searchViewModel;
+        }
+
+        public virtual dynamic SearchFormShape(ISearchViewModel searchViewModel = null)
+        {
+            if (searchViewModel == null) searchViewModel = GetSearchViewModel();
+            
 
             return _shapeFactory.DisplayTemplate(
                     TemplateName: "FrontendEngines/SearchForm",
@@ -46,7 +55,7 @@ namespace Associativy.FrontendEngines
                     Prefix: null);
         }
 
-        public dynamic GraphShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
+        public virtual dynamic GraphShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
         {
             var viewNodes = new Dictionary<int, IGraphNodeViewModel<TNode>>(graph.VertexCount);
 
@@ -81,12 +90,12 @@ namespace Associativy.FrontendEngines
                 Prefix: null);
         }
 
-        public dynamic GraphResultShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
+        public virtual dynamic GraphResultShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
         {
             return GraphResultShape(SearchFormShape(), GraphShape(graph));
         }
 
-        public dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape)
+        public virtual dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape)
         {
             dynamic New = new ClayFactory();
             var model = New.Model();
@@ -99,16 +108,15 @@ namespace Associativy.FrontendEngines
                 Prefix: null);
         }
 
-    //    protected ActionResult AssociationsNotFound<TSearchViewModel>(TSearchViewModel viewModel)
-    //where TSearchViewModel : class, ISearchViewModel, new()
-    //    {
-    //        return GraphResult(
-    //                SearchFormShape<TSearchViewModel>(viewModel),
-    //                _shapeFactory.DisplayTemplate(
-    //                    TemplateName: "Graphs/NotFound",
-    //                    Model: viewModel,
-    //                    Prefix: null)
-    //            );
-    //    }
+        public virtual dynamic AssociationsNotFound(ISearchViewModel searchViewModel)
+        {
+            return GraphResultShape(
+                    SearchFormShape(searchViewModel),
+                    _shapeFactory.DisplayTemplate(
+                        TemplateName: "FrontendEngines/NotFound",
+                        Model: searchViewModel,
+                        Prefix: null)
+                );
+        }
     }
 }
