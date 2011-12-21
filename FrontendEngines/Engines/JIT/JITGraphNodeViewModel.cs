@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Associativy.Models;
 using Associativy.FrontendEngines.ViewModels;
+using Associativy.Models;
 using Orchard.Environment.Extensions;
 
 namespace Associativy.FrontendEngines.Engines.JIT.ViewModels

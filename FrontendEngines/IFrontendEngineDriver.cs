@@ -1,8 +1,7 @@
-﻿using System;
-using QuickGraph;
+﻿using Associativy.FrontendEngines.ViewModels;
 using Associativy.Models;
-using Associativy.FrontendEngines.ViewModels;
 using Orchard.ContentManagement;
+using QuickGraph;
 
 namespace Associativy.FrontendEngines
 {

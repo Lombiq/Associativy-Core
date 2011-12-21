@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Autofac.Core;
-using Autofac;
-using Associativy.Services;
-using Associativy.FrontendEngines;
+﻿using Associativy.FrontendEngines;
 using Associativy.FrontendEngines.Engines.Dracula;
 using Associativy.FrontendEngines.ViewModels;
+using Associativy.Services;
+using Autofac;
+using Autofac.Core;
+using Orchard.Environment.Extensions;
 
 namespace Associativy
 {
+    [OrchardFeature("Associativy")]
     public class AssociativyModule : IModule
     {
         public void Configure(IComponentRegistry componentRegistry)

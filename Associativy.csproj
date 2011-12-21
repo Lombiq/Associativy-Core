@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\JITDriver.cs" />
     <Compile Include="FrontendEngines\FrontendEngineDriver.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\DraculaDriver.cs" />
     <Compile Include="FrontendEngines\FrontendEngineDriverLocator.cs" />

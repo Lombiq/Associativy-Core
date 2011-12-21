@@ -7,7 +7,6 @@ using Orchard.Caching;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
-using Orchard.Services;
 using QuickGraph;
 
 namespace Associativy.Services
