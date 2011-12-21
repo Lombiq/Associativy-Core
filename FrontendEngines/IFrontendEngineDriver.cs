@@ -31,14 +31,14 @@ namespace Associativy.FrontendEngines
         /// </summary>
         /// <param name="graph">The graph to display</param>
         /// <returns>The shape of the graph</returns>
-        dynamic GraphShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph);
+        dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph
         /// </summary>
         /// <param name="graph">The graph to display</param>
         /// <returns>The result shape containing the search from and the graph</returns>
-        dynamic GraphResultShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph);
+        dynamic GraphResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph
