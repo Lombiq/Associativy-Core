@@ -7,7 +7,5 @@ namespace Associativy.FrontendEngines.ViewModels
     {
         string Terms { get; set; }
         string[] TermsArray { get; }
-        RouteValueDictionary PostRouteValueDictionary { get; set; }
-        string FetchUrl { get; set; }
     }
 }

@@ -33,8 +33,5 @@ namespace Associativy.FrontendEngines.ViewModels
             get;
             private set;
         }
-
-        public RouteValueDictionary PostRouteValueDictionary { get; set; }
-        public string FetchUrl { get; set; }
     }
 }
