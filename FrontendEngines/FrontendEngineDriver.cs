@@ -10,9 +10,11 @@ using QuickGraph;
 using Associativy.Models;
 using System.Dynamic;
 using ClaySharp;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.FrontendEngines
 {
+    [OrchardFeature("Associativy")]
     public abstract class FrontendEngineDriver<TNode> : IFrontendEngineDriver<TNode>
         where TNode : INode
     {
