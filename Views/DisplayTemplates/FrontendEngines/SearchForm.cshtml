@@ -1,0 +1,20 @@
+﻿@model Associativy.FrontendEngines.ViewModels.ISearchViewModel
+
+@{
+    Script.Require("AssociativyAutoComplete").AtHead();
+    Style.Require("jQueryUI_Orchard");
+    var routeData = Html.ViewContext.RouteData.Values;
+}
+
+
+@using (Html.BeginForm("ShowAssociations", routeData["controller"].ToString(), new { Area = routeData["area"] }, FormMethod.Get, new { @id = "notions-search-form" }))
+{
+    <fieldset>
+        @Html.TextBox("Terms", Model.Terms)
+        <button type="submit">@T("Find associations")</button>
+    </fieldset>
+}
+
+<script type="text/javascript">
+    $.associativyAutoComplete.terms("Terms", '@Url.Action("FetchSimilarTerms", new { Controller = routeData["controller"], Area = routeData["area"] })');
+</script>
