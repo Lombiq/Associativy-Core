@@ -36,7 +36,14 @@ namespace Associativy.FrontendEngines
 
         public virtual ISearchViewModel GetSearchViewModel(IUpdateModel updater = null)
         {
-            var searchViewModel = _workContextAccessor.GetContext().Resolve<ISearchViewModel>();
+            return GetSearchViewModel<ISearchViewModel>(updater);
+        }
+
+        // Can be used in derived classes to switch the ISearchViewModel implementation
+        protected virtual TSearchViewModel GetSearchViewModel<TSearchViewModel>(IUpdateModel updater = null)
+            where TSearchViewModel : class, ISearchViewModel
+        {
+            var searchViewModel = _workContextAccessor.GetContext().Resolve<TSearchViewModel>();
 
             if (updater != null) updater.TryUpdateModel(searchViewModel, null, null, null);
 
@@ -45,8 +52,14 @@ namespace Associativy.FrontendEngines
 
         public virtual dynamic SearchFormShape(ISearchViewModel searchViewModel = null)
         {
-            if (searchViewModel == null) searchViewModel = GetSearchViewModel();
-            
+            return SearchFormShape<ISearchViewModel>(searchViewModel);
+        }
+
+        // Can be used in derived classes to switch the ISearchViewModel implementation
+        protected virtual dynamic SearchFormShape<TSearchViewModel>(TSearchViewModel searchViewModel = null)
+            where TSearchViewModel : class, ISearchViewModel
+        {
+            if (searchViewModel == null) searchViewModel = GetSearchViewModel<TSearchViewModel>();
 
             return _shapeFactory.DisplayTemplate(
                     TemplateName: "FrontendEngines/SearchForm",
@@ -54,23 +67,31 @@ namespace Associativy.FrontendEngines
                     Prefix: null);
         }
 
-        public virtual dynamic GraphShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
+        public virtual dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
-            var viewNodes = new Dictionary<int, IGraphNodeViewModel<TNode>>(graph.VertexCount);
+            return GraphShape<IGraphResultViewModel, IGraphNodeViewModel<TNode>>(graph);
+        }
+
+        // Can be used in derived classes to switch the ISearchViewModel implementation
+        protected virtual dynamic GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+            where TGraphResultViewModel : IGraphResultViewModel
+            where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
+        {
+            var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
 
             var edges = graph.Edges.ToList();
             foreach (var edge in edges)
             {
                 if (!viewNodes.ContainsKey(edge.Source.Id))
                 {
-                    viewNodes[edge.Source.Id] = _workContextAccessor.GetContext().Resolve<IGraphNodeViewModel<TNode>>();
+                    viewNodes[edge.Source.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
                     viewNodes[edge.Source.Id].MapFromNode(edge.Source);
                 }
                 viewNodes[edge.Source.Id].NeighbourIds.Add(edge.Target.Id);
 
                 if (!viewNodes.ContainsKey(edge.Target.Id))
                 {
-                    viewNodes[edge.Target.Id] = _workContextAccessor.GetContext().Resolve<IGraphNodeViewModel<TNode>>();
+                    viewNodes[edge.Target.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
                     viewNodes[edge.Target.Id].MapFromNode(edge.Target);
                 }
                 viewNodes[edge.Target.Id].NeighbourIds.Add(edge.Source.Id);
@@ -80,7 +101,7 @@ namespace Associativy.FrontendEngines
             // appropriate type as necessary.
             var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
 
-            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<IGraphResultViewModel>();
+            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<TGraphResultViewModel>();
             graphResultViewModel.Nodes = nodes;
 
             return _shapeFactory.DisplayTemplate(
@@ -89,7 +110,7 @@ namespace Associativy.FrontendEngines
                 Prefix: null);
         }
 
-        public virtual dynamic GraphResultShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph)
+        public virtual dynamic GraphResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
             return GraphResultShape(SearchFormShape(), GraphShape(graph));
         }
@@ -108,6 +129,13 @@ namespace Associativy.FrontendEngines
         }
 
         public virtual dynamic AssociationsNotFoundShape(ISearchViewModel searchViewModel)
+        {
+            return AssociationsNotFoundShape<ISearchViewModel>(searchViewModel);
+        }
+
+        // Can be used in derived classes to switch the ISearchViewModel implementation
+        protected virtual dynamic AssociationsNotFoundShape<TSearchViewModel>(TSearchViewModel searchViewModel)
+            where TSearchViewModel : class, ISearchViewModel
         {
             return GraphResultShape(
                     SearchFormShape(searchViewModel),
