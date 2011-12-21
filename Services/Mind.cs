@@ -43,7 +43,7 @@ namespace Associativy.Services
             _nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
 
-        public virtual UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
+        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
         {
             if (useCache)
             {
@@ -78,7 +78,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        public virtual UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeAssociations(
+        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
             IList<TNodePart> nodes, 
             bool simpleAlgorithm = false, 
             int zoomLevel = 0, 
@@ -115,7 +115,7 @@ namespace Associativy.Services
             }
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
         {
             var graph = GraphFactory();
 
@@ -130,7 +130,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
@@ -161,7 +161,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes)
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes)
         {
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
@@ -379,9 +379,9 @@ namespace Associativy.Services
             return CachePrefix + name;
         }
 
-        private UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>> GraphFactory()
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GraphFactory()
         {
-            return new UndirectedGraph<TNodePart, UndirectedEdge<TNodePart>>();
+            return new UndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>();
         }
     }
 }
