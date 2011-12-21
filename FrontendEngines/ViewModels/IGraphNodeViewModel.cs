@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Orchard;
+using Associativy.Models;
 
 namespace Associativy.FrontendEngines.ViewModels
 {
@@ -11,7 +12,7 @@ namespace Associativy.FrontendEngines.ViewModels
     }
 
     public interface IGraphNodeViewModel<TNode> : IGraphNodeViewModel
-     where TNode : Associativy.Models.INode
+     where TNode : INode
     {
         TNode Node { get; set; }
         void MapFromNode(TNode node);
