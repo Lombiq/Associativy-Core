@@ -108,7 +108,7 @@ namespace Associativy.FrontendEngines
                 Prefix: null);
         }
 
-        public virtual dynamic AssociationsNotFound(ISearchViewModel searchViewModel)
+        public virtual dynamic AssociationsNotFoundShape(ISearchViewModel searchViewModel)
         {
             return GraphResultShape(
                     SearchFormShape(searchViewModel),

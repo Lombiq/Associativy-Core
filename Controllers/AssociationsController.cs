@@ -69,7 +69,7 @@ namespace Associativy.Controllers
                 foreach (var term in searchViewModel.TermsArray)
                 {
                     var node = _associativyServices.NodeManager.Get(term);
-                    if (node == null) return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFound(searchViewModel));
+                    if (node == null) return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFoundShape(searchViewModel));
                     searched.Add(node);
                 }
 
@@ -86,7 +86,7 @@ namespace Associativy.Controllers
                 }
                 else
                 {
-                    return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFound(searchViewModel));
+                    return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFoundShape(searchViewModel));
                 }
             }
             else

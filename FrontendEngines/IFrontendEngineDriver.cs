@@ -14,6 +14,6 @@ namespace Associativy.FrontendEngines
         dynamic GraphShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph);
         dynamic GraphResultShape(UndirectedGraph<TNode, UndirectedEdge<TNode>> graph);
         dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape);
-        dynamic AssociationsNotFound(ISearchViewModel searchViewModel);
+        dynamic AssociationsNotFoundShape(ISearchViewModel searchViewModel);
     }
 }
