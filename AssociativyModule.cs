@@ -5,6 +5,7 @@ using Associativy.Services;
 using Autofac;
 using Autofac.Core;
 using Orchard.Environment.Extensions;
+using Associativy.FrontendEngines.Engines.JIT;
 
 namespace Associativy
 {
@@ -25,6 +26,7 @@ namespace Associativy
 
             // Frontend engine drivers
             builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
 
             builder.Update(componentRegistry);
         }

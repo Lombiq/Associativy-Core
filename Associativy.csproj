@@ -84,6 +84,7 @@
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graph.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\JIT\Custom.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -148,8 +149,9 @@
       <Name>Orchard.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\Graph.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

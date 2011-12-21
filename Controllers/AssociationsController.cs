@@ -35,7 +35,7 @@ namespace Associativy.Controllers
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
+            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("JIT");
 
             T = NullLocalizer.Instance;
         }
