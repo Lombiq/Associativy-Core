@@ -6,7 +6,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.FrontendEngines.Engines.JIT
 {
     [OrchardFeature("Associativy")]
-    public class JITDriver<TNode> : FrontendEngineDriver<TNode>,  IFrontendEngineDriver<TNode>
+    public class JITDriver<TNode> : FrontendEngineDriver<TNode>
         where TNode : INode
     {
         protected override string Name

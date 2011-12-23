@@ -87,14 +87,14 @@ namespace Associativy.FrontendEngines
                     viewNodes[edge.Source.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
                     viewNodes[edge.Source.Id].MapFromNode(edge.Source);
                 }
-                viewNodes[edge.Source.Id].NeighbourIds.Add(edge.Target.Id);
+                viewNodes[edge.Source.Id].Neighbours.Add(edge.Target);
 
                 if (!viewNodes.ContainsKey(edge.Target.Id))
                 {
                     viewNodes[edge.Target.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
                     viewNodes[edge.Target.Id].MapFromNode(edge.Target);
                 }
-                viewNodes[edge.Target.Id].NeighbourIds.Add(edge.Source.Id);
+                viewNodes[edge.Target.Id].Neighbours.Add(edge.Source);
             }
 
             // Necessary as shapes and views can't be generic. The nodes can be casted to the

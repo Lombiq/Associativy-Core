@@ -15,13 +15,13 @@ $(document).ready(function(){
     {
         var node = nodeItem.Value;
         @: g.addNode("@node.Id", { label : "@Html.Raw(node.Label)" }); @*Without Html.Raw() the output would be encoded, non-ASCII characters too*@
-        foreach (var id in node.NeighbourIds)
+        foreach (var neighbour in node.Neighbours)
         {
-            var key = Math.Min(node.Id, id).ToString() + " " + Math.Max(node.Id, id).ToString();
+            var key = Math.Min(node.Id, neighbour.Id).ToString() + " " + Math.Max(node.Id, neighbour.Id).ToString();
             if (!edgeRegister.ContainsKey(key))
             {
                 edgeRegister[key] = true;
-                edges += "g.addEdge(\"" + node.Id + "\", \"" + id + "\");";
+                edges += "g.addEdge(\"" + node.Id + "\", \"" + neighbour.Id + "\");";
             }
         }
     }

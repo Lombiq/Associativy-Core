@@ -10,12 +10,12 @@ namespace Associativy.FrontendEngines.ViewModels
     {
         public int Id { get; set; }
         public string Label { get; set; }
-        public IList<int> NeighbourIds { get; set; }
+        public IList<INode> Neighbours { get; set; }
         public TNode Node { get; set; }
 
         public GraphNodeViewModel()
         {
-            NeighbourIds = new List<int>();
+            Neighbours = new List<INode>();
         }
 
         public virtual void MapFromNode(TNode node)

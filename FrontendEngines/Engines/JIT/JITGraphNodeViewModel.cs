@@ -25,10 +25,10 @@ namespace Associativy.FrontendEngines.Engines.JIT.ViewModels
             set { Label = value; }
         }
 
-        public IList<int> adjacencies
+        public IList<INode> adjacencies
         {
-            get { return NeighbourIds; }
-            set { NeighbourIds = value; }
+            get { return Neighbours; }
+            set { Neighbours = value; }
         }
 
         public IDictionary<string, string> data { get; set; }
