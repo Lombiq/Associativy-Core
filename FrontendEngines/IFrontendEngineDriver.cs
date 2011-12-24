@@ -38,7 +38,7 @@ namespace Associativy.FrontendEngines
         /// </summary>
         /// <param name="graph">The graph to display</param>
         /// <returns>The result shape containing the search from and the graph</returns>
-        dynamic GraphResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
+        dynamic SearchResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph
@@ -46,7 +46,7 @@ namespace Associativy.FrontendEngines
         /// <param name="searchFormShape">Shape of the search form</param>
         /// <param name="graphShape">Shape of the graph</param>
         /// <returns>The result shape containing the search from and the graph</returns>
-        dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape);
+        dynamic SearchResultShape(dynamic searchFormShape, dynamic graphShape);
 
         /// <summary>
         /// Returns the not found shape

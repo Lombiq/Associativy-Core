@@ -116,21 +116,21 @@ namespace Associativy.FrontendEngines
             return viewNodes;
         }
 
-        public virtual dynamic GraphResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+        public virtual dynamic SearchResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
-            return GraphResultShape(SearchFormShape(), GraphShape(graph));
+            return SearchResultShape(SearchFormShape(), GraphShape(graph));
         }
 
-        public virtual dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape)
+        public virtual dynamic SearchResultShape(dynamic searchFormShape, dynamic graphShape)
         {
-            return GraphResultShape<IGraphResultViewModel>(searchFormShape, graphShape);
+            return SearchResultShape<ISearchResultViewModel>(searchFormShape, graphShape);
         }
 
-        // Can be used in derived classes to switch the IGraphResultViewModel implementation
-        protected virtual dynamic GraphResultShape<TGraphResultViewModel>(dynamic searchFormShape, dynamic graphShape)
-            where TGraphResultViewModel : IGraphResultViewModel
+        // Can be used in derived classes to switch the ISearchResultViewModel implementation
+        protected virtual dynamic SearchResultShape<TSearchViewModel>(dynamic searchFormShape, dynamic graphShape)
+            where TSearchViewModel : ISearchResultViewModel
         {
-            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<IGraphResultViewModel>();
+            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<ISearchResultViewModel>();
             graphResultViewModel.SearchForm = searchFormShape;
             graphResultViewModel.Graph = graphShape;
 
@@ -149,7 +149,7 @@ namespace Associativy.FrontendEngines
         protected virtual dynamic AssociationsNotFoundShape<TSearchViewModel>(TSearchViewModel searchViewModel)
             where TSearchViewModel : class, ISearchViewModel
         {
-            return GraphResultShape(
+            return SearchResultShape(
                     SearchFormShape(searchViewModel),
                     _shapeFactory.DisplayTemplate(
                         TemplateName: "FrontendEngines/NotFound",
