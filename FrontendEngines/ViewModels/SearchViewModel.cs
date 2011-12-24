@@ -28,10 +28,6 @@ namespace Associativy.FrontendEngines.ViewModels
             }
         }
 
-        public string[] TermsArray
-        {
-            get;
-            private set;
-        }
+        public string[] TermsArray { get; private set; }
     }
 }

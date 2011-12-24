@@ -8,7 +8,7 @@ namespace Associativy.FrontendEngines.ViewModels
     {
         int Id { get; set; }
         string Label { get; set; }
-        IList<int> NeighbourIds { get; set; }
+        IList<INode> Neighbours { get; set; }
     }
 
     public interface IGraphNodeViewModel<TNode> : IGraphNodeViewModel

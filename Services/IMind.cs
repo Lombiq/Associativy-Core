@@ -21,17 +21,16 @@ namespace Associativy.Services
         /// <summary>
         /// Returns the whole association graph
         /// </summary>
-        /// <param name="zoomLevel"></param>
-        /// <param name="useCache"></param>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true);
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null);
 
         /// <summary>
         /// Makes associations after the specified terms
         /// </summary>
-        /// <param name="terms"></param>
-        /// <param name="simpleAlgorithm"></param>
-        /// <param name="zoomLevel"></param>
-        /// <param name="useCache"></param>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> terms, bool simpleAlgorithm = false, int zoomLevel = 0, bool useCache = true);
+        /// <param name="nodes"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, IMindSettings settings = null);
     }
 }

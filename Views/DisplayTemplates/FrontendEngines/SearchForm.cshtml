@@ -6,8 +6,7 @@
     var routeData = Html.ViewContext.RouteData.Values;
 }
 
-
-@using (Html.BeginForm("ShowAssociations", routeData["controller"].ToString(), new { Area = routeData["area"] }, FormMethod.Get, new { @id = "notions-search-form" }))
+@using (Html.BeginForm("ShowAssociations", routeData["controller"].ToString(), FormMethod.Get, new { @id = "associativy-search-form" }))
 {
     <fieldset>
         @Html.TextBox("Terms", Model.Terms)
@@ -16,5 +15,5 @@
 }
 
 <script type="text/javascript">
-    $.associativyAutoComplete.terms("Terms", '@Url.Action("FetchSimilarTerms", new { Controller = routeData["controller"], Area = routeData["area"] })');
+    $.associativyAutoComplete.terms("Terms", "@Url.Action("FetchSimilarTerms", routeData["controller"].ToString())");
 </script>

@@ -2,6 +2,7 @@
 using Orchard;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
+using System;
 
 namespace Associativy.FrontendEngines.Engines.Dracula
 {
@@ -20,6 +21,11 @@ namespace Associativy.FrontendEngines.Engines.Dracula
             IWorkContextAccessor workContextAccessor)
             : base(orchardServices, shapeFactory, workContextAccessor)
         {
+        }
+
+        public override string GraphJson(QuickGraph.IUndirectedGraph<TNode, QuickGraph.IUndirectedEdge<TNode>> graph)
+        {
+            throw new NotImplementedException();
         }
     }
 }

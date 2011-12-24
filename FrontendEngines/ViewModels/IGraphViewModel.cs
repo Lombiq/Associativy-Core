@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Orchard;
+using Associativy.Models;
 
 namespace Associativy.FrontendEngines.ViewModels
 {
-    public interface IGraphResultViewModel : ITransientDependency
+    public interface IGraphViewModel : ITransientDependency
     {
         Dictionary<int, IGraphNodeViewModel> Nodes { get; set; }
     }

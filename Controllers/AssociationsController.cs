@@ -11,6 +11,8 @@ using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Mvc;
 using Orchard.Themes;
+using QuickGraph;
+using Associativy.FrontendEngines.ViewModels;
 
 namespace Associativy.Controllers
 {
@@ -44,39 +46,31 @@ namespace Associativy.Controllers
         {
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
+            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
+            settings.ZoomLevel = 5;
+
             return new ShapeResult(
                     this,
-                    _frontendEngineDriver.GraphResultShape(_associativyServices.Mind.GetAllAssociations(useCache: true))
+                    _frontendEngineDriver.SearchResultShape(_associativyServices.Mind.GetAllAssociations(settings))
                 );
         }
 
         public ActionResult ShowAssociations()
         {
-            var useSimpleAlgorithm = false;
-
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
 
             if (ModelState.IsValid)
             {
                 _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchViewModel.Terms).ToString();
 
-                var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
-                foreach (var term in searchViewModel.TermsArray)
-                {
-                    var node = _associativyServices.NodeManager.Get(term);
-                    if (node == null) return new ShapeResult(this, _frontendEngineDriver.AssociationsNotFoundShape(searchViewModel));
-                    searched.Add(node);
-                }
-
-                var associationsGraph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
-
-                if (associationsGraph != null)
+                IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
+                if (TryGetGraph(searchViewModel, out graph))
                 {
                     return new ShapeResult(
                         this,
-                        _frontendEngineDriver.GraphResultShape(
+                        _frontendEngineDriver.SearchResultShape(
                             _frontendEngineDriver.SearchFormShape(searchViewModel),
-                            _frontendEngineDriver.GraphShape(associationsGraph))
+                            _frontendEngineDriver.GraphShape(graph))
                         );
                 }
                 else
@@ -102,13 +96,38 @@ namespace Associativy.Controllers
 
         // No performance loss if with the same params as ShowAssociations because the solution 
         // is cached after ShowAssociations()
-        public JsonResult FetchAssociations()
+        public JsonResult FetchAssociations(int zoomLevel = 0)
         {
-            //var z = new List<GraphNodeViewModel>();
-            //z.Add(new GraphNodeViewModel() { Id = 2, Label = "kkk", NeighbourIds = new List<int>() { 9, 5 } });
-            //z.Add(new GraphNodeViewModel() { Id = 5, Label = "sdafsdfdsf", NeighbourIds = new List<int>() { 9, 2 } });
-            //return Json(z, JsonRequestBehavior.AllowGet);
-            return null;
+            object jsonData = null;
+            var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
+
+            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
+            settings.ZoomLevel = zoomLevel;
+
+            if (ModelState.IsValid)
+            {
+                IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
+                if (TryGetGraph(searchViewModel, out graph, settings))
+                {
+                    jsonData = _frontendEngineDriver.GraphJson(graph);
+                }
+                else
+                {
+                    jsonData = null;
+                }
+            }
+            else
+            {
+                jsonData = _frontendEngineDriver.GraphJson(_associativyServices.Mind.GetAllAssociations(settings));
+            }
+
+            var json = new JsonResult()
+            {
+                Data = jsonData,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+
+            return json;
         }
 
         bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties)
@@ -119,6 +138,24 @@ namespace Associativy.Controllers
         void IUpdateModel.AddModelError(string key, LocalizedString errorMessage)
         {
             ModelState.AddModelError(key, errorMessage.ToString());
+        }
+
+        protected bool TryGetGraph(ISearchViewModel searchViewModel, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, IMindSettings settings = null)
+        {
+            var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
+            foreach (var term in searchViewModel.TermsArray)
+            {
+                var node = _associativyServices.NodeManager.Get(term);
+                if (node == null)
+                {
+                    graph = null;
+                    return false;
+                }
+                searched.Add(node);
+            }
+            graph = _associativyServices.Mind.MakeAssociations(searched, settings);
+
+            return !graph.IsVerticesEmpty;
         }
     }
 }
