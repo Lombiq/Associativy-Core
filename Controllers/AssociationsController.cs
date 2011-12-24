@@ -42,7 +42,7 @@ namespace Associativy.Controllers
             T = NullLocalizer.Instance;
         }
 
-        public ActionResult ShowWholeGraph()
+        public virtual ActionResult ShowWholeGraph()
         {
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
@@ -55,7 +55,7 @@ namespace Associativy.Controllers
                 );
         }
 
-        public ActionResult ShowAssociations()
+        public virtual ActionResult ShowAssociations()
         {
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
 
@@ -89,14 +89,14 @@ namespace Associativy.Controllers
             }
         }
 
-        public JsonResult FetchSimilarTerms(string term)
+        public virtual JsonResult FetchSimilarTerms(string term)
         {
             return Json(_associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
         }
 
         // No performance loss if with the same params as ShowAssociations because the solution 
         // is cached after ShowAssociations()
-        public JsonResult FetchAssociations(int zoomLevel = 0)
+        public virtual JsonResult FetchAssociations(int zoomLevel = 0)
         {
             object jsonData = null;
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
@@ -140,7 +140,7 @@ namespace Associativy.Controllers
             ModelState.AddModelError(key, errorMessage.ToString());
         }
 
-        protected bool TryGetGraph(ISearchViewModel searchViewModel, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, IMindSettings settings = null)
+        protected virtual bool TryGetGraph(ISearchViewModel searchViewModel, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, IMindSettings settings = null)
         {
             var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
             foreach (var term in searchViewModel.TermsArray)
