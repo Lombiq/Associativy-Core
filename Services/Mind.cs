@@ -8,6 +8,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 using QuickGraph;
+using Orchard;
 
 namespace Associativy.Services
 {
@@ -19,6 +20,7 @@ namespace Associativy.Services
     {
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        protected readonly IWorkContextAccessor _workContextAccessor;
         
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
@@ -30,11 +32,13 @@ namespace Associativy.Services
         public Mind(
             IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
+            IWorkContextAccessor workContextAccessor,
             ICacheManager cacheManager,
             ISignals signals)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;
+            _workContextAccessor = workContextAccessor;
 
             _cacheManager = cacheManager;
             _signals = signals;
@@ -44,15 +48,18 @@ namespace Associativy.Services
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(
-            IGraphSettings graphSettings = null, 
-            bool useCache = true)
+            IMindSettings mindSettings = null, 
+            IGraphSettings graphSettings = null)
         {
-            if (useCache)
+            MakeSettings(ref mindSettings, ref graphSettings);
+
+            if (mindSettings.UseCache)
             {
                 return _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        return GetAllAssociations(graphSettings, false);
+                        mindSettings.UseCache = false;
+                        return GetAllAssociations(mindSettings, graphSettings);
                     });
             }
 
@@ -81,19 +88,21 @@ namespace Associativy.Services
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
-            IList<TNodePart> nodes, 
-            bool simpleAlgorithm = false,
-            IGraphSettings graphSettings = null, 
-            bool useCache = true)
+            IList<TNodePart> nodes,
+            IMindSettings mindSettings = null, 
+            IGraphSettings graphSettings = null)
         {
-            if (useCache)
+            MakeSettings(ref mindSettings, ref graphSettings);
+
+            if (mindSettings.UseCache)
             {
                 string cacheKey = "";
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
                 return _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        return MakeAssociations(nodes, simpleAlgorithm, graphSettings, false);
+                        mindSettings.UseCache = false;
+                        return MakeAssociations(nodes, mindSettings, graphSettings);
                     });
             }
 
@@ -106,7 +115,7 @@ namespace Associativy.Services
                 return GetNeighboursGraph(nodes[0]);
             }
             // Simply calculate the intersection of the neighbours of the nodes
-            else if (simpleAlgorithm)
+            else if (mindSettings.UseCache == false)
             {
                 return MakeSimpleAssocations(nodes);
             }
@@ -384,6 +393,13 @@ namespace Associativy.Services
         private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GraphFactory()
         {
             return new UndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>();
+        }
+
+        private void MakeSettings(ref IMindSettings mindSettings, ref IGraphSettings graphSettings)
+        {
+            var workContext = _workContextAccessor.GetContext();
+            if (mindSettings == null) mindSettings = workContext.Resolve<IMindSettings>();
+            if (graphSettings == null) graphSettings = workContext.Resolve<IGraphSettings>();
         }
     }
 }
