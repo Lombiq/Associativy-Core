@@ -55,7 +55,7 @@ namespace Associativy.Services
 
             if (mindSettings.UseCache)
             {
-                return _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
+                return _cacheManager.Get(MakeCacheKey("WholeGraph", mindSettings, graphSettings), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
                         mindSettings.UseCache = false;
@@ -98,7 +98,7 @@ namespace Associativy.Services
             {
                 string cacheKey = "";
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-                return _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
+                return _cacheManager.Get(MakeCacheKey(cacheKey, mindSettings, graphSettings), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
                         mindSettings.UseCache = false;
@@ -115,7 +115,7 @@ namespace Associativy.Services
                 return GetNeighboursGraph(nodes[0]);
             }
             // Simply calculate the intersection of the neighbours of the nodes
-            else if (mindSettings.UseCache == false)
+            else if (mindSettings.Algorithm == MindAlgorithms.Simple)
             {
                 return MakeSimpleAssocations(nodes);
             }
@@ -383,6 +383,13 @@ namespace Associativy.Services
         private void TriggerGraphChangedSignal(object sender, GraphChangedEventArgs e)
         {
             _signals.Trigger(GraphSignal);
+        }
+
+        private string MakeCacheKey(string name, IMindSettings mindSettings, IGraphSettings graphSettings)
+        {
+            return MakeCacheKey(name)
+                + "MindSettings:" + mindSettings.Algorithm
+                + "GraphSettings:" + graphSettings.ZoomLevel;
         }
 
         private string MakeCacheKey(string name)
