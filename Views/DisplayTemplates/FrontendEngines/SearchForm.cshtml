@@ -6,7 +6,7 @@
     var routeData = Html.ViewContext.RouteData.Values;
 }
 
-@using (Html.BeginForm("ShowAssociations", routeData["controller"].ToString(), FormMethod.Get, new { @id = "notions-search-form" }))
+@using (Html.BeginForm("ShowAssociations", routeData["controller"].ToString(), FormMethod.Get, new { @id = "associativy-search-form" }))
 {
     <fieldset>
         @Html.TextBox("Terms", Model.Terms)

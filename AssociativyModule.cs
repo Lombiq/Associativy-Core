@@ -6,6 +6,7 @@ using Autofac;
 using Autofac.Core;
 using Orchard.Environment.Extensions;
 using Associativy.FrontendEngines.Engines.JIT;
+using Associativy.FrontendEngines.Engines.JIT.ViewModels;
 
 namespace Associativy
 {
@@ -21,12 +22,14 @@ namespace Associativy
             builder.RegisterGeneric(typeof(Mind<,,>)).As(typeof(IMind<,,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(NodeManager<,>)).As(typeof(INodeManager<,>)).InstancePerLifetimeScope();
 
+            // Frontend engines common
             builder.RegisterGeneric(typeof(FrontendEngineDriverLocator<>)).As(typeof(IFrontendEngineDriverLocator<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GraphNodeViewModel<>)).As(typeof(IGraphNodeViewModel<>));
 
             // Frontend engine drivers
             builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(JITGraphNodeViewModel<>)).As(typeof(IJITGraphNodeViewModel<>));
 
             builder.Update(componentRegistry);
         }

@@ -37,7 +37,7 @@ namespace Associativy.Controllers
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
+            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("JIT");
 
             T = NullLocalizer.Instance;
         }
@@ -54,8 +54,6 @@ namespace Associativy.Controllers
 
         public ActionResult ShowAssociations()
         {
-            var useSimpleAlgorithm = false;
-
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
 
             if (ModelState.IsValid)
@@ -63,7 +61,7 @@ namespace Associativy.Controllers
                 _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchViewModel.Terms).ToString();
 
                 IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
-                if (TryGetGraph(searchViewModel, useSimpleAlgorithm, out graph))
+                if (TryGetGraph(searchViewModel, out graph))
                 {
                     return new ShapeResult(
                         this,
@@ -95,7 +93,7 @@ namespace Associativy.Controllers
 
         // No performance loss if with the same params as ShowAssociations because the solution 
         // is cached after ShowAssociations()
-        public JsonResult FetchAssociations()
+        public JsonResult FetchAssociations(int zoomLevel = 0)
         {
             object jsonData = null;
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
@@ -104,8 +102,13 @@ namespace Associativy.Controllers
             else
             {
                 IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
-                if (TryGetGraph(searchViewModel, false, out graph))
+
+                var graphSettings = _orchardServices.WorkContext.Resolve<IGraphSettings>();
+                graphSettings.ZoomLevel = zoomLevel;
+
+                if (TryGetGraph(searchViewModel, out graph, graphSettings: graphSettings))
                 {
+                    jsonData = _frontendEngineDriver.GraphJson(graph);
                 }
                 else
                 {
@@ -132,7 +135,7 @@ namespace Associativy.Controllers
             ModelState.AddModelError(key, errorMessage.ToString());
         }
 
-        protected bool TryGetGraph(ISearchViewModel searchViewModel, bool useSimpleAlgorithm, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph)
+        protected bool TryGetGraph(ISearchViewModel searchViewModel, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, IMindSettings mindSettings = null, IGraphSettings graphSettings = null)
         {
             var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
             foreach (var term in searchViewModel.TermsArray)
@@ -146,7 +149,7 @@ namespace Associativy.Controllers
                 searched.Add(node);
             }
 
-            graph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
+            graph = _associativyServices.Mind.MakeAssociations(searched, mindSettings, graphSettings);
 
             return !graph.IsVerticesEmpty;
         }

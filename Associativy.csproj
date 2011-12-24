@@ -64,6 +64,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -84,7 +85,8 @@
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graph.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
-    <Content Include="Scripts\FrontendEngines\Engines\JIT\Custom.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\JIT\JITDrawer.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\JIT\JIT.custom.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -97,6 +99,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\IJITGraphNodeViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\JITDriver.cs" />
     <Compile Include="FrontendEngines\FrontendEngineDriver.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\DraculaDriver.cs" />
@@ -106,9 +109,15 @@
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="FrontendEngines\IFrontendEngineDriver.cs" />
     <Compile Include="FrontendEngines\IFrontendEngineDriverLocator.cs" />
+    <Compile Include="FrontendEngines\ViewModels\SearchResultViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\ISearchResultViewModel.cs" />
+    <Compile Include="Models\GraphSettings.cs" />
+    <Compile Include="Models\IGraphSettings.cs" />
+    <Compile Include="Models\IMindSettings.cs" />
     <Compile Include="Models\INodeParams.cs" />
     <Compile Include="Models\INode.cs" />
     <Compile Include="Models\INodeToNodeConnectorRecord.cs" />
+    <Compile Include="Models\MindSettings.cs" />
     <Compile Include="Models\NodePartRecord.cs" />
     <Compile Include="Models\NodePart.cs" />
     <Compile Include="Models\NodeParams.cs" />
@@ -124,9 +133,9 @@
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
     <Compile Include="FrontendEngines\ViewModels\GraphNodeViewModel.cs" />
-    <Compile Include="FrontendEngines\ViewModels\GraphResultViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\GraphViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\IGraphNodeViewModel.cs" />
-    <Compile Include="FrontendEngines\ViewModels\IGraphResultViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\IGraphViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\ISearchViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\JITGraphNodeViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\SearchViewModel.cs" />
@@ -134,7 +143,7 @@
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Graph.cshtml" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\NotFound.cshtml" />
-    <Content Include="Views\DisplayTemplates\FrontendEngines\Result.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\SearchResult.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\SearchForm.cshtml" />
@@ -148,8 +157,14 @@
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Piedone.HelpfulLibraries\Piedone.HelpfulLibraries.csproj">
+      <Project>{EA61AD10-39D6-41A9-B12B-227F50C54158}</Project>
+      <Name>Piedone.HelpfulLibraries</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\SearchResult.cshtml" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\Graph.cshtml" />
   </ItemGroup>
