@@ -307,7 +307,6 @@ namespace Associativy.Services
                 frontierNode = frontier.Pop();
                 currentNode = frontierNode.Node;
                 currentPath = frontierNode.Path;
-                currentPath.Add(currentNode.Id);
                 currentDistance = frontierNode.Distance;
 
                 // We can't traverse the graph further
@@ -344,6 +343,8 @@ namespace Associativy.Services
                             currentNode.Neighbours.Add(explored[neighbourId]);
                         }
                     }
+
+                    if (currentNode.Neighbours.Count > 3) currentPath.Add(currentNode.Id);
 
                     foreach (var neighbour in currentNode.Neighbours)
                     {
