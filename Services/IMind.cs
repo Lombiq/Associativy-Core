@@ -21,18 +21,16 @@ namespace Associativy.Services
         /// <summary>
         /// Returns the whole association graph
         /// </summary>
-        /// <param name="mindSettings"></param>
-        /// <param name="graphSettings"></param>
+        /// <param name="settings"></param>
         /// <returns></returns>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings mindSettings = null, IGraphSettings graphSettings = null);
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null);
 
         /// <summary>
         /// Makes associations after the specified terms
         /// </summary>
         /// <param name="nodes"></param>
-        /// <param name="mindSettings"></param>
-        /// <param name="graphSettings"></param>
+        /// <param name="settings"></param>
         /// <returns></returns>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, IMindSettings mindSettings = null, IGraphSettings graphSettings = null);
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, IMindSettings settings = null);
     }
 }

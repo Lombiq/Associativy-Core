@@ -47,19 +47,17 @@ namespace Associativy.Services
             _nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
 
-        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(
-            IMindSettings mindSettings = null, 
-            IGraphSettings graphSettings = null)
+        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null)
         {
-            MakeSettings(ref mindSettings, ref graphSettings);
+            MakeSettings(ref settings);
 
-            if (mindSettings.UseCache)
+            if (settings.UseCache)
             {
-                return _cacheManager.Get(MakeCacheKey("WholeGraph", mindSettings, graphSettings), ctx =>
+                return _cacheManager.Get(MakeCacheKey("WholeGraph", settings), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        mindSettings.UseCache = false;
-                        return GetAllAssociations(mindSettings, graphSettings);
+                        settings.UseCache = false;
+                        return GetAllAssociations(settings);
                     });
             }
 
@@ -89,20 +87,19 @@ namespace Associativy.Services
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
             IList<TNodePart> nodes,
-            IMindSettings mindSettings = null, 
-            IGraphSettings graphSettings = null)
+            IMindSettings settings = null)
         {
-            MakeSettings(ref mindSettings, ref graphSettings);
+            MakeSettings(ref settings);
 
-            if (mindSettings.UseCache)
+            if (settings.UseCache)
             {
                 string cacheKey = "";
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-                return _cacheManager.Get(MakeCacheKey(cacheKey, mindSettings, graphSettings), ctx =>
+                return _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        mindSettings.UseCache = false;
-                        return MakeAssociations(nodes, mindSettings, graphSettings);
+                        settings.UseCache = false;
+                        return MakeAssociations(nodes, settings);
                     });
             }
 
@@ -115,14 +112,14 @@ namespace Associativy.Services
                 return GetNeighboursGraph(nodes[0]);
             }
             // Simply calculate the intersection of the neighbours of the nodes
-            else if (mindSettings.Algorithm == MindAlgorithms.Simple)
+            else if (settings.Algorithm == MindAlgorithms.Simple)
             {
                 return MakeSimpleAssocations(nodes);
             }
             // Calculate the routes between two nodes
             else
             {
-                return MakeSophisticatedAssociations(nodes);
+                return MakeSophisticatedAssociations(nodes, settings);
             }
         }
 
@@ -172,14 +169,14 @@ namespace Associativy.Services
             return graph;
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes)
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes, IMindSettings settings)
         {
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
             var graph = GraphFactory();
             List<List<int>> succeededPaths;
 
-            var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
+            var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id, settings);
 
             if (allPairSucceededPaths.Count == 0) return graph;
 
@@ -205,8 +202,8 @@ namespace Associativy.Services
 
                     while (n < nodes.Count)
                     {
-                        // Itt lehetne multithreading
-                        var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id);
+                        // Here could be multithreading
+                        var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id, settings);
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -282,14 +279,15 @@ namespace Associativy.Services
         }
         #endregion
 
-        private List<List<int>> CalculatePaths(int startId, int targetId, int maxDistance = 3, bool useCache = true)
+        private List<List<int>> CalculatePaths(int startId, int targetId, IMindSettings settings)
         {
-            if (useCache)
+            if (settings.UseCache)
             {
-                return _cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString() + maxDistance.ToString()), ctx =>
+                return _cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString(), settings), ctx =>
                 {
                     MonitorGraphChangedSignal(ctx);
-                    return CalculatePaths(startId, targetId, maxDistance, false);
+                    settings.UseCache = false;
+                    return CalculatePaths(startId, targetId, settings);
                 });
             }
 
@@ -313,7 +311,7 @@ namespace Associativy.Services
                 currentDistance = frontierNode.Distance;
 
                 // We can't traverse the graph further
-                if (currentDistance == maxDistance - 1)
+                if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
                     if (_connectionManager.AreNeighbours(currentNode.Id, targetId))
@@ -385,11 +383,10 @@ namespace Associativy.Services
             _signals.Trigger(GraphSignal);
         }
 
-        private string MakeCacheKey(string name, IMindSettings mindSettings, IGraphSettings graphSettings)
+        private string MakeCacheKey(string name, IMindSettings settings)
         {
             return MakeCacheKey(name)
-                + "MindSettings:" + mindSettings.Algorithm
-                + "GraphSettings:" + graphSettings.ZoomLevel;
+                + "MindSettings:" + settings.Algorithm + settings.ZoomLevel + settings.MaxDistance;
         }
 
         private string MakeCacheKey(string name)
@@ -402,11 +399,10 @@ namespace Associativy.Services
             return new UndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>();
         }
 
-        private void MakeSettings(ref IMindSettings mindSettings, ref IGraphSettings graphSettings)
+        private void MakeSettings(ref IMindSettings settings)
         {
             var workContext = _workContextAccessor.GetContext();
-            if (mindSettings == null) mindSettings = workContext.Resolve<IMindSettings>();
-            if (graphSettings == null) graphSettings = workContext.Resolve<IGraphSettings>();
+            if (settings == null) settings = workContext.Resolve<IMindSettings>();
         }
     }
 }

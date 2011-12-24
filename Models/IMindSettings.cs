@@ -13,5 +13,7 @@ namespace Associativy.Models
     {
         MindAlgorithms Algorithm { get; set; }
         bool UseCache { get; set; }
+        int ZoomLevel { get; set; }
+        int MaxDistance { get; set; }
     }
 }

@@ -9,11 +9,15 @@ namespace Associativy.Models
     {
         public MindAlgorithms Algorithm { get; set; }
         public bool UseCache { get; set; }
+        public int ZoomLevel { get; set; }
+        public int MaxDistance { get; set; }
 
         public MindSettings()
         {
             Algorithm = MindAlgorithms.Sophisticated;
             UseCache = true;
+            ZoomLevel = 0;
+            MaxDistance = 3;
         }
     }
 }

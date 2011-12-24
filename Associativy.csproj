@@ -111,8 +111,6 @@
     <Compile Include="FrontendEngines\IFrontendEngineDriverLocator.cs" />
     <Compile Include="FrontendEngines\ViewModels\SearchResultViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\ISearchResultViewModel.cs" />
-    <Compile Include="Models\GraphSettings.cs" />
-    <Compile Include="Models\IGraphSettings.cs" />
     <Compile Include="Models\IMindSettings.cs" />
     <Compile Include="Models\INodeParams.cs" />
     <Compile Include="Models\INode.cs" />
