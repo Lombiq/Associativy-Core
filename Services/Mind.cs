@@ -148,7 +148,7 @@ namespace Associativy.Services
             //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
             //}
 
-            if (commonNeighbourIds.Count == 0) return null;
+            if (commonNeighbourIds.Count == 0) return graph;
 
             var commonNeighbours = _nodeManager.GetMany(commonNeighbourIds);
 
@@ -172,7 +172,7 @@ namespace Associativy.Services
 
             var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id);
 
-            if (allPairSucceededPaths.Count == 0) return null;
+            if (allPairSucceededPaths.Count == 0) return graph;
 
             if (nodes.Count == 2)
             {
@@ -205,7 +205,7 @@ namespace Associativy.Services
                     }
                 }
 
-                if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return null;
+                if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return graph;
 
                 succeededPaths = new List<List<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
 
@@ -215,7 +215,7 @@ namespace Associativy.Services
                     if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath.ToList()); // Only paths where intersecting nodes are present
                 }
 
-                if (succeededPaths.Count == 0) return null;
+                if (succeededPaths.Count == 0) return graph;
             }
 
 

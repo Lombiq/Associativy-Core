@@ -35,7 +35,7 @@ namespace Associativy.Controllers
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("JIT");
+            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
 
             T = NullLocalizer.Instance;
         }
@@ -46,7 +46,7 @@ namespace Associativy.Controllers
 
             return new ShapeResult(
                     this,
-                    _frontendEngineDriver.GraphResultShape(_associativyServices.Mind.GetAllAssociations(useCache: true))
+                    _frontendEngineDriver.GraphResultShape(_associativyServices.Mind.GetAllAssociations())
                 );
         }
 
@@ -70,7 +70,7 @@ namespace Associativy.Controllers
 
                 var associationsGraph = _associativyServices.Mind.MakeAssociations(searched, useSimpleAlgorithm);
 
-                if (associationsGraph != null)
+                if (!associationsGraph.IsVerticesEmpty)
                 {
                     return new ShapeResult(
                         this,
@@ -104,11 +104,16 @@ namespace Associativy.Controllers
         // is cached after ShowAssociations()
         public JsonResult FetchAssociations()
         {
-            //var z = new List<GraphNodeViewModel>();
-            //z.Add(new GraphNodeViewModel() { Id = 2, Label = "kkk", NeighbourIds = new List<int>() { 9, 5 } });
-            //z.Add(new GraphNodeViewModel() { Id = 5, Label = "sdafsdfdsf", NeighbourIds = new List<int>() { 9, 2 } });
-            //return Json(z, JsonRequestBehavior.AllowGet);
-            return null;
+            var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
+
+            if (ModelState.IsValid) return null;
+
+            var json = new JsonResult()
+            {
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
+
+            return json;
         }
 
         bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties)
