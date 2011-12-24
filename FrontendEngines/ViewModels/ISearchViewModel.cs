@@ -7,6 +7,5 @@ namespace Associativy.FrontendEngines.ViewModels
     {
         string Terms { get; set; }
         string[] TermsArray { get; }
-        int ZoomLevel { get; set;  }
     }
 }

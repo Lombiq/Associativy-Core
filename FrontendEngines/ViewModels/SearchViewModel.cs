@@ -29,7 +29,5 @@ namespace Associativy.FrontendEngines.ViewModels
         }
 
         public string[] TermsArray { get; private set; }
-
-        public int ZoomLevel { get; set; }
     }
 }
