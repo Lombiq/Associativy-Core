@@ -8,6 +8,7 @@ using Orchard.ContentManagement;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
+using System;
 
 namespace Associativy.FrontendEngines
 {
@@ -22,6 +23,27 @@ namespace Associativy.FrontendEngines
         protected virtual string Name
         {
             get { return ""; }
+        }
+
+        protected virtual string SearchFormShapeTemplateName
+        {
+            get { return "FrontendEngines/SearchForm"; }
+
+        }
+
+        protected virtual string SearchResultShapeTemplateName
+        {
+            get { return "FrontendEngines/SearchResult"; }
+        }
+
+        protected virtual string GraphShapeTemplateName
+        {
+            get { return "FrontendEngines/Engines/" + Name + "/Graph"; }
+        }
+
+        protected virtual string AssociationsNotFoundShapeTemplateName
+        {
+            get { return "FrontendEngines/NotFound"; }
         }
 
         public FrontendEngineDriver(
@@ -62,7 +84,7 @@ namespace Associativy.FrontendEngines
             if (searchViewModel == null) searchViewModel = GetSearchViewModel<TSearchViewModel>();
 
             return _shapeFactory.DisplayTemplate(
-                    TemplateName: "FrontendEngines/SearchForm",
+                    TemplateName: SearchFormShapeTemplateName,
                     Model: searchViewModel,
                     Prefix: null);
         }
@@ -85,10 +107,12 @@ namespace Associativy.FrontendEngines
             graphViewModel.Nodes = nodes;
 
             return _shapeFactory.DisplayTemplate(
-                TemplateName: "FrontendEngines/Engines/" + Name + "/Graph",
+                TemplateName: GraphShapeTemplateName,
                 Model: graphViewModel,
                 Prefix: null);
         }
+
+        public abstract string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         protected virtual Dictionary<int, TGraphNodeViewModel> BuildViewNodes<TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
             where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
@@ -135,7 +159,7 @@ namespace Associativy.FrontendEngines
             graphResultViewModel.Graph = graphShape;
 
             return _shapeFactory.DisplayTemplate(
-                TemplateName: "FrontendEngines/Result",
+                TemplateName: SearchResultShapeTemplateName,
                 Model: graphResultViewModel,
                 Prefix: null);
         }
@@ -152,7 +176,7 @@ namespace Associativy.FrontendEngines
             return SearchResultShape(
                     SearchFormShape(searchViewModel),
                     _shapeFactory.DisplayTemplate(
-                        TemplateName: "FrontendEngines/NotFound",
+                        TemplateName: AssociationsNotFoundShapeTemplateName,
                         Model: searchViewModel,
                         Prefix: null)
                 );

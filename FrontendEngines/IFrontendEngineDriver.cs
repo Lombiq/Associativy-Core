@@ -34,6 +34,13 @@ namespace Associativy.FrontendEngines
         dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         /// <summary>
+        /// Returns the JSON representation of the graph
+        /// </summary>
+        /// <param name="graph">The graph to display</param>
+        /// <returns>The JSON representation of the graph</returns>
+        string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
+
+        /// <summary>
         /// Returns the result shape containing the search form and the graph
         /// </summary>
         /// <param name="graph">The graph to display</param>
