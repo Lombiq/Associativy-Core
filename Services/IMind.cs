@@ -23,7 +23,7 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="zoomLevel"></param>
         /// <param name="useCache"></param>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true);
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IGraphSettings graphSettings = null, bool useCache = true);
 
         /// <summary>
         /// Makes associations after the specified terms
@@ -32,6 +32,6 @@ namespace Associativy.Services
         /// <param name="simpleAlgorithm"></param>
         /// <param name="zoomLevel"></param>
         /// <param name="useCache"></param>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> terms, bool simpleAlgorithm = false, int zoomLevel = 0, bool useCache = true);
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> terms, bool simpleAlgorithm = false, IGraphSettings graphSettings = null, bool useCache = true);
     }
 }

@@ -43,14 +43,16 @@ namespace Associativy.Services
             _nodeManager.GraphChanged += TriggerGraphChangedSignal;
         }
 
-        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(int zoomLevel = 0, bool useCache = true)
+        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(
+            IGraphSettings graphSettings = null, 
+            bool useCache = true)
         {
             if (useCache)
             {
                 return _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        return GetAllAssociations(zoomLevel, false);
+                        return GetAllAssociations(graphSettings, false);
                     });
             }
 
@@ -80,8 +82,8 @@ namespace Associativy.Services
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
             IList<TNodePart> nodes, 
-            bool simpleAlgorithm = false, 
-            int zoomLevel = 0, 
+            bool simpleAlgorithm = false,
+            IGraphSettings graphSettings = null, 
             bool useCache = true)
         {
             if (useCache)
@@ -91,7 +93,7 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
                     {
                         MonitorGraphChangedSignal(ctx);
-                        return MakeAssociations(nodes, simpleAlgorithm, zoomLevel, false);
+                        return MakeAssociations(nodes, simpleAlgorithm, graphSettings, false);
                     });
             }
 
