@@ -37,7 +37,7 @@ namespace Associativy.Controllers
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("JIT");
+            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
 
             T = NullLocalizer.Instance;
         }
@@ -46,9 +46,12 @@ namespace Associativy.Controllers
         {
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
+            var graphSettings = _orchardServices.WorkContext.Resolve<IGraphSettings>();
+            graphSettings.ZoomLevel = 5;
+
             return new ShapeResult(
                     this,
-                    _frontendEngineDriver.SearchResultShape(_associativyServices.Mind.GetAllAssociations())
+                    _frontendEngineDriver.SearchResultShape(_associativyServices.Mind.GetAllAssociations(graphSettings: graphSettings))
                 );
         }
 
@@ -97,15 +100,13 @@ namespace Associativy.Controllers
         {
             object jsonData = null;
             var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
-            
-            if (!ModelState.IsValid) jsonData = null;
-            else
+
+            var graphSettings = _orchardServices.WorkContext.Resolve<IGraphSettings>();
+            graphSettings.ZoomLevel = zoomLevel;
+
+            if (ModelState.IsValid)
             {
                 IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
-
-                var graphSettings = _orchardServices.WorkContext.Resolve<IGraphSettings>();
-                graphSettings.ZoomLevel = zoomLevel;
-
                 if (TryGetGraph(searchViewModel, out graph, graphSettings: graphSettings))
                 {
                     jsonData = _frontendEngineDriver.GraphJson(graph);
@@ -114,6 +115,10 @@ namespace Associativy.Controllers
                 {
                     jsonData = null;
                 }
+            }
+            else
+            {
+                jsonData = _frontendEngineDriver.GraphJson(_associativyServices.Mind.GetAllAssociations(graphSettings: graphSettings));
             }
 
             var json = new JsonResult()
