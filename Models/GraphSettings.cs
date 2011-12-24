@@ -8,5 +8,10 @@ namespace Associativy.Models
     public class GraphSettings : IGraphSettings
     {
         public int ZoomLevel { get; set; }
+
+        public GraphSettings()
+        {
+            ZoomLevel = 0;
+        }
     }
 }

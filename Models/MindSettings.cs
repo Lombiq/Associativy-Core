@@ -9,5 +9,11 @@ namespace Associativy.Models
     {
         public MindAlgorithms Algorithm { get; set; }
         public bool UseCache { get; set; }
+
+        public MindSettings()
+        {
+            Algorithm = MindAlgorithms.Sophisticated;
+            UseCache = true;
+        }
     }
 }
