@@ -69,12 +69,28 @@ namespace Associativy.FrontendEngines
 
         public virtual dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
-            return GraphShape<IGraphResultViewModel, IGraphNodeViewModel<TNode>>(graph);
+            return GraphShape<IGraphViewModel, IGraphNodeViewModel<TNode>>(graph);
         }
 
-        // Can be used in derived classes to switch the ISearchViewModel implementation
-        protected virtual dynamic GraphShape<TGraphResultViewModel, TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
-            where TGraphResultViewModel : IGraphResultViewModel
+        // Can be used in derived classes to switch the IGraphViewModel and IGraphNodeViewModel<> implementation
+        protected virtual dynamic GraphShape<TGraphViewModel, TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+            where TGraphViewModel : IGraphViewModel
+            where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
+        {
+            // Necessary as shapes and views can't be generic. The nodes can be casted to the
+            // appropriate type as necessary.
+            var nodes = BuildViewNodes<TGraphNodeViewModel>(graph).ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
+
+            var graphViewModel = _workContextAccessor.GetContext().Resolve<TGraphViewModel>();
+            graphViewModel.Nodes = nodes;
+
+            return _shapeFactory.DisplayTemplate(
+                TemplateName: "FrontendEngines/Engines/" + Name + "/Graph",
+                Model: graphViewModel,
+                Prefix: null);
+        }
+
+        protected virtual Dictionary<int, TGraphNodeViewModel> BuildViewNodes<TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
             where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
         {
             var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
@@ -97,17 +113,7 @@ namespace Associativy.FrontendEngines
                 viewNodes[edge.Target.Id].Neighbours.Add(edge.Source);
             }
 
-            // Necessary as shapes and views can't be generic. The nodes can be casted to the
-            // appropriate type as necessary.
-            var nodes = viewNodes.ToDictionary(item => item.Key, item => item.Value as IGraphNodeViewModel);
-
-            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<TGraphResultViewModel>();
-            graphResultViewModel.Nodes = nodes;
-
-            return _shapeFactory.DisplayTemplate(
-                TemplateName: "FrontendEngines/Engines/" + Name + "/Graph",
-                Model: graphResultViewModel,
-                Prefix: null);
+            return viewNodes;
         }
 
         public virtual dynamic GraphResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
@@ -117,14 +123,20 @@ namespace Associativy.FrontendEngines
 
         public virtual dynamic GraphResultShape(dynamic searchFormShape, dynamic graphShape)
         {
-            dynamic New = new ClayFactory();
-            var model = New.Model();
-            model.SearchForm = searchFormShape;
-            model.Result = graphShape;
+            return GraphResultShape<IGraphResultViewModel>(searchFormShape, graphShape);
+        }
+
+        // Can be used in derived classes to switch the IGraphResultViewModel implementation
+        protected virtual dynamic GraphResultShape<TGraphResultViewModel>(dynamic searchFormShape, dynamic graphShape)
+            where TGraphResultViewModel : IGraphResultViewModel
+        {
+            var graphResultViewModel = _workContextAccessor.GetContext().Resolve<IGraphResultViewModel>();
+            graphResultViewModel.SearchForm = searchFormShape;
+            graphResultViewModel.Graph = graphShape;
 
             return _shapeFactory.DisplayTemplate(
                 TemplateName: "FrontendEngines/Result",
-                Model: model,
+                Model: graphResultViewModel,
                 Prefix: null);
         }
 
