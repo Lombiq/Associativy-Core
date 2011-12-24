@@ -15,7 +15,7 @@ namespace Associativy.Models
         public MindSettings()
         {
             Algorithm = MindAlgorithms.Sophisticated;
-            UseCache = true;
+            UseCache = false;
             ZoomLevel = 0;
             MaxDistance = 3;
         }
