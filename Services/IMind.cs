@@ -4,6 +4,7 @@ using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using QuickGraph;
+using Associativy.Models.Mind;
 
 namespace Associativy.Services
 {

@@ -7,6 +7,7 @@ using Autofac.Core;
 using Orchard.Environment.Extensions;
 using Associativy.FrontendEngines.Engines.JIT;
 using Associativy.FrontendEngines.Engines.JIT.ViewModels;
+using Associativy.FrontendEngines.Engines.Graphviz;
 
 namespace Associativy
 {
@@ -15,21 +16,34 @@ namespace Associativy
     {
         public void Configure(IComponentRegistry componentRegistry)
         {
+            // Ideally all these registrations should not exist, but currently generics are not properly auto-registered
+            // by Orchard.
             var builder = new ContainerBuilder();
+
 
             builder.RegisterGeneric(typeof(AssociativyServices<,,>)).As(typeof(IAssociativyServices<,,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(ConnectionManager<>)).As(typeof(IConnectionManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(Mind<,,>)).As(typeof(IMind<,,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(NodeManager<,>)).As(typeof(INodeManager<,>)).InstancePerLifetimeScope();
 
+
             // Frontend engines common
             builder.RegisterGeneric(typeof(FrontendEngineDriverLocator<>)).As(typeof(IFrontendEngineDriverLocator<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GraphNodeViewModel<>)).As(typeof(IGraphNodeViewModel<>));
 
+
             // Frontend engine drivers
-            builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IFrontendEngineDriver<>)).InstancePerLifetimeScope();
+
+            // Dracula
+            builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IDraculaDriver<>)).InstancePerLifetimeScope();
+
+            // Graphviz
+            builder.RegisterGeneric(typeof(GraphvizDriver<>)).As(typeof(IGraphvizDriver<>)).InstancePerLifetimeScope();
+
+            // JIT
+            builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IJITDriver<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(JITGraphNodeViewModel<>)).As(typeof(IJITGraphNodeViewModel<>));
+
 
             builder.Update(componentRegistry);
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Orchard;
 
-namespace Associativy.Models
+namespace Associativy.Models.Mind
 {
     public enum MindAlgorithms
     {

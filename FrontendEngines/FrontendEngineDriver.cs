@@ -112,8 +112,6 @@ namespace Associativy.FrontendEngines
                 Prefix: null);
         }
 
-        public abstract string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
-
         protected virtual Dictionary<int, TGraphNodeViewModel> BuildViewNodes<TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
             where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
         {

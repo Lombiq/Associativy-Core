@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Associativy.Models
+namespace Associativy.Models.Mind
 {
-    public class MindSettings : Associativy.Models.IMindSettings
+    public class MindSettings : IMindSettings
     {
         public MindAlgorithms Algorithm { get; set; }
         public bool UseCache { get; set; }

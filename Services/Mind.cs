@@ -9,6 +9,7 @@ using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 using QuickGraph;
 using Orchard;
+using Associativy.Models.Mind;
 
 namespace Associativy.Services
 {

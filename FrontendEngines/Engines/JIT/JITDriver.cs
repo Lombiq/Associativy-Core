@@ -15,7 +15,7 @@ using System;
 namespace Associativy.FrontendEngines.Engines.JIT
 {
     [OrchardFeature("Associativy")]
-    public class JITDriver<TNode> : FrontendEngineDriver<TNode>
+    public class JITDriver<TNode> : FrontendEngineDriver<TNode>, IJITDriver<TNode>
         where TNode : INode
     {
         private readonly ISimpleSerializer _simpleSerializer;
@@ -45,7 +45,7 @@ namespace Associativy.FrontendEngines.Engines.JIT
             return null;
         }
 
-        public override string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+        public string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
             IEnumerable<string> jsonNodes = from node in BuildViewNodes<IJITGraphNodeViewModel<TNode>>(graph).Values
                                             select _simpleSerializer.JsonSerialize(node);

@@ -2,6 +2,7 @@
 using Associativy.Models;
 using Orchard.ContentManagement;
 using QuickGraph;
+using Orchard;
 
 namespace Associativy.FrontendEngines
 {
@@ -9,7 +10,7 @@ namespace Associativy.FrontendEngines
     /// Display driver (much like Orchard drivers) for frontend engines
     /// </summary>
     /// <typeparam name="TNode">Node type</typeparam>
-    public interface IFrontendEngineDriver<TNode>
+    public interface IFrontendEngineDriver<TNode> : IDependency
         where TNode : INode
     {
         /// <summary>
@@ -32,13 +33,6 @@ namespace Associativy.FrontendEngines
         /// <param name="graph">The graph to display</param>
         /// <returns>The shape of the graph</returns>
         dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
-
-        /// <summary>
-        /// Returns the JSON representation of the graph
-        /// </summary>
-        /// <param name="graph">The graph to display</param>
-        /// <returns>The JSON representation of the graph</returns>
-        string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph

@@ -13,8 +13,9 @@ using Orchard.Mvc;
 using Orchard.Themes;
 using QuickGraph;
 using Associativy.FrontendEngines.ViewModels;
+using Associativy.Models.Mind;
 
-namespace Associativy.Controllers
+namespace Associativy.FrontendEngines.Controllers
 {
     [Themed]
     [OrchardFeature("Associativy")]
@@ -28,16 +29,21 @@ namespace Associativy.Controllers
         protected readonly IOrchardServices _orchardServices;
         protected IFrontendEngineDriver<TNodePart> _frontendEngineDriver;
 
+        protected virtual string FrontendEngineDriver
+        {
+            get { return ""; }
+        }
+
         public Localizer T { get; set; }
 
         protected AssociationsController(
             TAssocociativyServices associativyService,
             IOrchardServices orchardServices,
-            IFrontendEngineDriverLocator<TNodePart> frontendEngineDriverLocator)
+            IFrontendEngineDriver<TNodePart> frontendEngineDriver)
         {
             _associativyServices = associativyService;
             _orchardServices = orchardServices;
-            _frontendEngineDriver = frontendEngineDriverLocator.GetDriver("Dracula");
+            _frontendEngineDriver = frontendEngineDriver;
 
             T = NullLocalizer.Instance;
         }
@@ -92,42 +98,6 @@ namespace Associativy.Controllers
         public virtual JsonResult FetchSimilarTerms(string term)
         {
             return Json(_associativyServices.NodeManager.GetSimilarTerms(term), JsonRequestBehavior.AllowGet);
-        }
-
-        // No performance loss if with the same params as ShowAssociations because the solution 
-        // is cached after ShowAssociations()
-        public virtual JsonResult FetchAssociations(int zoomLevel = 0)
-        {
-            object jsonData = null;
-            var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
-
-            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = zoomLevel;
-
-            if (ModelState.IsValid)
-            {
-                IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
-                if (TryGetGraph(searchViewModel, out graph, settings))
-                {
-                    jsonData = _frontendEngineDriver.GraphJson(graph);
-                }
-                else
-                {
-                    jsonData = null;
-                }
-            }
-            else
-            {
-                jsonData = _frontendEngineDriver.GraphJson(_associativyServices.Mind.GetAllAssociations(settings));
-            }
-
-            var json = new JsonResult()
-            {
-                Data = jsonData,
-                JsonRequestBehavior = JsonRequestBehavior.AllowGet
-            };
-
-            return json;
         }
 
         bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties)

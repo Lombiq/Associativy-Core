@@ -98,8 +98,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
-    <Compile Include="Controllers\AssociationsController.cs" />
-    <Compile Include="FrontendEngines\Engines\JIT\IJITGraphNodeViewModel.cs" />
+    <Compile Include="FrontendEngines\Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\IDraculaDriver.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\GraphvizDriver.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\IGraphvizDriver.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\Controllers\AssociationsController.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\IJITDriver.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\ViewModels\IJITGraphNodeViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\JITDriver.cs" />
     <Compile Include="FrontendEngines\FrontendEngineDriver.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\DraculaDriver.cs" />
@@ -111,11 +118,11 @@
     <Compile Include="FrontendEngines\IFrontendEngineDriverLocator.cs" />
     <Compile Include="FrontendEngines\ViewModels\SearchResultViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\ISearchResultViewModel.cs" />
-    <Compile Include="Models\IMindSettings.cs" />
+    <Compile Include="Models\Mind\IMindSettings.cs" />
     <Compile Include="Models\INodeParams.cs" />
     <Compile Include="Models\INode.cs" />
     <Compile Include="Models\INodeToNodeConnectorRecord.cs" />
-    <Compile Include="Models\MindSettings.cs" />
+    <Compile Include="Models\Mind\MindSettings.cs" />
     <Compile Include="Models\NodePartRecord.cs" />
     <Compile Include="Models\NodePart.cs" />
     <Compile Include="Models\NodeParams.cs" />
@@ -135,7 +142,7 @@
     <Compile Include="FrontendEngines\ViewModels\IGraphNodeViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\IGraphViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\ISearchViewModel.cs" />
-    <Compile Include="FrontendEngines\Engines\JIT\JITGraphNodeViewModel.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\ViewModels\JITGraphNodeViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\SearchViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\Graph.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
