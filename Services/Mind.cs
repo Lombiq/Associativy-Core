@@ -104,7 +104,6 @@ namespace Associativy.Services
                     });
             }
 
-            settings.UseCache = true;
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
             if (nodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
