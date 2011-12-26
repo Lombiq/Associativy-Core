@@ -14,18 +14,18 @@ using Orchard.Themes;
 using QuickGraph;
 using Associativy.FrontendEngines.ViewModels;
 using Associativy.Models.Mind;
+using Associativy.Controllers;
 
 namespace Associativy.FrontendEngines.Controllers
 {
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller, IUpdateModel
+    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : AssociativyBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
         where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly TAssocociativyServices _associativyServices;
         protected readonly IOrchardServices _orchardServices;
         protected IFrontendEngineDriver<TNodePart> _frontendEngineDriver;
 
@@ -37,11 +37,11 @@ namespace Associativy.FrontendEngines.Controllers
         public Localizer T { get; set; }
 
         protected AssociationsController(
-            TAssocociativyServices associativyService,
+            TAssocociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendEngineDriver<TNodePart> frontendEngineDriver)
+            : base(associativyServices)
         {
-            _associativyServices = associativyService;
             _orchardServices = orchardServices;
             _frontendEngineDriver = frontendEngineDriver;
 
@@ -57,7 +57,7 @@ namespace Associativy.FrontendEngines.Controllers
 
             return new ShapeResult(
                     this,
-                    _frontendEngineDriver.SearchResultShape(_associativyServices.Mind.GetAllAssociations(settings))
+                    _frontendEngineDriver.SearchResultShape(_mind.GetAllAssociations(settings))
                 );
         }
 
@@ -123,7 +123,7 @@ namespace Associativy.FrontendEngines.Controllers
                 }
                 searched.Add(node);
             }
-            graph = _associativyServices.Mind.MakeAssociations(searched, settings);
+            graph = _mind.MakeAssociations(searched, settings);
 
             return !graph.IsVerticesEmpty;
         }
