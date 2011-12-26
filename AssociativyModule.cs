@@ -25,7 +25,7 @@ namespace Associativy
             builder.RegisterGeneric(typeof(ConnectionManager<>)).As(typeof(IConnectionManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(Mind<,,>)).As(typeof(IMind<,,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(NodeManager<,>)).As(typeof(INodeManager<,>)).InstancePerLifetimeScope();
-
+            builder.RegisterGeneric(typeof(PathFinder<>)).As(typeof(IPathFinder<>)).InstancePerLifetimeScope();
 
             // Frontend engines common
             builder.RegisterGeneric(typeof(FrontendEngineDriverLocator<>)).As(typeof(IFrontendEngineDriverLocator<>)).InstancePerLifetimeScope();

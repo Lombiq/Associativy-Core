@@ -21,6 +21,7 @@ namespace Associativy.Services
     {
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        protected readonly IPathFinder<TNodeToNodeConnectorRecord> _pathFinder;
         protected readonly IWorkContextAccessor _workContextAccessor;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
@@ -33,12 +34,14 @@ namespace Associativy.Services
         public Mind(
             IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
+            IPathFinder<TNodeToNodeConnectorRecord> pathFinder,
             IWorkContextAccessor workContextAccessor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;
+            _pathFinder = pathFinder;
             _workContextAccessor = workContextAccessor;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
 
@@ -101,6 +104,7 @@ namespace Associativy.Services
                     });
             }
 
+            settings.UseCache = true;
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
             if (nodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
@@ -172,9 +176,9 @@ namespace Associativy.Services
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
             var graph = GraphFactory();
-            List<List<int>> succeededPaths;
+            IList<IList<int>> succeededPaths;
 
-            var allPairSucceededPaths = CalculatePaths(nodes[0].Id, nodes[1].Id, settings);
+            var allPairSucceededPaths = _pathFinder.FindPaths(nodes[0], nodes[1], settings);
 
             if (allPairSucceededPaths.Count == 0) return graph;
 
@@ -201,7 +205,7 @@ namespace Associativy.Services
                     while (n < nodes.Count)
                     {
                         // Here could be multithreading
-                        var pairSucceededPaths = CalculatePaths(nodes[i].Id, nodes[n].Id, settings);
+                        var pairSucceededPaths = _pathFinder.FindPaths(nodes[i], nodes[n], settings);
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -211,7 +215,7 @@ namespace Associativy.Services
 
                 if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return graph;
 
-                succeededPaths = new List<List<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
+                succeededPaths = new List<IList<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
 
                 foreach (var path in allPairSucceededPaths)
                 {
@@ -236,139 +240,21 @@ namespace Associativy.Services
             return graph;
         }
 
-        private Dictionary<int, TNodePart> GetSucceededNodes(List<List<int>> succeededPaths)
+        private Dictionary<int, TNodePart> GetSucceededNodes(IList<IList<int>> succeededPaths)
         {
             return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
         }
 
-        private List<int> GetSucceededNodeIds(List<List<int>> succeededPaths)
+        private List<int> GetSucceededNodeIds(IList<IList<int>> succeededPaths)
         {
-            var succeededNodeIds = new List<int>(succeededPaths.Count); // An incorrect estimate, but enhaces performance
-            succeededPaths.ForEach(row => succeededNodeIds = succeededNodeIds.Union(row).ToList()); // To parallel?
+            var succeededNodeIds = new List<int>(succeededPaths.Count); // An incorrect estimate, but (micro)enhaces performance
+
+            foreach (var row in succeededPaths)
+            {
+                succeededNodeIds = succeededNodeIds.Union(row).ToList();
+            }
+
             return succeededNodeIds;
-        }
-
-        #region CalculatePaths() auxiliary classes
-        private class PathNode
-        {
-            public int Id { get; private set; }
-            public int MinDistance { get; set; }
-            public List<PathNode> Neighbours { get; set; }
-
-            public PathNode(int id)
-            {
-                Id = id;
-                MinDistance = int.MaxValue;
-                Neighbours = new List<PathNode>();
-            }
-        }
-
-        private class FrontierNode
-        {
-            public int Distance { get; set; }
-            public List<int> Path { get; set; }
-            public PathNode Node { get; set; }
-
-            public FrontierNode()
-            {
-                Distance = 0;
-                Path = new List<int>();
-            }
-        }
-        #endregion
-
-        private List<List<int>> CalculatePaths(int startId, int targetId, IMindSettings settings)
-        {
-            if (settings.UseCache)
-            {
-                return _cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString(), settings), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
-                    settings.UseCache = false;
-                    return CalculatePaths(startId, targetId, settings);
-                });
-            }
-
-            var explored = new Dictionary<int, PathNode>();
-            var succeededPaths = new List<List<int>>();
-            var frontier = new Stack<FrontierNode>();
-
-            explored[startId] = new PathNode(startId) { MinDistance = 0 };
-            frontier.Push(new FrontierNode { Node = explored[startId] });
-
-            FrontierNode frontierNode;
-            PathNode currentNode;
-            List<int> currentPath;
-            int currentDistance;
-            while (frontier.Count != 0)
-            {
-                frontierNode = frontier.Pop();
-                currentNode = frontierNode.Node;
-                currentPath = frontierNode.Path;
-                currentPath.Add(currentNode.Id);
-                currentDistance = frontierNode.Distance;
-
-                // We can't traverse the graph further
-                if (currentDistance == settings.MaxDistance - 1)
-                {
-                    // Target will be only found if it's the direct neighbour of current
-                    if (_connectionManager.AreNeighbours(currentNode.Id, targetId))
-                    {
-                        if (!explored.ContainsKey(targetId)) explored[targetId] = new PathNode(targetId);
-                        if (explored[targetId].MinDistance > currentDistance + 1)
-                        {
-                            explored[targetId].MinDistance = currentDistance + 1;
-                        }
-
-                        currentNode.Neighbours.Add(explored[targetId]);
-                        currentPath.Add(targetId);
-                        succeededPaths.Add(currentPath);
-                    }
-                }
-                // We can traverse the graph further
-                else
-                {
-                    // If we haven't already fetched current's neighbours, fetch them
-                    if (currentNode.Neighbours.Count == 0)
-                    {
-                        var neighbourIds = _connectionManager.GetNeighbourIds(currentNode.Id);
-                        currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
-                        foreach (var neighbourId in neighbourIds)
-                        {
-                            if (!explored.ContainsKey(neighbourId))
-                            {
-                                explored[neighbourId] = new PathNode(neighbourId);
-                            }
-                            currentNode.Neighbours.Add(explored[neighbourId]);
-                        }
-                    }
-
-                    foreach (var neighbour in currentNode.Neighbours)
-                    {
-                        // Target is a neighbour
-                        if (neighbour.Id == targetId)
-                        {
-                            var succeededPath = new List<int>(currentPath) { targetId }; // Since we will use currentPath in further iterations too
-                            succeededPaths.Add(succeededPath);
-                        }
-                        // We can traverse further, push the neighbour onto the stack
-                        else if (neighbour.Id != startId)
-                        {
-                            neighbour.MinDistance = currentDistance + 1;
-                            frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
-                        }
-
-                        // If this is the shortest path to the node, overwrite its minDepth
-                        if (neighbour.Id != startId && neighbour.MinDistance > currentDistance + 1)
-                        {
-                            neighbour.MinDistance = currentDistance + 1;
-                        }
-                    }
-                }
-            }
-
-
-            return succeededPaths;
         }
 
         private string MakeCacheKey(string name, IMindSettings settings)
