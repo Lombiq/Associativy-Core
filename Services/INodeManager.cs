@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Associativy.Events;
 using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
@@ -17,12 +16,6 @@ namespace Associativy.Services
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
     {
-        /// <summary>
-        /// Event handler that is triggered when something changes in the graph
-        /// </summary>
-        event EventHandler<GraphChangedEventArgs> GraphChanged;
-
-
         /// <summary>
         /// Lists terms similar to the snippet
         /// </summary>

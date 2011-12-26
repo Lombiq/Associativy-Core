@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Associativy.Events;
 using Associativy.Models;
 using Orchard;
 
@@ -13,12 +12,6 @@ namespace Associativy.Services
     public interface IConnectionManager<TNodeToNodeConnectorRecord> : IDependency
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        /// <summary>
-        /// Event handler that is triggered when something changes in the graph
-        /// </summary>
-        event EventHandler<GraphChangedEventArgs> GraphChanged;
-
-
         /// <summary>
         /// Checks if the nodes are neighbours (= directly connected to each other)
         /// </summary>

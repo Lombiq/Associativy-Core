@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Associativy.Events;
 using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
+using Associativy.EventHandlers;
 
 namespace Associativy.Services
 {
@@ -15,15 +15,16 @@ namespace Associativy.Services
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
-
-        public event EventHandler<GraphChangedEventArgs> GraphChanged;
+        protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            IContentManager contentManager)
+            IContentManager contentManager,
+            IAssociativeGraphEventHandler associativeGraphEventHandler)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _contentManager = contentManager;
+            _associativeGraphEventHandler = associativeGraphEventHandler;
         }
 
         public virtual bool AreNeighbours(int nodeId1, int nodeId2)
@@ -49,7 +50,7 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
             }
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
         }
 
         public virtual void DeleteFromNode(INode node)
@@ -68,14 +69,14 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
         }
 
         public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
         }
 
         public virtual IList<TNodeToNodeConnectorRecord> GetAll()
@@ -95,14 +96,6 @@ namespace Associativy.Services
         {
             return _nodeToNodeRecordRepository.
                 Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
-        }
-
-        private void OnGraphChanged()
-        {
-            if (GraphChanged != null)
-            {
-                GraphChanged(this, new GraphChangedEventArgs());
-            }
         }
     }
 }

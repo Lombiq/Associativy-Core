@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Associativy.Events;
 using Associativy.Models;
 using Orchard.Caching;
 using Orchard.ContentManagement;
@@ -10,6 +9,7 @@ using Orchard.Environment.Extensions;
 using QuickGraph;
 using Orchard;
 using Associativy.Models.Mind;
+using Associativy.EventHandlers;
 
 namespace Associativy.Services
 {
@@ -22,6 +22,7 @@ namespace Associativy.Services
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
         protected readonly IWorkContextAccessor _workContextAccessor;
+        protected readonly IAssociativeGraphEventDispatcher _graphEventDispatcher;
         
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
@@ -34,18 +35,19 @@ namespace Associativy.Services
             IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
             IWorkContextAccessor workContextAccessor,
+            IAssociativeGraphEventDispatcher graphEventDispatcher,
             ICacheManager cacheManager,
             ISignals signals)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _workContextAccessor = workContextAccessor;
+            _graphEventDispatcher = graphEventDispatcher;
 
             _cacheManager = cacheManager;
             _signals = signals;
 
-            _connectionManager.GraphChanged += TriggerGraphChangedSignal;
-            _nodeManager.GraphChanged += TriggerGraphChangedSignal;
+            _graphEventDispatcher.ChangedEvent += TriggerGraphChangedSignal;
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null)
@@ -379,7 +381,7 @@ namespace Associativy.Services
             ctx.Monitor(_signals.When(GraphSignal));
         }
 
-        private void TriggerGraphChangedSignal(object sender, GraphChangedEventArgs e)
+        private void TriggerGraphChangedSignal(object sender, EventArgs e)
         {
             _signals.Trigger(GraphSignal);
         }

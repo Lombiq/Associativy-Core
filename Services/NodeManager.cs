@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Associativy.Events;
 using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
+using Associativy.EventHandlers;
 
 namespace Associativy.Services
 {
@@ -17,15 +17,16 @@ namespace Associativy.Services
     {
         protected readonly IContentManager _contentManager;
         protected readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
-
-        public event EventHandler<GraphChangedEventArgs> GraphChanged;
+        protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
 
         public NodeManager(
             IContentManager contentManager,
-            IRepository<TNodePartRecord> nodePartRecordRepository)
+            IRepository<TNodePartRecord> nodePartRecordRepository,
+            IAssociativeGraphEventHandler associativeGraphEventHandler)
         {
             _contentManager = contentManager;
             _nodePartRecordRepository = nodePartRecordRepository;
+            _associativeGraphEventHandler = associativeGraphEventHandler;
         }
 
         public virtual IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
@@ -46,7 +47,7 @@ namespace Associativy.Services
             nodeParams.MapToNode(node);
             _contentManager.Create(node);
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
 
             return node;
         }
@@ -59,7 +60,7 @@ namespace Associativy.Services
         public virtual void Create(ContentItem node)
         {
             _contentManager.Create(node);
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
         }
 
         public virtual TNodePart Get(int id)
@@ -89,7 +90,7 @@ namespace Associativy.Services
                 nodeParams.MapToNode(node);
                 _contentManager.Flush();
 
-                OnGraphChanged();
+                _associativeGraphEventHandler.Changed();
             }
 
             return node;
@@ -102,7 +103,7 @@ namespace Associativy.Services
 
             _contentManager.Flush();
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
 
             return node;
         }
@@ -111,16 +112,8 @@ namespace Associativy.Services
         {
             _contentManager.Remove(_contentManager.Get(id));
 
-            OnGraphChanged();
+            _associativeGraphEventHandler.Changed();
         }
         #endregion
-
-        private void OnGraphChanged()
-        {
-            if (GraphChanged != null)
-            {
-                GraphChanged(this, new GraphChangedEventArgs()); 
-            }
-        }
     }
 }
