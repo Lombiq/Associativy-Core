@@ -22,11 +22,10 @@ namespace Associativy.Services
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
         protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
         protected readonly IWorkContextAccessor _workContextAccessor;
-        protected readonly IAssociativeGraphEventDispatcher _graphEventDispatcher;
-        
+        protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
+
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
-        protected readonly ISignals _signals;
         protected readonly string CachePrefix = "Associativy." + typeof(TNodePart).Name;
         protected readonly string GraphSignal = "Associativy.Graph." + typeof(TNodePart).Name;
         #endregion
@@ -35,19 +34,15 @@ namespace Associativy.Services
             IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
             INodeManager<TNodePart, TNodePartRecord> nodeManager,
             IWorkContextAccessor workContextAccessor,
-            IAssociativeGraphEventDispatcher graphEventDispatcher,
-            ICacheManager cacheManager,
-            ISignals signals)
+            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            ICacheManager cacheManager)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _workContextAccessor = workContextAccessor;
-            _graphEventDispatcher = graphEventDispatcher;
+            _associativeGraphEventMonitor = associativeGraphEventMonitor;
 
             _cacheManager = cacheManager;
-            _signals = signals;
-
-            _graphEventDispatcher.ChangedEvent += TriggerGraphChangedSignal;
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null)
@@ -58,7 +53,7 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get(MakeCacheKey("WholeGraph", settings), ctx =>
                     {
-                        MonitorGraphChangedSignal(ctx);
+                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
                         settings.UseCache = false;
                         return GetAllAssociations(settings);
                     });
@@ -100,7 +95,7 @@ namespace Associativy.Services
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
                 return _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
                     {
-                        MonitorGraphChangedSignal(ctx);
+                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
                         settings.UseCache = false;
                         return MakeAssociations(nodes, settings);
                     });
@@ -288,7 +283,7 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get(MakeCacheKey(startId.ToString() + targetId.ToString(), settings), ctx =>
                 {
-                    MonitorGraphChangedSignal(ctx);
+                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
                     settings.UseCache = false;
                     return CalculatePaths(startId, targetId, settings);
                 });
@@ -374,16 +369,6 @@ namespace Associativy.Services
 
 
             return succeededPaths;
-        }
-
-        private void MonitorGraphChangedSignal(AcquireContext<string> ctx)
-        {
-            ctx.Monitor(_signals.When(GraphSignal));
-        }
-
-        private void TriggerGraphChangedSignal(object sender, EventArgs e)
-        {
-            _signals.Trigger(GraphSignal);
         }
 
         private string MakeCacheKey(string name, IMindSettings settings)
