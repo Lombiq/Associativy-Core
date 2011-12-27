@@ -20,7 +20,7 @@ namespace Associativy.FrontendEngines.Controllers
 {
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : AssociativyBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
+    public abstract class FrontendEngineBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : AssociativyBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
         where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -36,7 +36,7 @@ namespace Associativy.FrontendEngines.Controllers
 
         public Localizer T { get; set; }
 
-        protected AssociationsController(
+        protected FrontendEngineBaseController(
             TAssocociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendEngineDriver<TNodePart> frontendEngineDriver)

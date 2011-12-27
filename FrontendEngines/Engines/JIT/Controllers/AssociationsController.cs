@@ -15,7 +15,7 @@ using Orchard.ContentManagement.Records;
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Associativy.FrontendEngines.Controllers.AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public abstract class AssociationsController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Associativy.FrontendEngines.Controllers.FrontendEngineBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
@@ -37,8 +37,6 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             _jitDriver = jitDriver;
         }
 
-        // No performance loss if with the same params as ShowAssociations because the solution 
-        // is cached after ShowAssociations()
         public virtual JsonResult FetchAssociations(int zoomLevel = 0)
         {
             object jsonData = null;
@@ -61,7 +59,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             }
             else
             {
-                jsonData = _jitDriver.GraphJson(_associativyServices.Mind.GetAllAssociations(settings));
+                jsonData = _jitDriver.GraphJson(_mind.GetAllAssociations(settings));
             }
 
             var json = new JsonResult()
