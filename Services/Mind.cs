@@ -80,65 +80,70 @@ namespace Associativy.Services
                 };
 
 
-            IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
             if (settings.UseCache)
             {
-                graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
+                var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
+                 {
+                     _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                     return makeWholeGraph();
+                 });
+
+                return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
-                    return makeWholeGraph();
+                    return ZoomedGraph(graph, settings.ZoomLevel);
                 });
             }
-            else graph = makeWholeGraph();
-
-
-            if (settings.UseCache)
-            {
-                return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed", settings), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
-                    return ZoomGraph(graph, settings.ZoomLevel);
-                });
-            }
-            else return ZoomGraph(graph, settings.ZoomLevel);
+            else return ZoomedGraph(makeWholeGraph(), settings.ZoomLevel);
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
             IList<TNodePart> nodes,
             IMindSettings settings = null)
         {
-            MakeSettings(ref settings);
-
-            if (settings.UseCache)
-            {
-                string cacheKey = "";
-                nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-                return _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
-                    {
-                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
-                        settings.UseCache = false;
-                        return MakeAssociations(nodes, settings);
-                    });
-            }
-
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
             if (nodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
-            // If there's only one node, return its neighbours
-            if (nodes.Count == 1)
+            MakeSettings(ref settings);
+
+            Func<IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>> makeGraph =
+                () =>
+                {
+                    // If there's only one node, return its neighbours
+                    if (nodes.Count == 1)
+                    {
+                        return GetNeighboursGraph(nodes[0]);
+                    }
+                    // Simply calculate the intersection of the neighbours of the nodes
+                    else if (settings.Algorithm == MindAlgorithms.Simple)
+                    {
+                        return MakeSimpleAssocations(nodes);
+                    }
+                    // Calculate the routes between two nodes
+                    else
+                    {
+                        return MakeSophisticatedAssociations(nodes, settings);
+                    }
+                };
+
+            if (settings.UseCache)
             {
-                return GetNeighboursGraph(nodes[0]);
+                string cacheKey = "AssociativeGraph.";
+                nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
+
+                var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
+                    {
+                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                        return makeGraph();
+                    });
+
+                return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
+                {
+                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    return ZoomedGraph(graph, settings.ZoomLevel);
+                });
             }
-            // Simply calculate the intersection of the neighbours of the nodes
-            else if (settings.Algorithm == MindAlgorithms.Simple)
-            {
-                return MakeSimpleAssocations(nodes);
-            }
-            // Calculate the routes between two nodes
-            else
-            {
-                return MakeSophisticatedAssociations(nodes, settings);
-            }
+            else return ZoomedGraph(makeGraph(), settings.ZoomLevel);
         }
 
         private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
@@ -273,17 +278,16 @@ namespace Associativy.Services
             return succeededNodeIds;
         }
 
-        /// <summary>
-        /// Zooms in the graph to the specified level. Modifies the graph!
-        /// </summary>
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomedGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
             // with the same numbers for a graph when calculating zoomed graphs, there is no gain in caching: the algorithm runs
             // freaking fast: ~100 ticks on i7@3,2Ghz, running sequentially. That's very far from even one ms...
 
-            var nodes = graph.Vertices.ToList();
+            IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> zoomedGraph = GraphFactory();
+            zoomedGraph.AddVerticesAndEdgeRange(graph.Edges);
+            var nodes = zoomedGraph.Vertices.ToList();
 
 
             /// Grouping vertices by the number of their neighbours (= adjacentDegree)
@@ -291,7 +295,7 @@ namespace Associativy.Services
             var maxAdjacentDegree = 0;
             foreach (var node in nodes)
             {
-                var adjacentDegree = graph.AdjacentDegree(node);
+                var adjacentDegree = zoomedGraph.AdjacentDegree(node);
                 if (adjacentDegree > maxAdjacentDegree) maxAdjacentDegree = adjacentDegree;
                 if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<TNodePart>();
                 adjacentDegreeGroups[adjacentDegree].Add(node);
@@ -327,30 +331,30 @@ namespace Associativy.Services
             {
                 foreach (var node in zoomPartitions[i])
                 {
-                    var adjacentEdges = graph.AdjacentEdges(node);
+                    var adjacentEdges = zoomedGraph.AdjacentEdges(node);
                     // Rewiring all edges so that nodes previously connected through this nodes now get directly connected
                     // Looks unneeded and wrong
                     //if (adjacentEdges.Count() > 1)
                     //{
-                    //    foreach (var edge in graph.AdjacentEdges(node))
+                    //    foreach (var edge in zoomedGraph.AdjacentEdges(node))
                     //    {
 
                     //    }
                     //}
-                    graph.RemoveVertex(node);
+                    zoomedGraph.RemoveVertex(node);
                 }
 
                 i--;
             }
 
 
-            return graph;
+            return zoomedGraph;
         }
 
         private string MakeCacheKey(string name, IMindSettings settings)
         {
             return MakeCacheKey(name)
-                + "MindSettings:" + settings.Algorithm + settings.ZoomLevel + settings.MaxDistance;
+                + "MindSettings:" + settings.Algorithm + settings.MaxDistance;
         }
 
         private string MakeCacheKey(string name)
