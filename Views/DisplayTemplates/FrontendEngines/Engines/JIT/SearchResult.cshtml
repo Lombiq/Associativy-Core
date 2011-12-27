@@ -7,10 +7,10 @@
 @Display(Model.SearchForm)
 <script type="text/javascript">
 $(document).ready(function(){
-	$.getJSON("@Url.Action("FetchAssociations", routeData["controller"].ToString(), new { ZoomLevel = 5 })&" + $("#associativy-search-form").serialize(), function(data) {
+	$.getJSON("@Url.Action("FetchAssociations", routeData["controller"].ToString(), new { ZoomLevel = 10 })&" + $("#associativy-search-form").serialize(), function(data) {
         $.jit.draw($.parseJSON(data));
     });
 });
 </script>
-<div id="jit-associations" style="width: 700px; height: 600px;">
+<div id="jit-associations" style="width: 900px; height: 800px;">
 </div>
