@@ -10,6 +10,7 @@ using QuickGraph;
 using Orchard;
 using Associativy.Models.Mind;
 using Associativy.EventHandlers;
+using System.Diagnostics;
 
 namespace Associativy.Services
 {
@@ -52,38 +53,49 @@ namespace Associativy.Services
         {
             MakeSettings(ref settings);
 
+            Func<IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>> makeWholeGraph =
+                () =>
+                {
+                    var wholeGraph = GraphFactory();
+
+                    var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
+
+                    foreach (var node in nodes)
+                    {
+                        wholeGraph.AddVertex(node.Value);
+                    }
+
+                    var connections = _connectionManager.GetAll();
+                    for (int i = 0; i < connections.Count; i++)
+                    {
+                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connections[i].Record1Id], nodes[connections[i].Record2Id]));
+                    }
+
+                    return wholeGraph;
+                };
+
+
+            IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
             if (settings.UseCache)
             {
-                return _cacheManager.Get(MakeCacheKey("WholeGraph", settings), ctx =>
-                    {
-                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
-                        settings.UseCache = false;
-                        return GetAllAssociations(settings);
-                    });
+                graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
+                {
+                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    return makeWholeGraph();
+                });
             }
+            else graph = makeWholeGraph();
 
-            var graph = GraphFactory();
 
-            var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
-
-            foreach (var node in nodes)
+            if (settings.UseCache)
             {
-                graph.AddVertex(node.Value);
+                return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed", settings), ctx =>
+                {
+                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    return ZoomGraph(graph, settings.ZoomLevel);
+                });
             }
-
-            var connections = _connectionManager.GetAll();
-            for (int i = 0; i < connections.Count; i++)
-            {
-                graph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connections[i].Record1Id], nodes[connections[i].Record2Id]));
-            }
-
-            // Leaves out nodes that don't have any neighbours
-            //foreach (var connection in _nodeManager.NodeToNodeRecordRepository.Table.ToList())
-            //{
-            //    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
-            //}
-
-            return graph;
+            else return ZoomGraph(graph, settings.ZoomLevel);
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
@@ -254,6 +266,85 @@ namespace Associativy.Services
             }
 
             return succeededNodeIds;
+        }
+
+        protected virtual int MaxZoomLevel
+        {
+            get { return 10; }
+        }
+
+        /// <summary>
+        /// Zooms in the graph to the specified level. Modifies the graph!
+        /// </summary>
+        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
+        {
+            // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
+            // because the objects are not the same. But it seems that although the calculation to the last block is repeated
+            // with the same numbers for a graph when calculating zoomed graphs, there is no gain in caching: the algorithm runs
+            // freaking fast: ~100 ticks on i7@3,2Ghz, running sequentially. That's very far from even one ms...
+
+            var nodes = graph.Vertices.ToList();
+
+
+            /// Grouping vertices by the number of their neighbours (= adjacentDegree)
+            var adjacentDegreeGroups = new SortedList<int, List<TNodePart>>();
+            var maxAdjacentDegree = 0;
+            foreach (var node in nodes)
+            {
+                var adjacentDegree = graph.AdjacentDegree(node);
+                if (adjacentDegree > maxAdjacentDegree) maxAdjacentDegree = adjacentDegree;
+                if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<TNodePart>();
+                adjacentDegreeGroups[adjacentDegree].Add(node);
+            }
+
+
+            /// Partitioning nodes into continuous zoom levels
+            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / MaxZoomLevel), 0);
+            if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
+            int currentRealZoomLevel = 0;
+            int previousRealZoomLevel = -1;
+            int nodeCountTillThisLevel = 0;
+            var zoomPartitions = new List<List<TNodePart>>(MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            // Iterating backwards as nodes with higher neighbourCount are on the top
+            // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
+            // all the nodes.
+            var reversedAdjacentDegreeGroups = adjacentDegreeGroups.Reverse();
+            foreach (var nodeGroup in reversedAdjacentDegreeGroups)
+            {
+                nodeCountTillThisLevel += nodeGroup.Value.Count;
+                currentRealZoomLevel = (int)Math.Floor((double)(nodeCountTillThisLevel / approxVerticesInPartition));
+
+                if (previousRealZoomLevel != currentRealZoomLevel) zoomPartitions.Add(nodeGroup.Value); // We've reached a new zoom level
+                else zoomPartitions[zoomPartitions.Count - 1].AddRange(nodeGroup.Value);
+
+                previousRealZoomLevel = currentRealZoomLevel;
+            }
+
+
+            /// Removing all nodes that are above the specified zoom level
+            int i = zoomPartitions.Count - 1;
+            while (i >= 0 && i > zoomLevel)
+            {
+                foreach (var node in zoomPartitions[i])
+                {
+                    var adjacentEdges = graph.AdjacentEdges(node);
+                    // Rewiring all edges so that nodes previously connected through this nodes now get directly connected
+                    // Looks unneeded and wrong
+                    //if (adjacentEdges.Count() > 1)
+                    //{
+                    //    foreach (var edge in graph.AdjacentEdges(node))
+                    //    {
+
+                    //    }
+                    //}
+                    graph.RemoveVertex(node);
+                }
+
+                i--;
+            }
+
+
+            return graph;
         }
 
         private string MakeCacheKey(string name, IMindSettings settings)
