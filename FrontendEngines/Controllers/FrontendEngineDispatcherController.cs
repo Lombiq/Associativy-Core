@@ -49,11 +49,6 @@ namespace Associativy.FrontendEngines.Controllers
 
             //var d = _componentContext.Resolve<IDiscoverableFrontendEngineController<IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>>();
 
-            var testService = _componentContext.Resolve<ITestService<TNodeToNodeConnectorRecord>>();
-
-            var d = _componentContext.Resolve<ITest<ITestService<int>, int>>(); // Ez nem működik, csak TestService-zel. Autofac bug miatt.
-            int z = 5 + 5;
-
 
             //var z = Type.GetType("Associativy.FrontendEngines.Engines." + FrontendEngineName + ".Controllers.IFrontendEngineController, Associativy");
             //var frontendEngineController = (IController)_componentContext.Resolve(

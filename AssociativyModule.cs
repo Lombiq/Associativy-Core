@@ -15,24 +15,6 @@ using Orchard.ContentManagement.Records;
 
 namespace Associativy
 {
-    public interface ITestService<T>
-    {
-    }
-
-    public class TestService<T> : ITestService<T>
-    {
-    }
-
-    public interface ITest<TService, T>
-        where TService : ITestService<T>
-    {
-    }
-
-    public class Test<TService, T> : ITest<TService, T>
-        where TService : ITestService<T>
-    {
-    }
-
     [OrchardFeature("Associativy")]
     public class AssociativyModule : IModule
     {
@@ -57,9 +39,6 @@ namespace Associativy
             // Frontend engines
 
             // Dracula
-            builder.RegisterGeneric(typeof(TestService<>)).As(typeof(ITestService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(Test<,>)).As(typeof(ITest<,>)).InstancePerLifetimeScope();
-
             builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IDraculaDriver<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,,,>)).As(typeof(IDiscoverableFrontendEngineController<,,,>)).InstancePerLifetimeScope();
 
