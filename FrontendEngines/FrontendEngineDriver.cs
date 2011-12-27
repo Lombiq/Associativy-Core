@@ -116,22 +116,16 @@ namespace Associativy.FrontendEngines
             where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
         {
             var viewNodes = new Dictionary<int, TGraphNodeViewModel>(graph.VertexCount);
+            foreach (var vertex in graph.Vertices)
+            {
+                viewNodes[vertex.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
+                viewNodes[vertex.Id].MapFromNode(vertex);
+            }
 
             var edges = graph.Edges.ToList();
             foreach (var edge in edges)
             {
-                if (!viewNodes.ContainsKey(edge.Source.Id))
-                {
-                    viewNodes[edge.Source.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
-                    viewNodes[edge.Source.Id].MapFromNode(edge.Source);
-                }
                 viewNodes[edge.Source.Id].Neighbours.Add(edge.Target);
-
-                if (!viewNodes.ContainsKey(edge.Target.Id))
-                {
-                    viewNodes[edge.Target.Id] = _workContextAccessor.GetContext().Resolve<TGraphNodeViewModel>();
-                    viewNodes[edge.Target.Id].MapFromNode(edge.Target);
-                }
                 viewNodes[edge.Target.Id].Neighbours.Add(edge.Source);
             }
 
