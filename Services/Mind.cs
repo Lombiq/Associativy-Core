@@ -26,6 +26,11 @@ namespace Associativy.Services
         protected readonly IWorkContextAccessor _workContextAccessor;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
+        protected virtual int MaxZoomLevel
+        {
+            get { return 10; }
+        }
+
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
         protected readonly string CachePrefix = "Associativy." + typeof(TNodePart).Name;
@@ -266,11 +271,6 @@ namespace Associativy.Services
             }
 
             return succeededNodeIds;
-        }
-
-        protected virtual int MaxZoomLevel
-        {
-            get { return 10; }
         }
 
         /// <summary>
