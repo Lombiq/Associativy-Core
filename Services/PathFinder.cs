@@ -30,7 +30,7 @@ namespace Associativy.Services
         }
 
         #region FindPaths() auxiliary classes
-        protected virtual class PathNode
+        protected class PathNode
         {
             public int Id { get; private set; }
             public int MinDistance { get; set; }
@@ -44,7 +44,7 @@ namespace Associativy.Services
             }
         }
 
-        protected virtual class FrontierNode
+        protected class FrontierNode
         {
             public int Distance { get; set; }
             public List<int> Path { get; set; }
