@@ -146,7 +146,7 @@ namespace Associativy.Services
             else return ZoomedGraph(makeGraph(), settings.ZoomLevel);
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
         {
             var graph = GraphFactory();
 
@@ -161,7 +161,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
@@ -192,7 +192,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes, IMindSettings settings)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes, IMindSettings settings)
         {
             if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
@@ -261,12 +261,12 @@ namespace Associativy.Services
             return graph;
         }
 
-        private Dictionary<int, TNodePart> GetSucceededNodes(IList<IList<int>> succeededPaths)
+        protected virtual Dictionary<int, TNodePart> GetSucceededNodes(IList<IList<int>> succeededPaths)
         {
             return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
         }
 
-        private List<int> GetSucceededNodeIds(IList<IList<int>> succeededPaths)
+        protected virtual List<int> GetSucceededNodeIds(IList<IList<int>> succeededPaths)
         {
             var succeededNodeIds = new List<int>(succeededPaths.Count); // An incorrect estimate, but (micro)enhaces performance
 
@@ -278,7 +278,7 @@ namespace Associativy.Services
             return succeededNodeIds;
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomedGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomedGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
@@ -351,23 +351,23 @@ namespace Associativy.Services
             return zoomedGraph;
         }
 
-        private string MakeCacheKey(string name, IMindSettings settings)
+        protected virtual string MakeCacheKey(string name, IMindSettings settings)
         {
             return MakeCacheKey(name)
                 + "MindSettings:" + settings.Algorithm + settings.MaxDistance;
         }
 
-        private string MakeCacheKey(string name)
+        protected virtual string MakeCacheKey(string name)
         {
             return CachePrefix + name;
         }
 
-        private IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GraphFactory()
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GraphFactory()
         {
             return new UndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>();
         }
 
-        private void MakeSettings(ref IMindSettings settings)
+        protected virtual void MakeSettings(ref IMindSettings settings)
         {
             var workContext = _workContextAccessor.GetContext();
             if (settings == null) settings = workContext.Resolve<IMindSettings>();

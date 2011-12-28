@@ -45,7 +45,7 @@ namespace Associativy.FrontendEngines.Engines.JIT
             return null;
         }
 
-        public string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+        public virtual string GraphJson(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
         {
             IEnumerable<string> jsonNodes = from node in BuildViewNodes<IJITGraphNodeViewModel<TNode>>(graph).Values
                                             select _simpleSerializer.JsonSerialize(node);

@@ -30,7 +30,7 @@ namespace Associativy.Services
         }
 
         #region FindPaths() auxiliary classes
-        private class PathNode
+        protected virtual class PathNode
         {
             public int Id { get; private set; }
             public int MinDistance { get; set; }
@@ -44,7 +44,7 @@ namespace Associativy.Services
             }
         }
 
-        private class FrontierNode
+        protected virtual class FrontierNode
         {
             public int Distance { get; set; }
             public List<int> Path { get; set; }
@@ -58,7 +58,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public IList<IList<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings)
+        public virtual IList<IList<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings)
         {
             var startId = startNode.Id;
             var targetId = targetNode.Id;
