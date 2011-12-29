@@ -12,6 +12,7 @@ using Associativy.FrontendEngines.Controllers;
 using Orchard.ContentManagement;
 using Associativy.Models;
 using Orchard.ContentManagement.Records;
+using Associativy.FrontendEngines.Engines.Graphviz.Services;
 
 namespace Associativy
 {
@@ -40,10 +41,11 @@ namespace Associativy
 
             // Dracula
             builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IDraculaDriver<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,,,>)).As(typeof(IDiscoverableFrontendEngineController<,,,>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,,>)).As(typeof(IDiscoverableFrontendEngineController<,,>)).InstancePerLifetimeScope();
 
             // Graphviz
             builder.RegisterGeneric(typeof(GraphvizDriver<>)).As(typeof(IGraphvizDriver<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(GraphImageService<>)).As(typeof(IGraphImageService<>)).InstancePerLifetimeScope();
 
             // JIT
             builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IJITDriver<>)).InstancePerLifetimeScope();

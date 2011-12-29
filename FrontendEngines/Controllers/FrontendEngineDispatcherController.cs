@@ -17,8 +17,7 @@ using Associativy.FrontendEngines.Engines.Dracula;
 namespace Associativy.FrontendEngines.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineDispatcherController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller, IFrontendEngineController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public class FrontendEngineDispatcherController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller, IFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()

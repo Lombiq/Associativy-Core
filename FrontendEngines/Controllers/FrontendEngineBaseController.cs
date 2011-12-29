@@ -15,13 +15,17 @@ using QuickGraph;
 using Associativy.FrontendEngines.ViewModels;
 using Associativy.Models.Mind;
 using Associativy.Controllers;
+using System.Diagnostics;
 
 namespace Associativy.FrontendEngines.Controllers
 {
+    /// <summary>
+    /// Base class for frontend engine controllers
+    /// </summary>
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : AssociativyBaseController<TAssocociativyServices, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
-        where TAssocociativyServices : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
+    public abstract class FrontendEngineBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> 
+        : AssociativyBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
         where TNodePart : ContentPart<TNodePartRecord>, INode
         where TNodePartRecord : ContentPartRecord, INode
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
@@ -36,8 +40,8 @@ namespace Associativy.FrontendEngines.Controllers
 
         public Localizer T { get; set; }
 
-        protected FrontendEngineBaseController(
-            TAssocociativyServices associativyServices,
+        public FrontendEngineBaseController(
+            IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> associativyServices,
             IOrchardServices orchardServices,
             IFrontendEngineDriver<TNodePart> frontendEngineDriver)
             : base(associativyServices)
@@ -53,7 +57,7 @@ namespace Associativy.FrontendEngines.Controllers
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = 5;
+            settings.ZoomLevel = 10;
 
             return new ShapeResult(
                     this,
