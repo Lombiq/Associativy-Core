@@ -58,7 +58,14 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
             //}
             //var graphML = stringBuilder.ToString();
 
-            var filePath = _storagePath + graph.GetHashCode().ToString() + initialization.GetHashCode() + ".svg";
+            // Sadly graph.GetHashCode() gives different results on different requests, therefore only the dot hash
+            // is reliable. Fortunately it's quite fast.
+            var dotData = graph.ToGraphviz(algorithm =>
+            {
+                initialization(algorithm);
+            });
+
+            var filePath = _storagePath + dotData.GetHashCode() + ".svg";
 
             return _cacheManager.Get("Associativy.GraphImages." + filePath, ctx =>
             {
@@ -72,11 +79,6 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
                 catch (Exception)
                 {
                 }
-
-                var dotData = graph.ToGraphviz(algorithm =>
-                {
-                    initialization(algorithm);
-                });
 
                 var wc = new WebClient();
                 var svgData = wc.UploadString("http://rise4fun.com/services.svc/ask/agl", dotData);
