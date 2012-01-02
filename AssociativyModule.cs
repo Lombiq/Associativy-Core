@@ -9,6 +9,7 @@ using Associativy.FrontendEngines.Controllers;
 using Orchard.ContentManagement;
 using Associativy.Models;
 using Orchard.ContentManagement.Records;
+using Associativy.FrontendEngines.Engines.Graphviz.Services;
 
 namespace Associativy
 {
@@ -35,6 +36,7 @@ namespace Associativy
             builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
 
             //// Graphviz
+            builder.RegisterGeneric(typeof(GraphImageService<>)).As(typeof(IGraphImageService<>)).InstancePerLifetimeScope();
 
             //// JIT
 

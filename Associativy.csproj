@@ -121,7 +121,7 @@
     <Compile Include="FrontendEngines\FrontendEngineControllerLocator.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
-    <Compile Include="IShapes.cs" />
+    <Compile Include="Shapes\IFrontendShapes.cs" />
     <Compile Include="Models\AssociativyContext.cs" />
     <Compile Include="Models\IAssociativyContext.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
@@ -143,7 +143,7 @@
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
     <Compile Include="Services\PathFinder.cs" />
-    <Compile Include="Shapes.cs" />
+    <Compile Include="Shapes\Shapes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Graph.cshtml" />
