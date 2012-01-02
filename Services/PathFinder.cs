@@ -11,19 +11,21 @@ using Associativy.Models;
 
 namespace Associativy.Services
 {
-    public class PathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> : IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
+    public class PathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : AssociativyService<TAssociativyContext>, IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
-        protected readonly string GraphSignal = "Associativy.Graph.Connections." + typeof(TNodeToNodeConnectorRecord).Name;
 
         public PathFinder(
+            TAssociativyContext associativyContext,
             IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
+            : base(associativyContext)
         {
             _connectionManager = connectionManager;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
@@ -65,9 +67,9 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphSignal);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
                     settings.UseCache = false;
-                    return FindPaths(startNode, targetNode, settings);
+                    return FindPaths(startNodeId, targetNodeId, settings);
                 });
             }
 

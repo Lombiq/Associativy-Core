@@ -35,12 +35,5 @@ namespace Associativy.Services
         /// <param name="label"></param>
         /// <returns></returns>
         IContent Get(string label);
-
-        /// <summary>
-        /// Gets the nodes with the specified ids
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        //IEnumerable<TNodePart> GetMany(IEnumerable<int> ids);
     }
 }

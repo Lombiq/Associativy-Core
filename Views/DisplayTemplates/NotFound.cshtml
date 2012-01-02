@@ -1,3 +1,5 @@
-﻿@model Associativy.FrontendEngines.ViewModels.ISearchViewModel
+﻿@using Orchard.ContentManagement
+@using Associativy.Models
+@model Orchard.ContentManagement.IContent
 
-@T("No associations found for {0}", Model.Terms)
+@T("No associations found for {0}", Model.As<SearchFormPart>().Terms)

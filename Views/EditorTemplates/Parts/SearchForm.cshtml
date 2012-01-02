@@ -3,6 +3,7 @@
 @{
     Script.Require("AssociativyAutoComplete").AtHead();
     Style.Require("jQueryUI_Orchard");
+    var routeData = Html.ViewContext.RouteData.Values;
 }
 
 <fieldset>
@@ -11,7 +12,6 @@
     @Html.ValidationMessageFor(model => model.Terms)
 </fieldset>
 
-
 <script type="text/javascript">
-    $.associativyAutoComplete.terms("Terms", "@Url.Action("FetchSimilarTerms", routeData["controller"].ToString())");
+    $.associativyAutoComplete.terms("@Html.FieldIdFor(model => model.Terms)", "@Url.Action("FetchSimilarTerms", routeData["controller"].ToString())");
 </script>

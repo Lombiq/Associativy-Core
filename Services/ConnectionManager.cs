@@ -81,9 +81,10 @@ namespace Associativy.Services
             _associativeGraphEventHandler.Changed(_associativyContext);
         }
 
-        public virtual IEnumerable<TNodeToNodeConnectorRecord> GetAll()
+        public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()
         {
-            return _nodeToNodeRecordRepository.Table;
+            var records = _nodeToNodeRecordRepository.Table.ToList();
+            return records.Select(r => (INodeToNodeConnectorRecord)r).ToList();
         }
 
         public virtual IEnumerable<int> GetNeighbourIds(int nodeId)

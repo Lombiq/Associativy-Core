@@ -12,30 +12,28 @@ using Associativy.Services;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.FrontendEngines.Controllers;
+using Orchard.DisplayManagement;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> 
-        : FrontendEngineBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IDiscoverableFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class FrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : FrontendEngineBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected IDraculaDriver<TNodePart> _draculaDriver;
-
-        protected override string FrontendEngineDriver
+        protected override string FrontendEngine
         {
             get { return "Dracula"; }
         }
 
         public FrontendEngineController(
-            IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> associativyService,
+            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
-            IDraculaDriver<TNodePart> draculaDriver)
-            : base(associativyService, orchardServices, draculaDriver)
+            IShapes shapes,
+            IShapeFactory shapeFactory)
+            : base(associativyServices, orchardServices, shapes, shapeFactory)
         {
-            _draculaDriver = draculaDriver;
         }
     }
 }

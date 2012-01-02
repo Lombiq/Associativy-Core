@@ -42,7 +42,11 @@ namespace Associativy.Services
 
         public void Changed(IAssociativyContext associativyContext)
         {
-            _signals.Trigger(_changedSignals[associativyContext.TechnicalName]);
+            string signal;
+            if (_changedSignals.TryGetValue(associativyContext.TechnicalName, out signal))
+            {
+                _signals.Trigger(signal);
+            }
         }
     }
 }

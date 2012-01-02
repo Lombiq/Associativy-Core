@@ -8,17 +8,8 @@ namespace Associativy.Extensions
         {
             table
                 .Column<int>("Id", column => column.PrimaryKey().Identity())
-                .Column<int>("Record1Id", column => column.NotNull())
-                .Column<int>("Record2Id", column => column.NotNull());
-
-            return table;
-        }
-
-        public static CreateTableCommand NodePartRecord(this CreateTableCommand table)
-        {
-            table
-                .ContentPartRecord()
-                .Column<string>("Label", column => column.NotNull());
+                .Column<int>("Node1Id", column => column.NotNull())
+                .Column<int>("Node2Id", column => column.NotNull());
 
             return table;
         }
