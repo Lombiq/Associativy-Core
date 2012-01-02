@@ -32,7 +32,7 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChangedSignal(IAcquireContext ctx, object signal)
+        public void MonitorChangedSignal(IAcquireContext ctx, object signal/*, context*/)
         {
             _changedSignalObjects.Add(signal);
             ctx.Monitor(_signals.When(signal));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Orchard.Events;
+using Associativy.Models;
 
 namespace Associativy.EventHandlers
 {
@@ -16,6 +17,6 @@ namespace Associativy.EventHandlers
         /// <summary>
         /// Gets called when the associative graph has changed.
         /// </summary>
-        void Changed();
+        void Changed(/*Context*/);
     }
 }
