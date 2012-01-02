@@ -10,33 +10,35 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class AssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : AssociativyService<TAssociativyContext>, IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
-        public IConnectionManager<TNodeToNodeConnectorRecord> ConnectionManager
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
+        public IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> ConnectionManager
         {
             get { return _connectionManager; }
         }
 
-        protected readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _mind;
-        public IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind
+        protected readonly IMind<TNodeToNodeConnectorRecord, TAssociativyContext> _mind;
+        public IMind<TNodeToNodeConnectorRecord, TAssociativyContext> Mind
         {
             get { return _mind; }
         }
 
-        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
-        public INodeManager<TNodePart, TNodePartRecord> NodeManager
+        protected readonly INodeManager<TAssociativyContext> _nodeManager;
+        public INodeManager<TAssociativyContext> NodeManager
         {
             get { return _nodeManager; }
         }
 
         public AssociativyServices(
-            IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
-            IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> mind,
-            INodeManager<TNodePart, TNodePartRecord> nodeManager)
+            TAssociativyContext associativyContext,
+            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
+            IMind<TNodeToNodeConnectorRecord, TAssociativyContext> mind,
+            INodeManager<TAssociativyContext> nodeManager)
+            : base(associativyContext)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;

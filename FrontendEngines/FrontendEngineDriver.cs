@@ -13,8 +13,7 @@ using System;
 namespace Associativy.FrontendEngines
 {
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineDriver<TNode> : IFrontendEngineDriver<TNode>
-        where TNode : INode
+    public abstract class FrontendEngineDriver : IFrontendEngineDriver
     {
         protected readonly IOrchardServices _orchardServices;
         protected dynamic _shapeFactory;
@@ -89,13 +88,13 @@ namespace Associativy.FrontendEngines
                     Prefix: null);
         }
 
-        public virtual dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+        public virtual dynamic GraphShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph)
         {
-            return GraphShape<IGraphViewModel, IGraphNodeViewModel<TNode>>(graph);
+            return GraphShape<IGraphViewModel, IGraphNodeViewModel<IContent>>(graph);
         }
 
         // Can be used in derived classes to switch the IGraphViewModel and IGraphNodeViewModel<> implementation
-        protected virtual dynamic GraphShape<TGraphViewModel, TGraphNodeViewModel>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph)
+        protected virtual dynamic GraphShape<TGraphViewModel, TGraphNodeViewModel>(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph)
             where TGraphViewModel : IGraphViewModel
             where TGraphNodeViewModel : IGraphNodeViewModel<TNode>
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using Associativy.Models;
 
 namespace Associativy.EventHandlers
 {
@@ -12,6 +13,6 @@ namespace Associativy.EventHandlers
     public interface IAssociativeGraphEventDispatcher : IAssociativeGraphEventHandler
     {
         event EventHandler ChangedEvent;
-        void Changed();
+        void Changed(IAssociativyContext associativyContext);
     }
 }

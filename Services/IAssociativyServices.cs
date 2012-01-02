@@ -8,27 +8,25 @@ namespace Associativy.Services
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    /// <typeparam name="TNodePart">Content part type for nodes</typeparam>
-    /// <typeparam name="TNodePartRecord">Content part record type for nodes</typeparam>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    public interface IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IDependency
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
+    public interface IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> : IDependency
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
         /// <summary>
         /// Service for dealing with connections between nodes
         /// </summary>
-        IConnectionManager<TNodeToNodeConnectorRecord> ConnectionManager { get; }
+        IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> ConnectionManager { get; }
 
         /// <summary>
         /// Service for generating associations
         /// </summary>
-        IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> Mind { get; }
+        IMind<TNodeToNodeConnectorRecord, TAssociativyContext> Mind { get; }
 
         /// <summary>
         /// Service for handling nodes
         /// </summary>
-        INodeManager<TNodePart, TNodePartRecord> NodeManager { get; }
+        INodeManager<TAssociativyContext> NodeManager { get; }
     }
 }

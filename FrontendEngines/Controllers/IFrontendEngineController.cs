@@ -11,10 +11,9 @@ using System.Web.Mvc;
 
 namespace Associativy.FrontendEngines.Controllers
 {
-    public interface IFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IController
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public interface IFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext> : IController
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
     }
 }

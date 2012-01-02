@@ -11,16 +11,17 @@ using Associativy.Models;
 
 namespace Associativy.Services
 {
-    public class PathFinder<TNodeToNodeConnectorRecord> : IPathFinder<TNodeToNodeConnectorRecord>
+    public class PathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> : IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
         protected readonly string GraphSignal = "Associativy.Graph.Connections." + typeof(TNodeToNodeConnectorRecord).Name;
 
         public PathFinder(
-            IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
+            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
         {
@@ -58,16 +59,13 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual IEnumerable<IEnumerable<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings)
+        public virtual IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, IMindSettings settings)
         {
-            var startId = startNode.Id;
-            var targetId = targetNode.Id;
-
             if (settings.UseCache)
             {
-                return _cacheManager.Get("Associativy." + startId.ToString() + targetId.ToString() + settings.MaxDistance, ctx =>
+                return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphSignal);
                     settings.UseCache = false;
                     return FindPaths(startNode, targetNode, settings);
                 });
@@ -77,8 +75,8 @@ namespace Associativy.Services
             var succeededPaths = new List<IList<int>>();
             var frontier = new Stack<FrontierNode>();
 
-            explored[startId] = new PathNode(startId) { MinDistance = 0 };
-            frontier.Push(new FrontierNode { Node = explored[startId] });
+            explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
+            frontier.Push(new FrontierNode { Node = explored[startNodeId] });
 
             FrontierNode frontierNode;
             PathNode currentNode;
@@ -96,16 +94,16 @@ namespace Associativy.Services
                 if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (_connectionManager.AreNeighbours(currentNode.Id, targetId))
+                    if (_connectionManager.AreNeighbours(currentNode.Id, targetNodeId))
                     {
-                        if (!explored.ContainsKey(targetId)) explored[targetId] = new PathNode(targetId);
-                        if (explored[targetId].MinDistance > currentDistance + 1)
+                        if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
+                        if (explored[targetNodeId].MinDistance > currentDistance + 1)
                         {
-                            explored[targetId].MinDistance = currentDistance + 1;
+                            explored[targetNodeId].MinDistance = currentDistance + 1;
                         }
 
-                        currentNode.Neighbours.Add(explored[targetId]);
-                        currentPath.Add(targetId);
+                        currentNode.Neighbours.Add(explored[targetNodeId]);
+                        currentPath.Add(targetNodeId);
                         succeededPaths.Add(currentPath);
                     }
                 }
@@ -130,20 +128,20 @@ namespace Associativy.Services
                     foreach (var neighbour in currentNode.Neighbours)
                     {
                         // Target is a neighbour
-                        if (neighbour.Id == targetId)
+                        if (neighbour.Id == targetNodeId)
                         {
-                            var succeededPath = new List<int>(currentPath) { targetId }; // Since we will use currentPath in further iterations too
+                            var succeededPath = new List<int>(currentPath) { targetNodeId }; // Since we will use currentPath in further iterations too
                             succeededPaths.Add(succeededPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
-                        else if (neighbour.Id != startId)
+                        else if (neighbour.Id != startNodeId)
                         {
                             neighbour.MinDistance = currentDistance + 1;
                             frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
                         }
 
                         // If this is the shortest path to the node, overwrite its minDepth
-                        if (neighbour.Id != startId && neighbour.MinDistance > currentDistance + 1)
+                        if (neighbour.Id != startNodeId && neighbour.MinDistance > currentDistance + 1)
                         {
                             neighbour.MinDistance = currentDistance + 1;
                         }

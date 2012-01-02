@@ -10,18 +10,17 @@ using Orchard.ContentManagement.Records;
 
 namespace Associativy.Controllers
 {
-    public abstract class AssociativyBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public abstract class AssociativyBaseController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected readonly IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _associativyServices;
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
-        protected readonly IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> _mind;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
+        protected readonly IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> _associativyServices;
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
+        protected readonly IMind<TNodeToNodeConnectorRecord, TAssociativyContext> _mind;
+        protected readonly INodeManager<TAssociativyContext> _nodeManager;
 
         protected AssociativyBaseController(
-            IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> associativyServices)
+            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices)
         {
             _associativyServices = associativyServices;
             _connectionManager = associativyServices.ConnectionManager;

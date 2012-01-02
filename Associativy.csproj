@@ -107,6 +107,7 @@
     <Compile Include="EventHandlers\IAssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs" />
     <Compile Include="FrontendEngines\Controllers\FrontendEngineDispatcherController.cs" />
     <Compile Include="FrontendEngines\Controllers\IDiscoverableFrontendEngineController.cs" />
@@ -135,17 +136,13 @@
     <Compile Include="Models\AssociativyContext.cs" />
     <Compile Include="Models\IAssociativyContext.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
-    <Compile Include="Models\Nodes\INodeParams.cs" />
-    <Compile Include="Models\Nodes\INode.cs" />
     <Compile Include="Models\Nodes\INodeToNodeConnectorRecord.cs" />
     <Compile Include="Models\Mind\MindSettings.cs" />
-    <Compile Include="Models\Nodes\NodePartRecord.cs" />
-    <Compile Include="Models\Nodes\NodePart.cs" />
-    <Compile Include="Models\Nodes\NodeParams.cs" />
     <Compile Include="Models\Nodes\NodeToNodeRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Routes.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventMonitor.cs" />
+    <Compile Include="Services\AssociativyService.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />

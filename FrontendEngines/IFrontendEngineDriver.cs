@@ -10,8 +10,7 @@ namespace Associativy.FrontendEngines
     /// Display driver (much like Orchard drivers) for frontend engines
     /// </summary>
     /// <typeparam name="TNode">Node type</typeparam>
-    public interface IFrontendEngineDriver<TNode> : IDependency
-        where TNode : INode
+    public interface IFrontendEngineDriver : IDependency
     {
         /// <summary>
         /// Returns a new search view model instance
@@ -32,14 +31,14 @@ namespace Associativy.FrontendEngines
         /// </summary>
         /// <param name="graph">The graph to display</param>
         /// <returns>The shape of the graph</returns>
-        dynamic GraphShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
+        dynamic GraphShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph
         /// </summary>
         /// <param name="graph">The graph to display</param>
         /// <returns>The result shape containing the search from and the graph</returns>
-        dynamic SearchResultShape(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph);
+        dynamic SearchResultShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph);
 
         /// <summary>
         /// Returns the result shape containing the search form and the graph

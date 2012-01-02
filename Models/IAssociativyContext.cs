@@ -2,19 +2,14 @@
 using Orchard.Localization;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
+using Orchard;
 
 namespace Associativy.Models
 {
-    public interface IAssociativyContext
+    public interface IAssociativyContext : IDependency
     {
         LocalizedString Name { get; }
         string TechnicalName { get; }
-    }
-
-    public interface IAssociativyContext<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IAssociativyContext
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-    {
+        string[] ContentTypeNames { get; }
     }
 }

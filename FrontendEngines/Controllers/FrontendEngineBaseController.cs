@@ -16,6 +16,8 @@ using Associativy.FrontendEngines.ViewModels;
 using Associativy.Models.Mind;
 using Associativy.Controllers;
 using System.Diagnostics;
+using System;
+using Orchard.Core.Routable.Models;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -24,11 +26,10 @@ namespace Associativy.FrontendEngines.Controllers
     /// </summary>
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> 
-        : AssociativyBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IUpdateModel
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public abstract class FrontendEngineBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : AssociativyBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>, IFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>, IUpdateModel
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
         protected readonly IOrchardServices _orchardServices;
         protected IFrontendEngineDriver<TNodePart> _frontendEngineDriver;
@@ -38,10 +39,15 @@ namespace Associativy.FrontendEngines.Controllers
             get { return ""; }
         }
 
+        protected virtual Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> GraphQueryModifier
+        {
+            get { return (query) => query.Join<RoutePartRecord>(); }
+        }
+
         public Localizer T { get; set; }
 
         public FrontendEngineBaseController(
-            IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> associativyServices,
+            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
             IFrontendEngineDriver<TNodePart> frontendEngineDriver)
             : base(associativyServices)
@@ -61,7 +67,7 @@ namespace Associativy.FrontendEngines.Controllers
 
             return new ShapeResult(
                     this,
-                    _frontendEngineDriver.SearchResultShape(_mind.GetAllAssociations(settings))
+                    _frontendEngineDriver.SearchResultShape(_mind.GetAllAssociations(settings, GraphQueryModifier))
                 );
         }
 
@@ -73,7 +79,7 @@ namespace Associativy.FrontendEngines.Controllers
             {
                 _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchViewModel.Terms).ToString();
 
-                IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
+                IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
                 if (TryGetGraph(searchViewModel, out graph))
                 {
                     return new ShapeResult(
@@ -114,9 +120,13 @@ namespace Associativy.FrontendEngines.Controllers
             ModelState.AddModelError(key, errorMessage.ToString());
         }
 
-        protected virtual bool TryGetGraph(ISearchViewModel searchViewModel, out IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, IMindSettings settings = null)
+        protected virtual bool TryGetGraph(
+            ISearchViewModel searchViewModel, 
+            out IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, 
+            IMindSettings settings = null,
+             Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
         {
-            var searched = new List<TNodePart>(searchViewModel.TermsArray.Length);
+            var searched = new List<IContent>(searchViewModel.TermsArray.Length);
             foreach (var term in searchViewModel.TermsArray)
             {
                 var node = _associativyServices.NodeManager.Get(term);
@@ -127,7 +137,7 @@ namespace Associativy.FrontendEngines.Controllers
                 }
                 searched.Add(node);
             }
-            graph = _mind.MakeAssociations(searched, settings);
+            graph = _mind.MakeAssociations(searched, settings, queryModifier);
 
             return !graph.IsVerticesEmpty;
         }

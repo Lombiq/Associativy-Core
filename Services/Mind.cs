@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Associativy.Models;
 using Orchard.Caching;
-using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 using QuickGraph;
@@ -11,18 +10,22 @@ using Orchard;
 using Associativy.Models.Mind;
 using Associativy.EventHandlers;
 using System.Diagnostics;
+using Associativy.Extensions;
+using Orchard.ContentManagement;
+using Orchard.Data;
+using Orchard.Core.Common.Models;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class Mind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : IMind<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class Mind<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : AssociativyService<TAssociativyContext>, IMind<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord> _connectionManager;
-        protected readonly INodeManager<TNodePart, TNodePartRecord> _nodeManager;
-        protected readonly IPathFinder<TNodeToNodeConnectorRecord> _pathFinder;
+        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
+        protected readonly INodeManager<TAssociativyContext> _nodeManager;
+        protected readonly IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> _pathFinder;
         protected readonly IWorkContextAccessor _workContextAccessor;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
@@ -33,17 +36,18 @@ namespace Associativy.Services
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
-        protected readonly string CachePrefix = "Associativy." + typeof(TNodePart).Name;
-        protected readonly string GraphSignal = "Associativy.Graph." + typeof(TNodePart).Name;
+        protected readonly string _cachePrefix;
         #endregion
 
         public Mind(
-            IConnectionManager<TNodeToNodeConnectorRecord> connectionManager,
-            INodeManager<TNodePart, TNodePartRecord> nodeManager,
-            IPathFinder<TNodeToNodeConnectorRecord> pathFinder,
+            TAssociativyContext associativyContext,
+            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
+            INodeManager<TAssociativyContext> nodeManager,
+            IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> pathFinder,
             IWorkContextAccessor workContextAccessor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
+            : base(associativyContext)
         {
             _connectionManager = connectionManager;
             _nodeManager = nodeManager;
@@ -52,18 +56,22 @@ namespace Associativy.Services
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
 
             _cacheManager = cacheManager;
+            _cachePrefix = associativyContext.TechnicalName + ".";
         }
 
-        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetAllAssociations(IMindSettings settings = null)
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
+            IMindSettings settings = null,
+            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
         {
             MakeSettings(ref settings);
 
-            Func<IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>> makeWholeGraph =
+            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeWholeGraph =
                 () =>
                 {
                     var wholeGraph = GraphFactory();
 
-                    var nodes = _nodeManager.ContentQuery.List().ToDictionary<TNodePart, int>(node => node.Id);
+                    var query = queryModifier == null ? _nodeManager.ContentQuery : queryModifier(_nodeManager.ContentQuery);
+                    var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
 
                     foreach (var node in nodes)
                     {
@@ -73,7 +81,7 @@ namespace Associativy.Services
                     var connections = _connectionManager.GetAll();
                     foreach (var connection in connections)
                     {
-                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
+                        wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
                     }
 
                     return wholeGraph;
@@ -84,22 +92,23 @@ namespace Associativy.Services
             {
                 var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                  {
-                     _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                     _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
                      return makeWholeGraph();
                  });
 
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
                     return ZoomedGraph(graph, settings.ZoomLevel);
                 });
             }
             else return ZoomedGraph(makeWholeGraph(), settings.ZoomLevel);
         }
 
-        public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
-            IEnumerable<TNodePart> nodes,
-            IMindSettings settings = null)
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
+            IEnumerable<IContent> nodes,
+            IMindSettings settings = null,
+            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
         {
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
 
@@ -108,23 +117,25 @@ namespace Associativy.Services
 
             MakeSettings(ref settings);
 
-            Func<IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>> makeGraph =
+            if (queryModifier == null) queryModifier = (query) => query;
+
+            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
                 () =>
                 {
                     // If there's only one node, return its neighbours
                     if (nodeCount == 1)
                     {
-                        return GetNeighboursGraph(nodes.First());
+                        return GetNeighboursGraph(nodes.First(), queryModifier);
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
                     else if (settings.Algorithm == MindAlgorithms.Simple)
                     {
-                        return MakeSimpleAssocations(nodes);
+                        return MakeSimpleAssocations(nodes, queryModifier);
                     }
                     // Calculate the routes between two nodes
                     else
                     {
-                        return MakeSophisticatedAssociations(nodes, settings);
+                        return MakeSophisticatedAssociations(nodes, settings, queryModifier);
                     }
                 };
 
@@ -135,42 +146,45 @@ namespace Associativy.Services
 
                 var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
                     {
-                        _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                        _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
                         return makeGraph();
                     });
 
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChangedSignal(ctx, GraphSignal);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
                     return ZoomedGraph(graph, settings.ZoomLevel);
                 });
             }
             else return ZoomedGraph(makeGraph(), settings.ZoomLevel);
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GetNeighboursGraph(TNodePart node)
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
+            IContent node,
+            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
         {
             var graph = GraphFactory();
 
             graph.AddVertex(node);
-
-            var neighbours = _nodeManager.GetMany(_connectionManager.GetNeighbourIds(node.Id));
+            var neighbours = queryModifier(_nodeManager.GetManyQuery(_connectionManager.GetNeighbourIds(node.Id))).List();
             foreach (var neighbour in neighbours)
             {
-                graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, neighbour));
+                graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
             }
 
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IEnumerable<TNodePart> nodes)
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssocations(
+            IEnumerable<IContent> nodes,
+            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
             var graph = GraphFactory();
 
             var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes.First().Id);
-            var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
+            var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
             commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_connectionManager.GetNeighbourIds(node.Id)).ToList());
             // Same as
@@ -181,28 +195,45 @@ namespace Associativy.Services
 
             if (commonNeighbourIds.Count() == 0) return graph;
 
-            var commonNeighbours = _nodeManager.GetMany(commonNeighbourIds);
+            var commonNeighbours = queryModifier(_nodeManager.GetManyQuery(commonNeighbourIds)).List();
 
             foreach (var node in nodes)
             {
                 foreach (var neighbour in commonNeighbours)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, neighbour));
+                    graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
                 }
             }
 
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IEnumerable<TNodePart> nodes, IMindSettings settings)
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSophisticatedAssociations(
+            IEnumerable<IContent> nodes,
+            IMindSettings settings,
+            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
         {
             var nodeList = nodes.ToList();
             if (nodeList.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
+            Func<IEnumerable<IEnumerable<int>>, List<int>> getSucceededNodeIds =
+                (currentSucceededPaths) =>
+                {
+                    var succeededNodeIds = new List<int>(currentSucceededPaths.Count()); // An incorrect estimate, but (micro)enhaces performance
+
+                    foreach (var row in currentSucceededPaths)
+                    {
+                        succeededNodeIds = succeededNodeIds.Union(row).ToList();
+                    }
+
+                    return succeededNodeIds;
+                };
+
+
             var graph = GraphFactory();
             IList<IEnumerable<int>> succeededPaths;
 
-            var allPairSucceededPaths = _pathFinder.FindPaths(nodeList[0], nodeList[1], settings);
+            var allPairSucceededPaths = _pathFinder.FindPaths(nodeList[0].Id, nodeList[1].Id, settings);
 
             if (allPairSucceededPaths.Count() == 0) return graph;
 
@@ -219,7 +250,7 @@ namespace Associativy.Services
                         node => searchedNodeIds.Add(node.Id)
                     );
 
-                var commonSucceededNodeIds = GetSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
+                var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
 
                 for (int i = 0; i < nodeList.Count - 1; i++)
                 {
@@ -229,8 +260,8 @@ namespace Associativy.Services
                     while (n < nodeList.Count)
                     {
                         // Here could be multithreading
-                        var pairSucceededPaths = _pathFinder.FindPaths(nodeList[i], nodeList[n], settings);
-                        commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
+                        var pairSucceededPaths = _pathFinder.FindPaths(nodeList[i].Id, nodeList[n].Id, settings);
+                        commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
                         n++;
@@ -250,58 +281,40 @@ namespace Associativy.Services
                 if (succeededPaths.Count() == 0) return graph;
             }
 
-
-            var succeededNodes = GetSucceededNodes(succeededPaths);
+            var succeededNodes = queryModifier(_nodeManager.GetManyQuery(getSucceededNodeIds((succeededPaths)))).List().ToDictionary(node => node.Id);
 
             foreach (var path in succeededPaths)
             {
                 var pathList = path.ToList();
                 for (int i = 1; i < pathList.Count; i++)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]));
+                    graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]));
                 }
             }
 
             return graph;
         }
 
-        protected virtual Dictionary<int, TNodePart> GetSucceededNodes(IEnumerable<IEnumerable<int>> succeededPaths)
-        {
-            return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
-        }
-
-        protected virtual List<int> GetSucceededNodeIds(IEnumerable<IEnumerable<int>> succeededPaths)
-        {
-            var succeededNodeIds = new List<int>(succeededPaths.Count()); // An incorrect estimate, but (micro)enhaces performance
-
-            foreach (var row in succeededPaths)
-            {
-                succeededNodeIds = succeededNodeIds.Union(row).ToList();
-            }
-
-            return succeededNodeIds;
-        }
-
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> ZoomedGraph(IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph, int zoomLevel)
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> ZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
             // with the same numbers for a graph when calculating zoomed graphs, there is no gain in caching: the algorithm runs
             // freaking fast: ~100 ticks on i7@3,2Ghz, running sequentially. That's very far from even one ms...
 
-            IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> zoomedGraph = GraphFactory();
+            IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
             zoomedGraph.AddVerticesAndEdgeRange(graph.Edges);
             var nodes = zoomedGraph.Vertices.ToList();
 
 
             /// Grouping vertices by the number of their neighbours (= adjacentDegree)
-            var adjacentDegreeGroups = new SortedList<int, List<TNodePart>>();
+            var adjacentDegreeGroups = new SortedList<int, List<IContent>>();
             var maxAdjacentDegree = 0;
             foreach (var node in nodes)
             {
                 var adjacentDegree = zoomedGraph.AdjacentDegree(node);
                 if (adjacentDegree > maxAdjacentDegree) maxAdjacentDegree = adjacentDegree;
-                if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<TNodePart>();
+                if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<IContent>();
                 adjacentDegreeGroups[adjacentDegree].Add(node);
             }
 
@@ -312,7 +325,7 @@ namespace Associativy.Services
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevel = 0;
-            var zoomPartitions = new List<List<TNodePart>>(MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<IContent>>(MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
             // all the nodes.
@@ -363,12 +376,12 @@ namespace Associativy.Services
 
         protected virtual string MakeCacheKey(string name)
         {
-            return CachePrefix + name;
+            return _cachePrefix + name;
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> GraphFactory()
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
         {
-            return new UndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>();
+            return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>();
         }
 
         protected virtual void MakeSettings(ref IMindSettings settings)
