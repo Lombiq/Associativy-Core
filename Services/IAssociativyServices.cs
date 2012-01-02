@@ -14,6 +14,8 @@ namespace Associativy.Services
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {
+        IAssociativyContext Context { get; }
+
         /// <summary>
         /// Service for dealing with connections between nodes
         /// </summary>

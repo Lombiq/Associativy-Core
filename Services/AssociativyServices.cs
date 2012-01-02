@@ -15,6 +15,11 @@ namespace Associativy.Services
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {
+        public IAssociativyContext Context
+        {
+            get { return _associativyContext; }
+        }
+
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
         public IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> ConnectionManager
         {
