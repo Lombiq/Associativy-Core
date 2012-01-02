@@ -152,6 +152,13 @@ namespace Associativy.FrontendEngines.Controllers
              Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
         {
             var searchFormPart = searchForm.As<SearchFormPart>();
+
+            if (searchFormPart.TermsArray.Length == 0)
+            {
+                graph = null;
+                return false;
+            }
+
             var searched = new List<IContent>(searchFormPart.TermsArray.Length);
             foreach (var term in searchFormPart.TermsArray)
             {

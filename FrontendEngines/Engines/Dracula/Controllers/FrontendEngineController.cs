@@ -13,6 +13,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Associativy.FrontendEngines.Controllers;
 using Orchard.DisplayManagement;
+using Associativy.Shapes;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {

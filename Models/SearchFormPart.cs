@@ -31,5 +31,10 @@ namespace Associativy.Models
         }
 
         public string[] TermsArray { get; private set; }
+
+        public SearchFormPart()
+        {
+            TermsArray = new string[0];
+        }
     }
 }

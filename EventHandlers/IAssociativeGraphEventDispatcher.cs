@@ -13,6 +13,5 @@ namespace Associativy.EventHandlers
     public interface IAssociativeGraphEventDispatcher : IAssociativeGraphEventHandler
     {
         event EventHandler ChangedEvent;
-        void Changed(IAssociativyContext associativyContext);
     }
 }
