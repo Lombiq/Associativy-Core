@@ -73,7 +73,7 @@ namespace Associativy.Services
                     var connections = _connectionManager.GetAll();
                     foreach (var connection in connections)
                     {
-                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
+                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
                     }
 
                     return wholeGraph;

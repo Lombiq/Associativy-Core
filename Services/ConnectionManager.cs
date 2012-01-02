@@ -30,8 +30,8 @@ namespace Associativy.Services
         public virtual bool AreNeighbours(int nodeId1, int nodeId2)
         {
             return _nodeToNodeRecordRepository.Count(connector =>
-                connector.Record1Id == nodeId1 && connector.Record2Id == nodeId2 ||
-                connector.Record1Id == nodeId2 && connector.Record2Id == nodeId1) != 0;
+                connector.Node1Id == nodeId1 && connector.Node2Id == nodeId2 ||
+                connector.Node1Id == nodeId2 && connector.Node2Id == nodeId1) != 0;
         }
 
         public virtual void Connect(INode node1, INode node2)
@@ -47,7 +47,7 @@ namespace Associativy.Services
 
             if (!AreNeighbours(nodeId1, nodeId2))
             {
-                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Record1Id = nodeId1, Record2Id = nodeId2 });
+                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
             }
 
             _associativeGraphEventHandler.Changed();
@@ -62,7 +62,7 @@ namespace Associativy.Services
         {
             // Since there is no cummulative delete...
             var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
-                connector.Record1Id == nodeId || connector.Record2Id == nodeId).ToList();
+                connector.Node1Id == nodeId || connector.Node2Id == nodeId).ToList();
 
             foreach (var connector in connectionsToBeDeleted)
             {
@@ -88,14 +88,14 @@ namespace Associativy.Services
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
             return _nodeToNodeRecordRepository.
-                Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
-                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id);
+                Fetch(connector => connector.Node1Id == nodeId || connector.Node2Id == nodeId).
+                Select(connector => connector.Node1Id == nodeId ? connector.Node2Id : connector.Node1Id);
         }
 
         public virtual int GetNeighbourCount(int nodeId)
         {
             return _nodeToNodeRecordRepository.
-                Count(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId);
+                Count(connector => connector.Node1Id == nodeId || connector.Node2Id == nodeId);
         }
     }
 }

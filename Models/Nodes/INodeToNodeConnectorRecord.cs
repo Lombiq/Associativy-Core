@@ -3,7 +3,7 @@
     public interface INodeToNodeConnectorRecord
     {
         int Id { get; set; }
-        int Record1Id { get; set; }
-        int Record2Id { get; set; }
+        int Node1Id { get; set; }
+        int Node2Id { get; set; }
     }
 }
