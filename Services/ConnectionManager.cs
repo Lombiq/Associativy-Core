@@ -79,17 +79,17 @@ namespace Associativy.Services
             _associativeGraphEventHandler.Changed();
         }
 
-        public virtual IList<TNodeToNodeConnectorRecord> GetAll()
+        public virtual IEnumerable<TNodeToNodeConnectorRecord> GetAll()
         {
-            return _nodeToNodeRecordRepository.Table.ToList();
+            return _nodeToNodeRecordRepository.Table;
         }
 
-        public virtual IList<int> GetNeighbourIds(int nodeId)
+        public virtual IEnumerable<int> GetNeighbourIds(int nodeId)
         {
             // Measure performance with large datasets, as .AsParallel() queries tend to be slower
             return _nodeToNodeRecordRepository.
                 Fetch(connector => connector.Record1Id == nodeId || connector.Record2Id == nodeId).
-                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id).ToList();
+                Select(connector => connector.Record1Id == nodeId ? connector.Record2Id : connector.Record1Id);
         }
 
         public virtual int GetNeighbourCount(int nodeId)

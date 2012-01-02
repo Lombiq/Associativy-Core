@@ -22,7 +22,7 @@ namespace Associativy.Services
         /// <param name="snippet">The snippet to search for</param>
         /// <param name="maxCount">Maximal number of items returned</param>
         /// <returns>Terms similar to the snippet</returns>
-        IList<string> GetSimilarTerms(string snippet, int maxCount = 10);
+        IEnumerable<string> GetSimilarTerms(string snippet, int maxCount = 10);
 
         
         #region Node CRUD
@@ -66,7 +66,8 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        IList<TNodePart> GetMany(IList<int> ids);
+        IEnumerable<TNodePart> GetMany(IEnumerable<int> ids);
+
         TNodePart Update(INodeParams<TNodePart> nodeParams);
 
         /// <summary>

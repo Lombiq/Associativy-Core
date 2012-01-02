@@ -71,9 +71,9 @@ namespace Associativy.Services
                     }
 
                     var connections = _connectionManager.GetAll();
-                    for (int i = 0; i < connections.Count; i++)
+                    foreach (var connection in connections)
                     {
-                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connections[i].Record1Id], nodes[connections[i].Record2Id]));
+                        wholeGraph.AddEdge(new UndirectedEdge<TNodePart>(nodes[connection.Record1Id], nodes[connection.Record2Id]));
                     }
 
                     return wholeGraph;
@@ -98,11 +98,13 @@ namespace Associativy.Services
         }
 
         public virtual IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(
-            IList<TNodePart> nodes,
+            IEnumerable<TNodePart> nodes,
             IMindSettings settings = null)
         {
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
-            if (nodes.Count == 0) throw new ArgumentException("The list of searched nodes can't be empty");
+
+            var nodeCount = nodes.Count();
+            if (nodeCount == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
             MakeSettings(ref settings);
 
@@ -110,9 +112,9 @@ namespace Associativy.Services
                 () =>
                 {
                     // If there's only one node, return its neighbours
-                    if (nodes.Count == 1)
+                    if (nodeCount == 1)
                     {
-                        return GetNeighboursGraph(nodes[0]);
+                        return GetNeighboursGraph(nodes.First());
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
                     else if (settings.Algorithm == MindAlgorithms.Simple)
@@ -152,22 +154,22 @@ namespace Associativy.Services
 
             graph.AddVertex(node);
 
-            var nodes = _nodeManager.GetMany(_connectionManager.GetNeighbourIds(node.Id));
-            for (int i = 0; i < nodes.Count; i++)
+            var neighbours = _nodeManager.GetMany(_connectionManager.GetNeighbourIds(node.Id));
+            foreach (var neighbour in neighbours)
             {
-                graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, nodes[i]));
+                graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, neighbour));
             }
 
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IList<TNodePart> nodes)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSimpleAssocations(IEnumerable<TNodePart> nodes)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
             var graph = GraphFactory();
 
-            var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes[0].Id);
+            var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes.First().Id);
             var remainingNodes = new List<TNodePart>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
             commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_connectionManager.GetNeighbourIds(node.Id)).ToList());
@@ -177,56 +179,57 @@ namespace Associativy.Services
             //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
             //}
 
-            if (commonNeighbourIds.Count == 0) return graph;
+            if (commonNeighbourIds.Count() == 0) return graph;
 
             var commonNeighbours = _nodeManager.GetMany(commonNeighbourIds);
 
-            for (int i = 0; i < nodes.Count; i++)
+            foreach (var node in nodes)
             {
-                for (int n = 0; n < commonNeighbours.Count; n++)
+                foreach (var neighbour in commonNeighbours)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(nodes[i], commonNeighbours[n]));
+                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(node, neighbour));
                 }
             }
 
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IList<TNodePart> nodes, IMindSettings settings)
+        protected virtual IMutableUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeSophisticatedAssociations(IEnumerable<TNodePart> nodes, IMindSettings settings)
         {
-            if (nodes.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
+            var nodeList = nodes.ToList();
+            if (nodeList.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
             var graph = GraphFactory();
-            IList<IList<int>> succeededPaths;
+            IList<IEnumerable<int>> succeededPaths;
 
-            var allPairSucceededPaths = _pathFinder.FindPaths(nodes[0], nodes[1], settings);
+            var allPairSucceededPaths = _pathFinder.FindPaths(nodeList[0], nodeList[1], settings);
 
-            if (allPairSucceededPaths.Count == 0) return graph;
+            if (allPairSucceededPaths.Count() == 0) return graph;
 
-            if (nodes.Count == 2)
+            if (nodeList.Count == 2)
             {
-                succeededPaths = allPairSucceededPaths;
+                succeededPaths = allPairSucceededPaths.ToList();
             }
             // Calculate the routes between every nodes pair, then calculate the intersection of the routes
             else
             {
                 // We have to preserve the searched node ids in the succeeded paths despite the intersections
-                var searchedNodeIds = new List<int>(nodes.Count);
+                var searchedNodeIds = new List<int>(nodeList.Count);
                 nodes.ToList().ForEach(
                         node => searchedNodeIds.Add(node.Id)
                     );
 
                 var commonSucceededNodeIds = GetSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
 
-                for (int i = 0; i < nodes.Count - 1; i++)
+                for (int i = 0; i < nodeList.Count - 1; i++)
                 {
                     int n = i + 1;
                     if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
 
-                    while (n < nodes.Count)
+                    while (n < nodeList.Count)
                     {
                         // Here could be multithreading
-                        var pairSucceededPaths = _pathFinder.FindPaths(nodes[i], nodes[n], settings);
+                        var pairSucceededPaths = _pathFinder.FindPaths(nodeList[i], nodeList[n], settings);
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(GetSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -234,17 +237,17 @@ namespace Associativy.Services
                     }
                 }
 
-                if (allPairSucceededPaths.Count == 0 || commonSucceededNodeIds.Count == 0) return graph;
+                if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
 
-                succeededPaths = new List<IList<int>>(allPairSucceededPaths.Count); // We are oversizing, but it's worth the performance gain
+                succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
 
                 foreach (var path in allPairSucceededPaths)
                 {
                     var succeededPath = path.Intersect(commonSucceededNodeIds);
-                    if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath.ToList()); // Only paths where intersecting nodes are present
+                    if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
                 }
 
-                if (succeededPaths.Count == 0) return graph;
+                if (succeededPaths.Count() == 0) return graph;
             }
 
 
@@ -252,23 +255,24 @@ namespace Associativy.Services
 
             foreach (var path in succeededPaths)
             {
-                for (int i = 1; i < path.Count; i++)
+                var pathList = path.ToList();
+                for (int i = 1; i < pathList.Count; i++)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(succeededNodes[path[i - 1]], succeededNodes[path[i]]));
+                    graph.AddVerticesAndEdge(new UndirectedEdge<TNodePart>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]));
                 }
             }
 
             return graph;
         }
 
-        protected virtual Dictionary<int, TNodePart> GetSucceededNodes(IList<IList<int>> succeededPaths)
+        protected virtual Dictionary<int, TNodePart> GetSucceededNodes(IEnumerable<IEnumerable<int>> succeededPaths)
         {
             return _nodeManager.GetMany(GetSucceededNodeIds(succeededPaths)).ToDictionary(node => node.Id);
         }
 
-        protected virtual List<int> GetSucceededNodeIds(IList<IList<int>> succeededPaths)
+        protected virtual List<int> GetSucceededNodeIds(IEnumerable<IEnumerable<int>> succeededPaths)
         {
-            var succeededNodeIds = new List<int>(succeededPaths.Count); // An incorrect estimate, but (micro)enhaces performance
+            var succeededNodeIds = new List<int>(succeededPaths.Count()); // An incorrect estimate, but (micro)enhaces performance
 
             foreach (var row in succeededPaths)
             {

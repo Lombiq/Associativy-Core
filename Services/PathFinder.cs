@@ -58,7 +58,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual IList<IList<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings)
+        public virtual IEnumerable<IEnumerable<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings)
         {
             var startId = startNode.Id;
             var targetId = targetNode.Id;
@@ -116,7 +116,7 @@ namespace Associativy.Services
                     if (currentNode.Neighbours.Count == 0)
                     {
                         var neighbourIds = _connectionManager.GetNeighbourIds(currentNode.Id);
-                        currentNode.Neighbours = new List<PathNode>(neighbourIds.Count);
+                        currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {
                             if (!explored.ContainsKey(neighbourId))

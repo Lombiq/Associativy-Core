@@ -29,7 +29,7 @@ namespace Associativy.Services
             _associativeGraphEventHandler = associativeGraphEventHandler;
         }
 
-        public virtual IList<string> GetSimilarTerms(string snippet, int maxCount = 10)
+        public virtual IEnumerable<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
             return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
@@ -74,10 +74,10 @@ namespace Associativy.Services
             return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
         }
 
-        public virtual IList<TNodePart> GetMany(IList<int> ids)
+        public virtual IEnumerable<TNodePart> GetMany(IEnumerable<int> ids)
         {
             //? contentManager.GetMany<TNodePart>(ids, VersionOptions.AllVersions, new QueryHints().ExpandParts<TNodePart>());
-            return ContentQuery.Where(node => ids.Contains(node.Id)).List().ToList();
+            return ContentQuery.Where(node => ids.Contains(node.Id)).List();
         }
 
         public virtual TNodePart Update(INodeParams<TNodePart> nodeParams)

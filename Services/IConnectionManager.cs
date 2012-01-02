@@ -59,14 +59,14 @@ namespace Associativy.Services
         /// Returns all connector records
         /// </summary>
         /// <returns>All connector records</returns>
-        IList<TNodeToNodeConnectorRecord> GetAll();
+        IEnumerable<TNodeToNodeConnectorRecord> GetAll();
 
         /// <summary>
         /// Returns the ids of all the directly connected (= neighbour) nodes
         /// </summary>
         /// <param name="nodeId">Id of the node</param>
         /// <returns>The ids of all the directly connected (= neighbour) nodes</returns>
-        IList<int> GetNeighbourIds(int nodeId);
+        IEnumerable<int> GetNeighbourIds(int nodeId);
 
         /// <summary>
         /// Returns the count of all the directly connected (= neighbour) nodes

@@ -20,6 +20,6 @@ namespace Associativy.Services
         /// <param name="targetNode"></param>
         /// <param name="settings"></param>
         /// <returns>A list of succeeded paths, where a path is a list of the ids of the nodes on the path.</returns>
-        IList<IList<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings);
+        IEnumerable<IEnumerable<int>> FindPaths(INode startNode, INode targetNode, IMindSettings settings);
     }
 }

@@ -32,6 +32,6 @@ namespace Associativy.Services
         /// <param name="nodes"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IList<TNodePart> nodes, IMindSettings settings = null);
+        IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> MakeAssociations(IEnumerable<TNodePart> nodes, IMindSettings settings = null);
     }
 }

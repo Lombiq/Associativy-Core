@@ -143,7 +143,6 @@
     <Compile Include="Models\Nodes\NodePart.cs" />
     <Compile Include="Models\Nodes\NodeParams.cs" />
     <Compile Include="Models\Nodes\NodeToNodeRecord.cs" />
-    <Compile Include="Models\Nodes\TestNode.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Routes.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventMonitor.cs" />
