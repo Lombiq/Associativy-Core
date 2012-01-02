@@ -8,11 +8,10 @@ using Orchard;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 
-namespace Associativy
+namespace Associativy.Shapes
 {
     [OrchardFeature("Associativy")]
-    // Better name and location?
-    public class Shapes : IShapes
+    public class FrontendShapes : IFrontendShapes
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
@@ -37,7 +36,7 @@ namespace Associativy
         }
         #endregion
 
-        public Shapes(
+        public FrontendShapes(
             IOrchardServices orchardServices,
             IShapeFactory shapeFactory)
         {

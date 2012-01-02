@@ -30,7 +30,7 @@ namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
         public FrontendEngineController(
             IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
-            IShapes shapes,
+            IFrontendShapes shapes,
             IShapeFactory shapeFactory)
             : base(associativyServices, orchardServices, shapes, shapeFactory)
         {

@@ -14,6 +14,7 @@ using Orchard.ContentManagement.Records;
 using Associativy.FrontendEngines.Controllers;
 using Orchard.DisplayManagement;
 using Orchard.ContentManagement.Aspects;
+using Associativy.Shapes;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
@@ -31,7 +32,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
         public FrontendEngineController(
             IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
-            IShapes shapes,
+            IFrontendShapes shapes,
             IShapeFactory shapeFactory)
             : base(associativyServices, orchardServices, shapes, shapeFactory)
         {

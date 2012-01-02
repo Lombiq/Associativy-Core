@@ -28,22 +28,15 @@ namespace Associativy
             builder.RegisterGeneric(typeof(NodeManager<>)).As(typeof(INodeManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(PathFinder<,>)).As(typeof(IPathFinder<,>)).InstancePerLifetimeScope();
 
-            // Frontend engines common
-
 
             // Frontend engines
 
             // Dracula
-            //builder.RegisterGeneric(typeof(DraculaDriver<>)).As(typeof(IDraculaDriver<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
 
             //// Graphviz
-            //builder.RegisterGeneric(typeof(GraphvizDriver<>)).As(typeof(IGraphvizDriver<>)).InstancePerLifetimeScope();
-            //builder.RegisterGeneric(typeof(GraphImageService<>)).As(typeof(IGraphImageService<>)).InstancePerLifetimeScope();
 
             //// JIT
-            //builder.RegisterGeneric(typeof(JITDriver<>)).As(typeof(IJITDriver<>)).InstancePerLifetimeScope();
-            //builder.RegisterGeneric(typeof(JITGraphNodeViewModel<>)).As(typeof(IJITGraphNodeViewModel<>));
 
 
             builder.Update(componentRegistry);

@@ -19,6 +19,7 @@ using System;
 using Orchard.Core.Routable.Models;
 using Orchard.DisplayManagement;
 using ClaySharp;
+using Associativy.Shapes;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -34,7 +35,7 @@ namespace Associativy.FrontendEngines.Controllers
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
-        protected readonly IShapes _shapes;
+        protected readonly IFrontendShapes _shapes;
         protected readonly dynamic _shapeFactory;
 
         protected virtual string FrontendEngine
@@ -57,7 +58,7 @@ namespace Associativy.FrontendEngines.Controllers
         public FrontendEngineBaseController(
             IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
-            IShapes shapes,
+            IFrontendShapes shapes,
             IShapeFactory shapeFactory)
             : base(associativyServices)
         {
