@@ -1,5 +1,4 @@
 ﻿using System;
-using Associativy.Models;
 
 namespace Associativy.EventHandlers
 {

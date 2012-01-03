@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Associativy.EventHandlers;
 using Associativy.Models;
 using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using Orchard.Data;
-using Orchard.Environment.Extensions;
-using Associativy.EventHandlers;
-using Orchard.Core.Routable.Models;
 using Orchard.Core.Common.Models;
+using Orchard.Core.Routable.Models;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {

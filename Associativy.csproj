@@ -114,7 +114,6 @@
     <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\Controllers\FrontendEngineController.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\FrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\Models\GraphImage.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\GraphImageService.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs" />

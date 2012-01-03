@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Associativy.EventHandlers;
 using Associativy.Models;
+using Associativy.Models.Mind;
+using Orchard;
 using Orchard.Caching;
-using Orchard.ContentManagement.Records;
+using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
-using Orchard;
-using Associativy.Models.Mind;
-using Associativy.EventHandlers;
-using System.Diagnostics;
-using Associativy.Extensions;
-using Orchard.ContentManagement;
-using Orchard.Data;
-using Orchard.Core.Common.Models;
 
 namespace Associativy.Services
 {

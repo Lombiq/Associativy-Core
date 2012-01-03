@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.ContentManagement;
-using ClaySharp;
+﻿using ClaySharp;
 using Orchard;
+using Orchard.ContentManagement;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 

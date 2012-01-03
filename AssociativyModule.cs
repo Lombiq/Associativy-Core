@@ -1,36 +1,12 @@
-﻿using Associativy.FrontendEngines;
-using Associativy.FrontendEngines.Engines.Dracula;
+﻿using Associativy.FrontendEngines.Controllers;
+using Associativy.FrontendEngines.Engines.Graphviz.Services;
 using Associativy.Services;
 using Autofac;
 using Autofac.Core;
 using Orchard.Environment.Extensions;
-using Associativy.FrontendEngines.Engines.Graphviz;
-using Associativy.FrontendEngines.Controllers;
-using Orchard.ContentManagement;
-using Associativy.Models;
-using Orchard.ContentManagement.Records;
-using Associativy.FrontendEngines.Engines.Graphviz.Services;
 
 namespace Associativy
 {
-    public interface ITestService<T>
-    {
-    }
-
-    public class TestService<T> : ITestService<T>
-    {
-    }
-
-    public interface ITest<TService, T>
-        where TService : ITestService<T>
-    {
-    }
-
-    public class Test<TService, T> : ITest<TService, T>
-        where TService : ITestService<T>
-    {
-    }
-
     [OrchardFeature("Associativy")]
     public class AssociativyModule : IModule
     {
@@ -40,9 +16,6 @@ namespace Associativy
             // by Orchard.
             var builder = new ContainerBuilder();
 
-
-            builder.RegisterGeneric(typeof(TestService<>)).As(typeof(ITestService<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(Test<,>)).As(typeof(ITest<,>)).InstancePerLifetimeScope();
 
             builder.RegisterGeneric(typeof(AssociativyServices<,>)).As(typeof(IAssociativyServices<,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(ConnectionManager<,>)).As(typeof(IConnectionManager<,>)).InstancePerLifetimeScope();

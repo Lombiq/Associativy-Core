@@ -1,5 +1,4 @@
-﻿using System;
-using Orchard;
+﻿using Orchard;
 using Orchard.ContentManagement;
 
 namespace Associativy.Shapes

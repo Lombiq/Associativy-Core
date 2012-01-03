@@ -1,9 +1,8 @@
 ﻿using System;
-using Orchard;
-using QuickGraph;
-using QuickGraph.Graphviz;
 using Associativy.Models;
 using Orchard.ContentManagement;
+using QuickGraph;
+using QuickGraph.Graphviz;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 {

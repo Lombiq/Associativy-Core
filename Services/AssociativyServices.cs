@@ -1,6 +1,4 @@
 ﻿using Associativy.Models;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
 using Orchard.Environment.Extensions;
 
 // If circular dependencies should happen, use property injection:

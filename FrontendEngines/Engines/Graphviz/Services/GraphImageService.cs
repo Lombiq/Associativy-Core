@@ -1,22 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.FileSystems.Media;
-using Orchard.Environment.Extensions;
-using QuickGraph;
-using Associativy.Models;
-using QuickGraph.Graphviz;
-using QuickGraph.Serialization;
-using System.Xml;
-using System.IO;
-using System.Text;
 using System.Net;
-using System.Diagnostics;
+using System.Text;
 using Associativy.EventHandlers;
+using Associativy.Models;
+using Associativy.Services;
 using Orchard.Caching;
 using Orchard.ContentManagement;
-using Associativy.Services;
+using Orchard.Environment.Extensions;
+using Orchard.FileSystems.Media;
+using QuickGraph;
+using QuickGraph.Graphviz;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Associativy.Models;
 using Associativy.Models.Mind;
-using Orchard;
-using Orchard.ContentManagement;
 
 namespace Associativy.Services
 {

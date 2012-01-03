@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard;
-using Orchard.Environment.Extensions;
-using QuickGraph;
-using System.Web.Mvc;
+﻿using Associativy.FrontendEngines.Controllers;
 using Associativy.Models;
-using Associativy.Models.Mind;
 using Associativy.Services;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using Associativy.FrontendEngines.Controllers;
-using Orchard.DisplayManagement;
 using Associativy.Shapes;
-using Orchard.Themes;
+using Orchard;
+using Orchard.DisplayManagement;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {

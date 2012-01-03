@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orchard;
-using Associativy.Services;
-using Orchard.ContentManagement.Records;
-using Associativy.Models;
-using Orchard.ContentManagement;
+﻿using Associativy.Models;
 
 namespace Associativy.FrontendEngines.Controllers
 {

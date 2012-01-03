@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard;
-using Orchard.Environment.Extensions;
-using QuickGraph;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Associativy.FrontendEngines.Controllers;
+using Associativy.FrontendEngines.Engines.Graphviz.Services;
 using Associativy.Models;
 using Associativy.Models.Mind;
 using Associativy.Services;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using QuickGraph.Graphviz;
-using System.Diagnostics;
-using Piedone.HelpfulLibraries.Tasks;
-using System.Threading.Tasks;
-using Associativy.FrontendEngines.Controllers;
-using Associativy.FrontendEngines.Engines.Graphviz.Services;
-using QuickGraph.Data;
-using Orchard.DisplayManagement;
 using Associativy.Shapes;
+using Orchard;
+using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
+using Orchard.DisplayManagement;
+using Orchard.Environment.Extensions;
+using Piedone.HelpfulLibraries.Tasks;
+using QuickGraph;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {

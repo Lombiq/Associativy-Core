@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Concurrent;
 using Associativy.EventHandlers;
-using Orchard.Caching;
-using System.Collections.Concurrent;
 using Associativy.Models;
+using Orchard.Caching;
 
 namespace Associativy.Services
 {

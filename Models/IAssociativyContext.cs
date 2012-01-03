@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Orchard;
 using Orchard.Localization;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using Orchard;
 
 namespace Associativy.Models
 {
