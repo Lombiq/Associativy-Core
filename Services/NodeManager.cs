@@ -44,7 +44,9 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)
         {
-            return ContentQuery.Where<CommonPartRecord>(r => ids.Contains(r.Id));
+            // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown Orchard.ContentManagement.DefaultContentQuery on line 90.
+            var idsCollection = ids.ToList();
+            return ContentQuery.Where<CommonPartRecord>(r => idsCollection.Contains(r.Id));
         }
 
         // Better name for label?
