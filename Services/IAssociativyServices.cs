@@ -8,27 +8,37 @@ namespace Associativy.Services
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext>// : IDependency
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public interface IAssociativyServices// : IDependency
     {
+        /// <summary>
+        /// The AssociativyContext the services use
+        /// </summary>
         IAssociativyContext Context { get; }
 
         /// <summary>
         /// Service for dealing with connections between nodes
         /// </summary>
-        IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> ConnectionManager { get; }
+        IConnectionManager ConnectionManager { get; }
 
         /// <summary>
         /// Service for generating associations
         /// </summary>
-        IMind<TNodeToNodeConnectorRecord, TAssociativyContext> Mind { get; }
+        IMind Mind { get; }
 
         /// <summary>
         /// Service for handling nodes
         /// </summary>
-        INodeManager<TAssociativyContext> NodeManager { get; }
+        INodeManager NodeManager { get; }
+    }
+
+    /// <summary>
+    /// Service collector for Associativy services
+    /// </summary>
+    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
+    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
+    public interface IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> : IAssociativyServices
+        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
+    {
     }
 }

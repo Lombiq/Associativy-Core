@@ -28,10 +28,7 @@ namespace Associativy.FrontendEngines.Controllers
     /// </summary>
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : AssociativyBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>, IFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>, IUpdateModel
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public abstract class FrontendEngineBaseController : AssociativyBaseController, IFrontendEngineController, IUpdateModel
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
@@ -56,7 +53,7 @@ namespace Associativy.FrontendEngines.Controllers
         public Localizer T { get; set; }
 
         public FrontendEngineBaseController(
-            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
+            IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes shapes,
             IShapeFactory shapeFactory)

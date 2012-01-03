@@ -21,19 +21,19 @@ namespace Associativy.Services
         }
 
         protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
-        public IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> ConnectionManager
+        public IConnectionManager ConnectionManager
         {
             get { return _connectionManager; }
         }
 
         protected readonly IMind<TNodeToNodeConnectorRecord, TAssociativyContext> _mind;
-        public IMind<TNodeToNodeConnectorRecord, TAssociativyContext> Mind
+        public IMind Mind
         {
             get { return _mind; }
         }
 
         protected readonly INodeManager<TAssociativyContext> _nodeManager;
-        public INodeManager<TAssociativyContext> NodeManager
+        public INodeManager NodeManager
         {
             get { return _nodeManager; }
         }

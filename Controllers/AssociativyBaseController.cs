@@ -10,17 +10,15 @@ using Orchard.ContentManagement.Records;
 
 namespace Associativy.Controllers
 {
-    public abstract class AssociativyBaseController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public abstract class AssociativyBaseController : Controller
     {
-        protected readonly IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> _associativyServices;
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
-        protected readonly IMind<TNodeToNodeConnectorRecord, TAssociativyContext> _mind;
-        protected readonly INodeManager<TAssociativyContext> _nodeManager;
+        protected readonly IAssociativyServices _associativyServices;
+        protected readonly IConnectionManager _connectionManager;
+        protected readonly IMind _mind;
+        protected readonly INodeManager _nodeManager;
 
         protected AssociativyBaseController(
-            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices)
+            IAssociativyServices associativyServices)
         {
             _associativyServices = associativyServices;
             _connectionManager = associativyServices.ConnectionManager;

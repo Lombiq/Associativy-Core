@@ -17,7 +17,7 @@ using Associativy.FrontendEngines.Engines.Dracula;
 namespace Associativy.FrontendEngines.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineDispatcherController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller, IFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
+    public class FrontendEngineDispatcherController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller, IFrontendEngineController
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {
@@ -47,6 +47,8 @@ namespace Associativy.FrontendEngines.Controllers
 
             //var d = _componentContext.Resolve<IDiscoverableFrontendEngineController<IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>>();
 
+            var d = _componentContext.Resolve<ITest<ITestService<int>, int>>();
+            int z = 5;
 
             //var z = Type.GetType("Associativy.FrontendEngines.Engines." + FrontendEngineName + ".Controllers.IFrontendEngineController, Associativy");
             //var frontendEngineController = (IController)_componentContext.Resolve(
@@ -58,7 +60,7 @@ namespace Associativy.FrontendEngines.Controllers
             //        typeof(TNodeToNodeConnectorRecord)));
 
             //frontendEngineController.Execute(requestContext);
-            //base.Execute(requestContext);
+            base.Execute(requestContext);
         }
     }
 }

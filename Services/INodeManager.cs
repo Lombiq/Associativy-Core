@@ -9,10 +9,8 @@ namespace Associativy.Services
 {
     /// <summary>
     /// Service for handling nodes
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
     /// </summary>
-    public interface INodeManager<TAssociativyContext>// : IDependency
-        where TAssociativyContext : IAssociativyContext
+    public interface INodeManager// : IDependency
     {
         /// <summary>
         /// Lists terms similar to the snippet
@@ -35,5 +33,14 @@ namespace Associativy.Services
         /// <param name="label"></param>
         /// <returns></returns>
         IContent Get(string label);
+    }
+
+    /// <summary>
+    /// Service for handling nodes
+    /// </summary>
+    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
+    public interface INodeManager<TAssociativyContext> : INodeManager
+        where TAssociativyContext : IAssociativyContext
+    {
     }
 }

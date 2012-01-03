@@ -26,7 +26,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
     public class FrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : FrontendEngineBaseController<TNodeToNodeConnectorRecord, TAssociativyContext>, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : FrontendEngineBaseController, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {
