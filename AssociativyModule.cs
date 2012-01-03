@@ -57,9 +57,11 @@ namespace Associativy
             builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
 
             //// Graphviz
+            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Graphviz.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GraphImageService<>)).As(typeof(IGraphImageService<>)).InstancePerLifetimeScope();
 
             //// JIT
+            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.JIT.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
 
 
             builder.Update(componentRegistry);
