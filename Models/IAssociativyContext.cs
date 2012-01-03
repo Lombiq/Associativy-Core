@@ -8,5 +8,6 @@ namespace Associativy.Models
         LocalizedString Name { get; }
         string TechnicalName { get; }
         string[] ContentTypeNames { get; }
+        int MaxZoomLevel { get; }
     }
 }

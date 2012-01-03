@@ -26,6 +26,12 @@ namespace Associativy.Models
             get { return _contentTypeNames; }
         }
 
+        protected int _maxZoomLevel = 10;
+        public int MaxZoomLevel
+        {
+            get { return _maxZoomLevel; }
+        }
+
         public Localizer T { get; set; }
 
         public AssociativyContext()

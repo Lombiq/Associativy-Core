@@ -24,11 +24,6 @@ namespace Associativy.Services
         protected readonly IWorkContextAccessor _workContextAccessor;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
-        protected virtual int MaxZoomLevel
-        {
-            get { return 10; }
-        }
-
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
         protected readonly string _cachePrefix;
@@ -315,12 +310,12 @@ namespace Associativy.Services
 
 
             /// Partitioning nodes into continuous zoom levels
-            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / MaxZoomLevel), 0);
+            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / _associativyContext.MaxZoomLevel), 0);
             if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevel = 0;
-            var zoomPartitions = new List<List<IContent>>(MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<IContent>>(_associativyContext.MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
             // all the nodes.
