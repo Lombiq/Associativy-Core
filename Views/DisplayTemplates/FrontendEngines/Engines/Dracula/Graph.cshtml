@@ -1,32 +1,23 @@
-﻿@model Associativy.FrontendEngines.ViewModels.IGraphViewModel
+﻿@using Orchard.ContentManagement
+@model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
            
 @{
     Script.Require("Dracula").AtHead();
-    
-    // It is necessary to keep track of added edges so an edge is added only in one direction
-    var edgeRegister = new Dictionary<string, bool>(Model.Nodes.Count);
-    string edges = "";
 }
 
 <script type="text/javascript">
 $(document).ready(function(){
 	var graph = new Graph();
-    @foreach (var nodeItem in Model.Nodes)
+
+    @foreach (var node in Model.Vertices)
     {
-        var node = nodeItem.Value;
-        @: graph.addNode("@node.Id", { label : "@Html.Raw(node.Label)" }); @*Without Html.Raw() the output would be encoded, non-ASCII characters too*@
-        foreach (var neighbour in node.Neighbours)
-        {
-            var key = Math.Min(node.Id, neighbour.Id).ToString() + " " + Math.Max(node.Id, neighbour.Id).ToString();
-            if (!edgeRegister.ContainsKey(key))
-            {
-                edgeRegister[key] = true;
-                edges += "graph.addEdge(\"" + node.Id + "\", \"" + neighbour.Id + "\");";
-            }
-        }
+        @Html.Raw("graph.addNode(\"" + node.Id + "\", { label : \"" + node.As<Orchard.ContentManagement.Aspects.ITitleAspect>().Title + "\" });")
     }
 
-    @Html.Raw(edges);
+    @foreach (var edge in Model.Edges)
+    {
+        @Html.Raw("graph.addEdge(\"" + edge.Source.Id + "\", \"" + edge.Target.Id + "\");")
+    }
 	
 	var layouter = new Graph.Layout.Spring(graph);
 	layouter.layout();

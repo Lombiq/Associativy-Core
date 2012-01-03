@@ -15,30 +15,37 @@ using System.Net;
 using System.Diagnostics;
 using Associativy.EventHandlers;
 using Orchard.Caching;
+using Orchard.ContentManagement;
+using Associativy.Services;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphImageService<TNode> : Associativy.FrontendEngines.Engines.Graphviz.Services.IGraphImageService<TNode>
-        where TNode : INode
+    public class GraphImageService<TAssociativyContext>
+        : AssociativyService<TAssociativyContext>,  IGraphImageService<TAssociativyContext>
+        where TAssociativyContext : IAssociativyContext
     {
         protected readonly IStorageProvider _storageProvider;
         protected readonly ICacheManager _cacheManager;
         protected readonly IAssociativeGraphEventMonitor _graphEventMonitor;
 
-        protected readonly string _storagePath = "Associativy/Graphs-" + typeof(TNode).Name + "/";
+        protected readonly string _storagePath;
 
         public GraphImageService(
+            TAssociativyContext associativyContext,
             IStorageProvider storageProvider,
             ICacheManager cacheManager,
             IAssociativeGraphEventMonitor graphEventMonitor)
+            : base(associativyContext)
         {
             _storageProvider = storageProvider;
             _cacheManager = cacheManager;
             _graphEventMonitor = graphEventMonitor;
+
+            _storagePath = "Associativy/Graphs-" + associativyContext.TechnicalName + "/";
         }
 
-        public virtual string ToSvg(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, Action<GraphvizAlgorithm<TNode, IUndirectedEdge<TNode>>> initialization)
+        public virtual string ToSvg(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, Action<GraphvizAlgorithm<IContent, IUndirectedEdge<IContent>>> initialization)
         {
             //var stringBuilder = new StringBuilder();
             //using (var xmlWriter = XmlWriter.Create(stringBuilder))
@@ -51,15 +58,18 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
             //}
             //var graphML = stringBuilder.ToString();
 
-            var filePath = _storagePath + graph.GetHashCode().ToString() + initialization.GetHashCode() + ".svg";
-            var sw = new Stopwatch();
-            sw.Start();
-            var z = typeof(TNode).GetCustomAttributes(true);
-            sw.Stop();
+            // Sadly graph.GetHashCode() gives different results on different requests, therefore only the dot hash
+            // is reliable. Fortunately it's quite fast.
+            var dotData = graph.ToGraphviz(algorithm =>
+            {
+                initialization(algorithm);
+            });
+
+            var filePath = _storagePath + dotData.GetHashCode() + ".svg";
 
             return _cacheManager.Get("Associativy.GraphImages." + filePath, ctx =>
             {
-                //_graphEventMonitor.MonitorChangedSignal(ctx);
+                _graphEventMonitor.MonitorChanged(ctx, _associativyContext);
 
                 // Since there is no method for checking the existance of a file, we use this ugly technique
                 try
@@ -69,11 +79,6 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
                 catch (Exception)
                 {
                 }
-
-                var dotData = graph.ToGraphviz(algorithm =>
-                {
-                    initialization(algorithm);
-                });
 
                 var wc = new WebClient();
                 var svgData = wc.UploadString("http://rise4fun.com/services.svc/ask/agl", dotData);

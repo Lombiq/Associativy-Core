@@ -17,6 +17,6 @@ namespace Associativy.EventHandlers
         /// <summary>
         /// Gets called when the associative graph has changed.
         /// </summary>
-        void Changed(/*Context*/);
+        void Changed(IAssociativyContext context);
     }
 }

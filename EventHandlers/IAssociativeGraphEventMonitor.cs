@@ -1,10 +1,11 @@
 ﻿using System;
 using Orchard.Caching;
+using Associativy.Models;
 
 namespace Associativy.EventHandlers
 {
     public interface IAssociativeGraphEventMonitor : IAssociativeGraphEventHandler
     {
-        void MonitorChangedSignal(IAcquireContext ctx, object signal);
+        void MonitorChanged(IAcquireContext aquireContext, IAssociativyContext associativyContext);
     }
 }

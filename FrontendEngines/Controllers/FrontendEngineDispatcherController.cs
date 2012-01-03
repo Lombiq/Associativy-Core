@@ -13,14 +13,17 @@ using Autofac.Core;
 using Orchard.Environment.Extensions;
 using Orchard;
 using Associativy.FrontendEngines.Engines.Dracula;
+using System.Diagnostics;
+using Orchard.Themes;
+using Orchard.Mvc;
 
 namespace Associativy.FrontendEngines.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineDispatcherController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> : Controller, IFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    [Themed]
+    public class FrontendEngineDispatcherController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller, IFrontendEngineController
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
         private readonly IComponentContext _componentContext;
 
@@ -34,32 +37,27 @@ namespace Associativy.FrontendEngines.Controllers
             _componentContext = componentContext;
         }
 
-        protected override void Execute(RequestContext requestContext)
+        protected override void HandleUnknownAction(string actionName)
         {
-            //var controllerServiceType = (from registration in _componentContext.ComponentRegistry.Registrations
-            //                      where registration.Activator.LimitType.FullName.Contains(FrontendEngineName) && registration.Activator.LimitType.FullName.Contains("FrontendEngineController")
-            //                      select ((TypedService)registration.Services.First()).ServiceType).FirstOrDefault();
+            if (_componentContext.IsRegistered<IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>>())
+            {
+                var frontendEngineRegistration = (from registration in _componentContext.ComponentRegistry.Registrations
+                                                  where
+                                                     registration.Activator.LimitType.FullName.Contains(FrontendEngineName)
+                                                     && registration.Services.Where(service => service.Description.StartsWith("Associativy.FrontendEngines.Controllers.IDiscoverableFrontendEngineController")).Count() == 1
+                                                  select registration).First();
 
-            //var controllerRegistration = (from registration in _componentContext.ComponentRegistry.Registrations
-            //                              where
-            //                                typeof(IFrontendEngineController).IsAssignableFrom(registration.Activator.LimitType)
-            //                                && registration.Activator.LimitType.FullName.Contains(FrontendEngineName)
-            //                              select registration).FirstOrDefault();
+                var frontendEngineController = (IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>)frontendEngineRegistration.Activator.ActivateInstance(_componentContext, Enumerable.Empty<Parameter>());
+                frontendEngineController.Execute(ControllerContext.RequestContext);
+            }
 
-            //var d = _componentContext.Resolve<IDiscoverableFrontendEngineController<IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>>();
+            // This way theming gets applied, but the result should be somehow captured.
+            ActionInvoker.InvokeAction(this.ControllerContext, "Dispatch");
+        }
 
-
-            //var z = Type.GetType("Associativy.FrontendEngines.Engines." + FrontendEngineName + ".Controllers.IFrontendEngineController, Associativy");
-            //var frontendEngineController = (IController)_componentContext.Resolve(
-            //    Type.GetType("Associativy.FrontendEngines.Engines." + FrontendEngineName + ".Controllers.IFrontendEngineController")
-            //    .MakeGenericType(
-            //        typeof(TAssocociativyServices), 
-            //        typeof(TNodePart), 
-            //        typeof(TNodePartRecord), 
-            //        typeof(TNodeToNodeConnectorRecord)));
-
-            //frontendEngineController.Execute(requestContext);
-            //base.Execute(requestContext);
+        public ViewResult Dispatch()
+        {
+            return new ShapeResult(this, null);
         }
     }
 }

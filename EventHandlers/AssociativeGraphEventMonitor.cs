@@ -5,6 +5,7 @@ using System.Web;
 using Associativy.EventHandlers;
 using Orchard.Caching;
 using System.Collections.Concurrent;
+using Associativy.Models;
 
 namespace Associativy.Services
 {
@@ -22,7 +23,7 @@ namespace Associativy.Services
         /// ISingletonDependency this field could store an ISingletonDependency as well, but statics, just as ISingletonDependencys
         /// live as long as the shell.
         /// </remarks>
-        private static ConcurrentBag<object> _changedSignalObjects = new ConcurrentBag<object>();
+        private static ConcurrentDictionary<string, string> _changedSignals = new ConcurrentDictionary<string, string>();
 
         public AssociativeGraphEventMonitor(
             ICacheManager cacheManager,
@@ -32,17 +33,19 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChangedSignal(IAcquireContext ctx, object signal/*, context*/)
+        public void MonitorChanged(IAcquireContext aquireContext, IAssociativyContext associativyContext)
         {
-            _changedSignalObjects.Add(signal);
-            ctx.Monitor(_signals.When(signal));
+            var signal = associativyContext.TechnicalName + "ChangedSignal";
+            _changedSignals[associativyContext.TechnicalName] = signal;
+            aquireContext.Monitor(_signals.When(signal));
         }
 
-        public void Changed()
+        public void Changed(IAssociativyContext associativyContext)
         {
-            foreach (var signal in _changedSignalObjects)
+            string signal;
+            if (_changedSignals.TryGetValue(associativyContext.TechnicalName, out signal))
             {
-                _signals.Trigger(signal); 
+                _signals.Trigger(signal);
             }
         }
     }

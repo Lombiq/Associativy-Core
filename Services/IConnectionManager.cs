@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using Associativy.Models;
 using Orchard;
+using Orchard.ContentManagement;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Service for dealing with connections between nodes
     /// </summary>
-    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    public interface IConnectionManager<TNodeToNodeConnectorRecord> : IDependency
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+    public interface IConnectionManager// : IDependency
     {
         /// <summary>
         /// Checks if the nodes are neighbours (= directly connected to each other)
@@ -26,7 +25,7 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="node1">The first node</param>
         /// <param name="node2">The second node</param>
-        void Connect(INode node1, INode node2);
+        void Connect(IContent node1, IContent node2);
 
         /// <summary>
         /// Creates a new connection between two nodes
@@ -40,7 +39,7 @@ namespace Associativy.Services
         /// Deletes all connections of the node
         /// </summary>
         /// <param name="node">The node</param>
-        void DeleteFromNode(INode node);
+        void DeleteFromNode(IContent node);
 
         /// <summary>
         /// Deletes all connections of the node
@@ -59,7 +58,7 @@ namespace Associativy.Services
         /// Returns all connector records
         /// </summary>
         /// <returns>All connector records</returns>
-        IEnumerable<TNodeToNodeConnectorRecord> GetAll();
+        IEnumerable<INodeToNodeConnectorRecord> GetAll();
 
         /// <summary>
         /// Returns the ids of all the directly connected (= neighbour) nodes
@@ -74,5 +73,16 @@ namespace Associativy.Services
         /// <param name="nodeId">Id of the node</param>
         /// <returns>The count of all the directly connected (= neighbour) nodes</returns>
         int GetNeighbourCount(int nodeId);
+    }
+
+    /// <summary>
+    /// Service for dealing with connections between nodes
+    /// </summary>
+    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
+    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
+    public interface IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> : IConnectionManager
+        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
+    {
     }
 }

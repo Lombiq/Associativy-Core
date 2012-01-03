@@ -1,13 +1,15 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using System.Linq;
-using System.Web.Routing;
+using System.Web;
+using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
+using System.ComponentModel.DataAnnotations;
 
-namespace Associativy.FrontendEngines.ViewModels
+namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public class SearchViewModel : ISearchViewModel
+    public class SearchFormPart : ContentPart
     {
         [Required]
         public string Terms
@@ -29,5 +31,10 @@ namespace Associativy.FrontendEngines.ViewModels
         }
 
         public string[] TermsArray { get; private set; }
+
+        public SearchFormPart()
+        {
+            TermsArray = new string[0];
+        }
     }
 }

@@ -14,16 +14,22 @@ namespace Associativy.Models
     /// </summary>
     public abstract class AssociativyContext : IAssociativyContext
     {
-        protected readonly LocalizedString _name;
+        protected LocalizedString _name;
         public LocalizedString Name
         {
             get { return _name; }
         }
 
-        protected readonly string _technicalName;
+        protected string _technicalName;
         public string TechnicalName
         {
             get { return _technicalName; }
+        }
+
+        protected string[] _contentTypeNames;
+        public string[] ContentTypeNames
+        {
+            get { return _contentTypeNames; }
         }
 
         public Localizer T { get; set; }
@@ -32,14 +38,5 @@ namespace Associativy.Models
         {
             T = NullLocalizer.Instance;
         }
-    }
-
-    public abstract class AssociativyContext<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        : AssociativyContext, IAssociativyContext<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-    {
-        
     }
 }

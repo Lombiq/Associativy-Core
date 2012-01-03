@@ -7,113 +7,53 @@ using Orchard.ContentManagement.Records;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
 using Associativy.EventHandlers;
+using Orchard.Core.Routable.Models;
+using Orchard.Core.Common.Models;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class NodeManager<TNodePart, TNodePartRecord> : INodeManager<TNodePart, TNodePartRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class NodeManager<TAssociativyContext> 
+        : AssociativyService<TAssociativyContext>, INodeManager<TAssociativyContext>
+        where TAssociativyContext : IAssociativyContext
     {
         protected readonly IContentManager _contentManager;
-        protected readonly IRepository<TNodePartRecord> _nodePartRecordRepository;
         protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
 
         public NodeManager(
             IContentManager contentManager,
-            IRepository<TNodePartRecord> nodePartRecordRepository,
+            TAssociativyContext associativyContext,
             IAssociativeGraphEventHandler associativeGraphEventHandler)
+            : base(associativyContext)
         {
             _contentManager = contentManager;
-            _nodePartRecordRepository = nodePartRecordRepository;
+            _contentManager.Query(_associativyContext.ContentTypeNames).ForVersion(VersionOptions.AllVersions);
+
             _associativeGraphEventHandler = associativeGraphEventHandler;
         }
 
+        // Better name?
         public virtual IEnumerable<string> GetSimilarTerms(string snippet, int maxCount = 10)
         {
             if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
-            return _nodePartRecordRepository.Fetch(node => node.Label.StartsWith(snippet)).Select(node => node.Label).Take(maxCount).ToList();
+            return ContentQuery.Where<RoutePartRecord>(r => r.Title.StartsWith(snippet)).Slice(maxCount).ToList().Select(item => item.As<RoutePart>().Title);
         }
 
-        #region Node CRUD
-        public IContentQuery<TNodePart, TNodePartRecord> ContentQuery
+        public IContentQuery<ContentItem> ContentQuery
         {
-            get { return _contentManager.Query<TNodePart, TNodePartRecord>(); }
+            get { return _contentManager.Query(_associativyContext.ContentTypeNames); }
         }
 
-        public virtual TNodePart Create(INodeParams<TNodePart> nodeParams)
+        public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)
         {
-            var node = _contentManager.New<TNodePart>(nodeParams.ContentTypeName);
-            nodeParams.MapToNode(node);
-            _contentManager.Create(node);
-
-            _associativeGraphEventHandler.Changed();
-
-            return node;
+            return ContentQuery.Where<CommonPartRecord>(r => ids.Contains(r.Id));
         }
 
-        public virtual TNodePart New(string contentType)
-        {
-            return _contentManager.New<TNodePart>(contentType);
-        }
-
-        public virtual void Create(ContentItem node)
-        {
-            _contentManager.Create(node);
-            _associativeGraphEventHandler.Changed();
-        }
-
-        public virtual TNodePart Get(int id)
-        {
-            return _contentManager.Get<TNodePart>(id);
-        }
-
-        public virtual TNodePart Get(string label)
+        // Better name for label?
+        public virtual IContent Get(string label)
         {
             // Maybe rather as something like with a LIKE query?
-            return ContentQuery.Where(node => node.Label == label).List().FirstOrDefault();
+            return ContentQuery.Where<RoutePartRecord>(r => r.Title == label).List().FirstOrDefault();
         }
-
-        public virtual IEnumerable<TNodePart> GetMany(IEnumerable<int> ids)
-        {
-            //? contentManager.GetMany<TNodePart>(ids, VersionOptions.AllVersions, new QueryHints().ExpandParts<TNodePart>());
-            return ContentQuery.Where(node => ids.Contains(node.Id)).List();
-        }
-
-        public virtual TNodePart Update(INodeParams<TNodePart> nodeParams)
-        {
-            if (nodeParams.Id == 0) throw new ArgumentException("When updating a node the Id property of the INodeParams object should be set.");
-
-            var node = Get(nodeParams.Id);
-            if (node != null)
-            {
-                nodeParams.MapToNode(node);
-                _contentManager.Flush();
-
-                _associativeGraphEventHandler.Changed();
-            }
-
-            return node;
-        }
-
-        public virtual TNodePart Update(TNodePart node)
-        {
-            // What should happen with other parts?
-            if (node.Id == 0) throw new ArgumentException("When updating a node the Id property of the INode object should be set. (Maybe you tried to update a new, not yet created part?)");
-
-            _contentManager.Flush();
-
-            _associativeGraphEventHandler.Changed();
-
-            return node;
-        }
-
-        public virtual void Remove(int id)
-        {
-            _contentManager.Remove(_contentManager.Get(id));
-
-            _associativeGraphEventHandler.Changed();
-        }
-        #endregion
     }
 }

@@ -18,94 +18,91 @@ using System.Threading.Tasks;
 using Associativy.FrontendEngines.Controllers;
 using Associativy.FrontendEngines.Engines.Graphviz.Services;
 using QuickGraph.Data;
+using Orchard.DisplayManagement;
+using Associativy.Shapes;
+using Orchard.ContentManagement.Aspects;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        : FrontendEngineBaseController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>, IDiscoverableFrontendEngineController<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord>
-        where TNodePart : ContentPart<TNodePartRecord>, INode
-        where TNodePartRecord : ContentPartRecord, INode
+    public class FrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
+        : FrontendEngineBaseController, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
     {
-        protected IGraphvizDriver<TNodePart> _graphvizDriver;
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
-        protected readonly GraphImageService<TNodePart> _graphImageService;
+        protected readonly IGraphImageService<TAssociativyContext> _graphImageService;
 
-        protected override string FrontendEngineDriver
+        protected override string FrontendEngine
         {
             get { return "Graphviz"; }
         }
 
         public FrontendEngineController(
-            IAssociativyServices<TNodePart, TNodePartRecord, TNodeToNodeConnectorRecord> associativyServices,
+            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
             IOrchardServices orchardServices,
-            IGraphvizDriver<TNodePart> graphvizDriver,
+            IFrontendShapes shapes,
+            IShapeFactory shapeFactory,
             IDetachedDelegateBuilder detachedDelegateBuilder,
-            IGraphImageService<TNodePart> graphImageService)
-            : base(associativyServices, orchardServices, graphvizDriver)
+            IGraphImageService<TAssociativyContext> graphImageService)
+            : base(associativyServices, orchardServices, shapes, shapeFactory)
         {
-            _graphvizDriver = graphvizDriver;
             _detachedDelegateBuilder = detachedDelegateBuilder;
-            _graphImageService = (GraphImageService<TNodePart>)graphImageService;
+            _graphImageService = graphImageService;
         }
 
-        public void Index()
-        {
-            var count = 2;
+        //public void Index()
+        //{
+        //    var count = 2;
 
-            var sw = new Stopwatch();
-            sw.Start();
+        //    var sw = new Stopwatch();
+        //    sw.Start();
 
-            var graphs = new IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>[count];
-            for (int i = 0; i < count; i++)
-            {
-                graphs[i] = _mind.GetAllAssociations();
-            }
+        //    var graphs = new IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>[count];
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        graphs[i] = _mind.GetAllAssociations();
+        //    }
 
-            sw.Stop();
-            var z = sw.ElapsedMilliseconds;
-            sw.Restart();
+        //    sw.Stop();
+        //    var z = sw.ElapsedMilliseconds;
+        //    sw.Restart();
 
-            var tasks = new Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>[count];
-            for (int i = 0; i < count; i++)
-            {
-                tasks[i] = Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>.Factory.StartNew(
-                    _detachedDelegateBuilder.BuildBackgroundFunction<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>(
-                        () => _mind.GetAllAssociations()
-                    )
-                    );
-            }
-            Task.WaitAll(tasks);
+        //    var tasks = new Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>[count];
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        tasks[i] = Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>.Factory.StartNew(
+        //            _detachedDelegateBuilder.BuildBackgroundFunction<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>(
+        //                () => _mind.GetAllAssociations()
+        //            )
+        //            );
+        //    }
+        //    Task.WaitAll(tasks);
 
-            sw.Stop();
-            var y = sw.ElapsedMilliseconds;
-            int ze = 5 + 5;
-        }
+        //    sw.Stop();
+        //    var y = sw.ElapsedMilliseconds;
+        //    int ze = 5 + 5;
+        //}
 
         public virtual JsonResult Render(int zoomLevel = 0)
         {
-            var searchViewModel = _frontendEngineDriver.GetSearchViewModel(this);
+            var searchForm = _contentManager.New("AssociativySearchForm");
+            _contentManager.UpdateEditor(searchForm, this);
 
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
             settings.ZoomLevel = zoomLevel;
 
-            
-            IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>> graph;
+            IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
             if (ModelState.IsValid)
             {
-                if (TryGetGraph(searchViewModel, out graph, settings))
+                if (!TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
                 {
-                    //jsonData = _jitDriver.GraphJson(graph);
-                }
-                else
-                {
-                    //jsonData = null;
+                    return null;
                 }
             }
             else
             {
-                graph = _mind.GetAllAssociations(settings);
+                graph = _mind.GetAllAssociations(settings, GraphQueryModifier);
             }
 
 
@@ -114,7 +111,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
                 algorithm.FormatVertex +=
                     (sender, e) =>
                     {
-                        e.VertexFormatter.Label = e.Vertex.Label;
+                        e.VertexFormatter.Label = e.Vertex.As<ITitleAspect>().Title;
                         e.VertexFormatter.Shape = QuickGraph.Graphviz.Dot.GraphvizVertexShape.Diamond;
                         e.VertexFormatter.Url = "http://pyrocenter.hu";
                     };
