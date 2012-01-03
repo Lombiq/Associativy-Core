@@ -22,6 +22,11 @@ namespace Associativy.Services
         /// </summary>
         IContentQuery<ContentItem> ContentQuery { get; }
 
+        /// <summary>
+        /// Query for retrieving multiple items
+        /// </summary>
+        /// <param name="ids">Ids of nodes</param>
+        /// <returns></returns>
         IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids);
 
         /// <summary>
