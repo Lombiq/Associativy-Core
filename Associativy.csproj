@@ -89,6 +89,7 @@
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graph.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Graphviz\mapbox.min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JITDrawer.js" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JIT.custom.min.js" />
     <Content Include="Web.config">
@@ -113,10 +114,13 @@
     <Compile Include="FrontendEngines\Controllers\IDiscoverableFrontendEngineController.cs" />
     <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\Controllers\FrontendEngineController.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\ResourceManifest.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\FrontendEngineController.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\ResourceManifest.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\GraphImageService.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs" />
     <Compile Include="FrontendEngines\FrontendEngineControllerLocator.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
@@ -175,6 +179,7 @@
   <ItemGroup>
     <None Include="Placement.info" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\Graph.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
