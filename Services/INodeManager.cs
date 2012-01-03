@@ -11,7 +11,7 @@ namespace Associativy.Services
     /// Service for handling nodes
     /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
     /// </summary>
-    public interface INodeManager<TAssociativyContext> : IDependency
+    public interface INodeManager<TAssociativyContext>// : IDependency
         where TAssociativyContext : IAssociativyContext
     {
         /// <summary>

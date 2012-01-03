@@ -12,7 +12,7 @@ namespace Associativy.Services
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> : IDependency
+    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>// : IDependency
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
         where TAssociativyContext : IAssociativyContext
     {

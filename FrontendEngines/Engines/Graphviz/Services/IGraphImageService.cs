@@ -7,7 +7,7 @@ using Orchard.ContentManagement;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 {
-    public interface IGraphImageService<TAssociativyContext> : IDependency
+    public interface IGraphImageService<TAssociativyContext>// : IDependency
      where TAssociativyContext : IAssociativyContext
     {
         string ToSvg(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, Action<GraphvizAlgorithm<IContent, IUndirectedEdge<IContent>>> initialization);
