@@ -12,6 +12,9 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
@@ -75,41 +78,72 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
         //    int ze = 5 + 5;
         //}
 
-        public virtual JsonResult Render(int zoomLevel = 0)
+        public virtual JsonResult Render()
         {
             var searchForm = _contentManager.New("AssociativySearchForm");
             _contentManager.UpdateEditor(searchForm, this);
 
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = zoomLevel;
 
-            IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
+            List<string> graphImageUrls;
+
             if (ModelState.IsValid)
             {
-                if (!TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
-                {
-                    return null;
-                }
+                graphImageUrls = FetchZoomedGraphUrls(
+                            settings,
+                            (currentSettings) =>
+                            {
+                                IUndirectedGraph<IContent, IUndirectedEdge<IContent>> currentGraph;
+                                TryGetGraph(searchForm, out currentGraph, settings, GraphQueryModifier);
+                                return currentGraph;
+                            });
             }
             else
             {
-                graph = _mind.GetAllAssociations(settings, GraphQueryModifier);
+                graphImageUrls = FetchZoomedGraphUrls(
+                            settings,
+                            (currentSettings) =>
+                            {
+                                return _mind.GetAllAssociations(settings, GraphQueryModifier);
+                            });
             }
 
 
-            var graphImageUrl = _graphImageService.ToSvg(graph, algorithm =>
+            return Json(new { GraphImageUrls = graphImageUrls }, JsonRequestBehavior.AllowGet);
+        }
+
+        protected virtual List<string> FetchZoomedGraphUrls(IMindSettings settings, Func<IMindSettings, IUndirectedGraph<IContent, IUndirectedEdge<IContent>>> fetchGraph)
+        {
+            var graphImageUrls = new List<string>(_associativyServices.Context.MaxZoomLevel);
+
+            Func<int, string> getImageUrl =
+                (zoomLevel) =>
+                {
+                    settings.ZoomLevel = zoomLevel;
+                    return _graphImageService.ToSvg(fetchGraph(settings), algorithm =>
+                            {
+                                algorithm.FormatVertex +=
+                                    (sender, e) =>
+                                    {
+                                        e.VertexFormatter.Label = e.Vertex.As<ITitleAspect>().Title;
+                                        e.VertexFormatter.Shape = QuickGraph.Graphviz.Dot.GraphvizVertexShape.Diamond;
+                                        e.VertexFormatter.Url = e.Vertex.As<IRoutableAspect>().Path;
+                                    };
+                            });
+                };
+
+            graphImageUrls.Add(getImageUrl(0));
+
+            var currentImageUrl = getImageUrl(1);
+            int i = 1;
+            while (i < _associativyServices.Context.MaxZoomLevel && graphImageUrls[i - 1] != currentImageUrl)
             {
-                algorithm.FormatVertex +=
-                    (sender, e) =>
-                    {
-                        e.VertexFormatter.Label = e.Vertex.As<ITitleAspect>().Title;
-                        e.VertexFormatter.Shape = QuickGraph.Graphviz.Dot.GraphvizVertexShape.Diamond;
-                        e.VertexFormatter.Url = "http://pyrocenter.hu";
-                    };
-            });
+                graphImageUrls.Add(currentImageUrl);
+                i++;
+                currentImageUrl = getImageUrl(i);
+            }
 
-
-            return Json(new { GraphImageUrl = graphImageUrl }, JsonRequestBehavior.AllowGet);
+            return graphImageUrls;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
             _cacheManager = cacheManager;
             _graphEventMonitor = graphEventMonitor;
 
-            _storagePath = "Associativy/Graphs-" + associativyContext.TechnicalName + "/";
+            _storagePath = "Associativy/Graphs-" + associativyContext.TechnicalGraphName + "/";
         }
 
         public virtual string ToSvg(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, Action<GraphvizAlgorithm<IContent, IUndirectedEdge<IContent>>> initialization)
@@ -65,22 +65,22 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
                 _graphEventMonitor.MonitorChanged(ctx, _associativyContext);
 
                 // Since there is no method for checking the existance of a file, we use this ugly technique
-                try
-                {
-                    _storageProvider.DeleteFile(filePath);
-                }
-                catch (Exception)
-                {
-                }
+                //try
+                //{
+                //    _storageProvider.DeleteFile(filePath);
+                //}
+                //catch (Exception)
+                //{
+                //}
 
-                var wc = new WebClient();
-                var svgData = wc.UploadString("http://rise4fun.com/services.svc/ask/agl", dotData);
+                //var wc = new WebClient();
+                //var svgData = wc.UploadString("http://rise4fun.com/services.svc/ask/agl", dotData);
 
-                using (var stream = _storageProvider.CreateFile(filePath).OpenWrite())
-                {
-                    var bytes = Encoding.UTF8.GetBytes(svgData);
-                    stream.Write(bytes, 0, bytes.Length);
-                }
+                //using (var stream = _storageProvider.CreateFile(filePath).OpenWrite())
+                //{
+                //    var bytes = Encoding.UTF8.GetBytes(svgData);
+                //    stream.Write(bytes, 0, bytes.Length);
+                //}
 
                 return _storageProvider.GetPublicUrl(filePath);
             });
