@@ -292,17 +292,14 @@ namespace Associativy.Services
             // with the same numbers for a graph when calculating zoomed graphs, there is no gain in caching: the algorithm runs
             // freaking fast: ~100 ticks on i7@3,2Ghz, running sequentially. That's very far from even one ms...
 
-            IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
-            zoomedGraph.AddVerticesAndEdgeRange(graph.Edges);
-            var nodes = zoomedGraph.Vertices.ToList();
-
 
             /// Grouping vertices by the number of their neighbours (= adjacentDegree)
+            var nodes = graph.Vertices.ToList();
             var adjacentDegreeGroups = new SortedList<int, List<IContent>>();
             var maxAdjacentDegree = 0;
             foreach (var node in nodes)
             {
-                var adjacentDegree = zoomedGraph.AdjacentDegree(node);
+                var adjacentDegree = graph.AdjacentDegree(node);
                 if (adjacentDegree > maxAdjacentDegree) maxAdjacentDegree = adjacentDegree;
                 if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<IContent>();
                 adjacentDegreeGroups[adjacentDegree].Add(node);
@@ -333,6 +330,9 @@ namespace Associativy.Services
 
 
             /// Removing all nodes that are above the specified zoom level
+            IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
+            zoomedGraph.AddVerticesAndEdgeRange(graph.Edges); // Copying the original graph
+
             int i = zoomPartitions.Count - 1;
             while (i >= 0 && i > zoomLevel)
             {
