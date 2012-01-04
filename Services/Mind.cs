@@ -46,7 +46,7 @@ namespace Associativy.Services
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
 
             _cacheManager = cacheManager;
-            _cachePrefix = associativyContext.TechnicalName + ".";
+            _cachePrefix = associativyContext.TechnicalGraphName + ".";
         }
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(

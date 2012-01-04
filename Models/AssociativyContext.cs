@@ -8,16 +8,16 @@ namespace Associativy.Models
     /// </summary>
     public abstract class AssociativyContext : IAssociativyContext
     {
-        protected LocalizedString _name;
-        public LocalizedString Name
+        protected LocalizedString _graphName;
+        public LocalizedString GraphName
         {
-            get { return _name; }
+            get { return _graphName; }
         }
 
-        protected string _technicalName;
-        public string TechnicalName
+        protected string _technicalGraphName;
+        public string TechnicalGraphName
         {
-            get { return _technicalName; }
+            get { return _technicalGraphName; }
         }
 
         protected string[] _contentTypeNames;

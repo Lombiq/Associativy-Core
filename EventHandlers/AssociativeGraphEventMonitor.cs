@@ -31,15 +31,15 @@ namespace Associativy.Services
 
         public void MonitorChanged(IAcquireContext aquireContext, IAssociativyContext associativyContext)
         {
-            var signal = associativyContext.TechnicalName + "ChangedSignal";
-            _changedSignals[associativyContext.TechnicalName] = signal;
+            var signal = associativyContext.TechnicalGraphName + "ChangedSignal";
+            _changedSignals[associativyContext.TechnicalGraphName] = signal;
             aquireContext.Monitor(_signals.When(signal));
         }
 
         public void Changed(IAssociativyContext associativyContext)
         {
             string signal;
-            if (_changedSignals.TryGetValue(associativyContext.TechnicalName, out signal))
+            if (_changedSignals.TryGetValue(associativyContext.TechnicalGraphName, out signal))
             {
                 _signals.Trigger(signal);
             }

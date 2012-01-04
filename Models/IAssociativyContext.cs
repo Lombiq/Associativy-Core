@@ -5,8 +5,8 @@ namespace Associativy.Models
 {
     public interface IAssociativyContext : IDependency
     {
-        LocalizedString Name { get; }
-        string TechnicalName { get; }
+        LocalizedString GraphName { get; }
+        string TechnicalGraphName { get; }
         string[] ContentTypeNames { get; }
         int MaxZoomLevel { get; }
     }
