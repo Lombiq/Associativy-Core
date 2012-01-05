@@ -1,17 +1,13 @@
 ﻿using Associativy.Models;
+using Orchard;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    public interface IAssociativyServices// : IDependency
+    public interface IAssociativyServices : IAssociativyService, IDependency
     {
-        /// <summary>
-        /// The AssociativyContext the services use
-        /// </summary>
-        IAssociativyContext Context { get; }
-
         /// <summary>
         /// Service for dealing with connections between nodes
         /// </summary>

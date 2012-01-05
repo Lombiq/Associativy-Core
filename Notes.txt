@@ -1,8 +1,5 @@
 ﻿-	Generic services, although being an IDependency (= resolve as the same instance in the same request) resolve to different
 	instances when used with different type parameters (given the mechanism of generics, this is logical).
--	Implemented IAssociativyContext classes get instantiated and injected into the appropriate objects automatically. This means
-	that without additional work, only one associative database can be used in one module. However by requesting more specialized
-	contexts to be injected in derived services more than one database can be used.
 -	Logical and physical location (namespace and directory structure) of a type not always match!
 -	Calling BuildDisplay() on 55 nodes with CommonPart and RoutePart costs ~100ms. It might be slow to use this approach to build
 	graphs with possibly hundreds of items.

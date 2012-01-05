@@ -17,24 +17,11 @@ namespace Associativy
             var builder = new ContainerBuilder();
 
 
-            builder.RegisterGeneric(typeof(AssociativyServices<,>)).As(typeof(IAssociativyServices<,>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(ConnectionManager<,>)).As(typeof(IConnectionManager<,>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(Mind<,>)).As(typeof(IMind<,>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(NodeManager<>)).As(typeof(INodeManager<>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(PathFinder<,>)).As(typeof(IPathFinder<,>)).InstancePerLifetimeScope();
-
-
-            // Frontend engines
-
-            // Dracula
-            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Dracula.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
-
-            //// Graphviz
-            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.Graphviz.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
-            builder.RegisterGeneric(typeof(GraphImageService<>)).As(typeof(IGraphImageService<>)).InstancePerLifetimeScope();
-
-            //// JIT
-            builder.RegisterGeneric(typeof(Associativy.FrontendEngines.Engines.JIT.Controllers.FrontendEngineController<,>)).As(typeof(IDiscoverableFrontendEngineController<,>)).InstancePerLifetimeScope();
+            //builder.RegisterGeneric(typeof(AssociativyServices<,>)).As(typeof(IAssociativyServices<,>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(ConnectionManager<>)).As(typeof(IConnectionManager<>)).InstancePerLifetimeScope();
+            //builder.RegisterGeneric(typeof(Mind<,>)).As(typeof(IMind<,>)).InstancePerLifetimeScope();
+            //builder.RegisterGeneric(typeof(NodeManager<>)).As(typeof(INodeManager<>)).InstancePerLifetimeScope();
+            //builder.RegisterGeneric(typeof(PathFinder<,>)).As(typeof(IPathFinder<,>)).InstancePerLifetimeScope();
 
 
             builder.Update(componentRegistry);

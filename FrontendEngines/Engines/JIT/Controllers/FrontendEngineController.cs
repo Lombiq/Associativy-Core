@@ -15,10 +15,7 @@ using QuickGraph;
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : FrontendEngineBaseController, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public class FrontendEngineController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
     {
         protected override string FrontendEngine
         {
@@ -26,7 +23,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
         }
 
         public FrontendEngineController(
-            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
+            IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes shapes,
             IShapeFactory shapeFactory)

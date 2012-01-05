@@ -582,6 +582,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociativyBaseController.cs" />
+    <Compile Include="Drivers\AssociativyNodePartDriver.cs" />
     <Compile Include="Drivers\SearchFormPartDriver.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventDispatcher.cs" />
@@ -602,6 +603,10 @@
     <Compile Include="FrontendEngines\FrontendEngineControllerLocator.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
+    <Compile Include="Models\AssociativyNodePart.cs" />
+    <Compile Include="Services\AssociativyContextLocator.cs" />
+    <Compile Include="Services\IAssociativyContextLocator.cs" />
+    <Compile Include="Services\IAssociativyService.cs" />
     <Compile Include="Shapes\IFrontendShapes.cs" />
     <Compile Include="Models\AssociativyContext.cs" />
     <Compile Include="Models\IAssociativyContext.cs" />

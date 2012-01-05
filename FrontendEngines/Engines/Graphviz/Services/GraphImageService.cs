@@ -14,18 +14,29 @@ using QuickGraph.Graphviz;
 namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphImageService<TAssociativyContext>
-        : AssociativyService<TAssociativyContext>,  IGraphImageService<TAssociativyContext>
-        where TAssociativyContext : IAssociativyContext
+    public class GraphImageService : AssociativyService,  IGraphImageService
     {
         protected readonly IStorageProvider _storageProvider;
         protected readonly ICacheManager _cacheManager;
         protected readonly IAssociativeGraphEventMonitor _graphEventMonitor;
 
-        protected readonly string _storagePath;
+        protected string _storagePath;
+
+        private object _contextLocker = new object();
+        public override IAssociativyContext Context
+        {
+            set
+            {
+                lock (_contextLocker) // This is to ensure that used services also have the same context
+                {
+                    _storagePath = "Associativy/Graphs-" + value.TechnicalGraphName + "/";
+                    base.Context = value;
+                }
+            }
+        }
 
         public GraphImageService(
-            TAssociativyContext associativyContext,
+            IAssociativyContext associativyContext,
             IStorageProvider storageProvider,
             ICacheManager cacheManager,
             IAssociativeGraphEventMonitor graphEventMonitor)
@@ -34,8 +45,6 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
             _storageProvider = storageProvider;
             _cacheManager = cacheManager;
             _graphEventMonitor = graphEventMonitor;
-
-            _storagePath = "Associativy/Graphs-" + associativyContext.TechnicalGraphName + "/";
         }
 
         public virtual string ToSvg(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, Action<GraphvizAlgorithm<IContent, IUndirectedEdge<IContent>>> initialization)
@@ -62,7 +71,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Services
 
             return _cacheManager.Get("Associativy.GraphImages." + filePath, ctx =>
             {
-                _graphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                _graphEventMonitor.MonitorChanged(ctx, Context);
 
                 // Since there is no method for checking the existance of a file, we use this ugly technique
                 //try

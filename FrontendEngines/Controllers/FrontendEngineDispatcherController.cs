@@ -11,9 +11,8 @@ namespace Associativy.FrontendEngines.Controllers
 {
     [OrchardFeature("Associativy")]
     [Themed]
-    public class FrontendEngineDispatcherController<TNodeToNodeConnectorRecord, TAssociativyContext> : Controller, IFrontendEngineController
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    // Some way to set the IAssociativyContext maybe?
+    public abstract class FrontendEngineDispatcherController : Controller, IFrontendEngineController
     {
         private readonly IComponentContext _componentContext;
 
@@ -29,7 +28,7 @@ namespace Associativy.FrontendEngines.Controllers
 
         protected override void HandleUnknownAction(string actionName)
         {
-            if (_componentContext.IsRegistered<IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>>())
+            if (_componentContext.IsRegistered<IDiscoverableFrontendEngineController>())
             {
                 var frontendEngineRegistration = (from registration in _componentContext.ComponentRegistry.Registrations
                                                   where
@@ -37,7 +36,7 @@ namespace Associativy.FrontendEngines.Controllers
                                                      && registration.Services.Where(service => service.Description.StartsWith("Associativy.FrontendEngines.Controllers.IDiscoverableFrontendEngineController")).Count() == 1
                                                   select registration).First();
 
-                var frontendEngineController = (IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>)_componentContext.ResolveComponent(frontendEngineRegistration, Enumerable.Empty<Parameter>());
+                var frontendEngineController = (IDiscoverableFrontendEngineController)_componentContext.ResolveComponent(frontendEngineRegistration, Enumerable.Empty<Parameter>());
                 frontendEngineController.Execute(ControllerContext.RequestContext);
             }
 

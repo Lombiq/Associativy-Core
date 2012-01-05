@@ -11,22 +11,18 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class NodeManager<TAssociativyContext> 
-        : AssociativyService<TAssociativyContext>, INodeManager<TAssociativyContext>
-        where TAssociativyContext : IAssociativyContext
+    public class NodeManager : AssociativyService, INodeManager
     {
         protected readonly IContentManager _contentManager;
         protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
 
         public NodeManager(
             IContentManager contentManager,
-            TAssociativyContext associativyContext,
+            IAssociativyContext associativyContext,
             IAssociativeGraphEventHandler associativeGraphEventHandler)
             : base(associativyContext)
         {
             _contentManager = contentManager;
-            _contentManager.Query(_associativyContext.ContentTypeNames).ForVersion(VersionOptions.AllVersions);
-
             _associativeGraphEventHandler = associativeGraphEventHandler;
         }
 
@@ -39,7 +35,7 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> ContentQuery
         {
-            get { return _contentManager.Query(_associativyContext.ContentTypeNames); }
+            get { return _contentManager.Query(Context.ContentTypeNames); }
         }
 
         public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)

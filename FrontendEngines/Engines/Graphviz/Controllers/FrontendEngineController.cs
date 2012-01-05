@@ -19,13 +19,10 @@ using System;
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : FrontendEngineBaseController, IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public class FrontendEngineController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
     {
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
-        protected readonly IGraphImageService<TAssociativyContext> _graphImageService;
+        protected readonly IGraphImageService _graphImageService;
 
         protected override string FrontendEngine
         {
@@ -33,12 +30,12 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
         }
 
         public FrontendEngineController(
-            IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext> associativyServices,
+            IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes shapes,
             IShapeFactory shapeFactory,
             IDetachedDelegateBuilder detachedDelegateBuilder,
-            IGraphImageService<TAssociativyContext> graphImageService)
+            IGraphImageService graphImageService)
             : base(associativyServices, orchardServices, shapes, shapeFactory)
         {
             _detachedDelegateBuilder = detachedDelegateBuilder;

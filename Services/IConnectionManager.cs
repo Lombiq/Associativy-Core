@@ -7,7 +7,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for dealing with connections between nodes
     /// </summary>
-    public interface IConnectionManager// : IDependency
+    public interface IConnectionManager : IAssociativyService//, IDependency
     {
         /// <summary>
         /// Checks if the nodes are neighbours (= directly connected to each other)
@@ -77,10 +77,8 @@ namespace Associativy.Services
     /// Service for dealing with connections between nodes
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> : IConnectionManager
+    public interface IConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
     {
     }
 }

@@ -70,12 +70,6 @@ namespace Associativy.FrontendEngines.Controllers
 
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
             settings.ZoomLevel = 10;
-
-            var sw = new Stopwatch();
-            sw.Start();
-            _mind.GetAllAssociations(settings, GraphQueryModifier);
-            sw.Stop();
-
             
             return new ShapeResult(this, _shapes.SearchResultShape(
                     _shapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
@@ -96,10 +90,6 @@ namespace Associativy.FrontendEngines.Controllers
                 settings.ZoomLevel = 10;
 
                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
-                var sw = new Stopwatch();
-                sw.Start();
-                TryGetGraph(searchForm, out graph, settings, GraphQueryModifier);
-                sw.Stop();
                 if (TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
                 {
                     return new ShapeResult(this, _shapes.SearchResultShape(

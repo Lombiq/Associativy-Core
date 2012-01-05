@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
 using Associativy.Models;
 using Associativy.Models.Mind;
+using Orchard;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>// : IDependency
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public interface IPathFinder : IAssociativyService, IDependency
     {
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
@@ -21,5 +18,16 @@ namespace Associativy.Services
         /// <param name="settings"></param>
         /// <returns>A list of succeeded paths, where a path is a list of the ids of the nodes on the path.</returns>
         IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, IMindSettings settings);
+    }
+
+    /// <summary>
+    /// Deals with node-to-node path calculations
+    /// </summary>
+    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
+    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
+    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> : IPathFinder
+        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TAssociativyContext : IAssociativyContext
+    {
     }
 }

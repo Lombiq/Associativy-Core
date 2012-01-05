@@ -3,7 +3,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
 
-namespace Piedone.Combinator.Drivers
+namespace Associativy.Drivers
 {
     [OrchardFeature("Associativy")]
     public class SearchFormPartDriver : ContentPartDriver<SearchFormPart>

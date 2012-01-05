@@ -9,10 +9,9 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class ConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> 
-        : AssociativyService<TAssociativyContext>, IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext>
+    public class ConnectionManager<TNodeToNodeConnectorRecord> 
+        : AssociativyService, IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
@@ -20,7 +19,7 @@ namespace Associativy.Services
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            TAssociativyContext associativyContext,
+            IAssociativyContext associativyContext,
             IContentManager contentManager,
             IAssociativeGraphEventHandler associativeGraphEventHandler)
             : base(associativyContext)
@@ -51,7 +50,7 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
             }
 
-            _associativeGraphEventHandler.Changed(_associativyContext);
+            _associativeGraphEventHandler.Changed(Context);
         }
 
         public virtual void DeleteFromNode(IContent node)
@@ -70,14 +69,14 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            _associativeGraphEventHandler.Changed(_associativyContext);
+            _associativeGraphEventHandler.Changed(Context);
         }
 
         public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
-            _associativeGraphEventHandler.Changed(_associativyContext);
+            _associativeGraphEventHandler.Changed(Context);
         }
 
         public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()

@@ -4,13 +4,14 @@ using Associativy.Models;
 using Associativy.Models.Mind;
 using Orchard.ContentManagement;
 using QuickGraph;
+using Orchard;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Service for generating associations
     /// </summary>
-    public interface IMind// : IDependency
+    public interface IMind : IAssociativyService, IDependency
     {
         /// <summary>
         /// Returns the whole association graph

@@ -13,40 +13,47 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class Mind<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : AssociativyService<TAssociativyContext>, IMind<TNodeToNodeConnectorRecord, TAssociativyContext>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public class Mind : AssociativyService, IMind
     {
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
-        protected readonly INodeManager<TAssociativyContext> _nodeManager;
-        protected readonly IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> _pathFinder;
+        protected readonly INodeManager _nodeManager;
+        protected readonly IPathFinder _pathFinder;
         protected readonly IWorkContextAccessor _workContextAccessor;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
-        protected readonly string _cachePrefix;
+        protected string _cachePrefix;
         #endregion
 
+        private object _contextLocker = new object();
+        public override IAssociativyContext Context
+        {
+            set
+            {
+                lock (_contextLocker) // This is to ensure that used services also have the same context
+                {
+                    _nodeManager.Context = value;
+                    _pathFinder.Context = value;
+                    _cachePrefix = value.TechnicalGraphName + ".";
+                    base.Context = value; 
+                }
+            }
+        }
+
         public Mind(
-            TAssociativyContext associativyContext,
-            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
-            INodeManager<TAssociativyContext> nodeManager,
-            IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> pathFinder,
+            IAssociativyContext associativyContext,
+            INodeManager nodeManager,
+            IPathFinder pathFinder,
             IWorkContextAccessor workContextAccessor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(associativyContext)
         {
-            _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _pathFinder = pathFinder;
             _workContextAccessor = workContextAccessor;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
-
             _cacheManager = cacheManager;
-            _cachePrefix = associativyContext.TechnicalGraphName + ".";
         }
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
@@ -68,7 +75,7 @@ namespace Associativy.Services
                         wholeGraph.AddVertex(node.Value);
                     }
 
-                    var connections = _connectionManager.GetAll();
+                    var connections = Context.ConnectionManager.GetAll();
                     foreach (var connection in connections)
                     {
                         wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
@@ -82,13 +89,13 @@ namespace Associativy.Services
             {
                 var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                  {
-                     _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                     _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
                      return makeWholeGraph();
                  });
 
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
                     return ZoomedGraph(graph, settings.ZoomLevel);
                 });
             }
@@ -136,13 +143,13 @@ namespace Associativy.Services
 
                 var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
                     {
-                        _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                        _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
                         return makeGraph();
                     });
 
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
                     return ZoomedGraph(graph, settings.ZoomLevel);
                 });
             }
@@ -156,7 +163,7 @@ namespace Associativy.Services
             var graph = GraphFactory();
 
             graph.AddVertex(node);
-            var neighbours = queryModifier(_nodeManager.GetManyQuery(_connectionManager.GetNeighbourIds(node.Id))).List();
+            var neighbours = queryModifier(_nodeManager.GetManyQuery(Context.ConnectionManager.GetNeighbourIds(node.Id))).List();
             foreach (var neighbour in neighbours)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
@@ -173,10 +180,10 @@ namespace Associativy.Services
 
             var graph = GraphFactory();
 
-            var commonNeighbourIds = _connectionManager.GetNeighbourIds(nodes.First().Id);
+            var commonNeighbourIds = Context.ConnectionManager.GetNeighbourIds(nodes.First().Id);
             var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
-            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_connectionManager.GetNeighbourIds(node.Id)).ToList());
+            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(Context.ConnectionManager.GetNeighbourIds(node.Id)).ToList());
             // Same as
             //foreach (var node in remainingNodes)
             //{
@@ -307,12 +314,12 @@ namespace Associativy.Services
 
 
             /// Partitioning nodes into continuous zoom levels
-            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / _associativyContext.MaxZoomLevel), 0);
+            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / Context.MaxZoomLevel), 0);
             if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevel = 0;
-            var zoomPartitions = new List<List<IContent>>(_associativyContext.MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<IContent>>(Context.MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
             // all the nodes.

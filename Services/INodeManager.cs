@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Associativy.Models;
 using Orchard.ContentManagement;
+using Orchard;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    public interface INodeManager// : IDependency
+    public interface INodeManager : IAssociativyService, IDependency
     {
         /// <summary>
         /// Lists terms similar to the snippet

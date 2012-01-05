@@ -7,23 +7,17 @@ using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    public class PathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : AssociativyService<TAssociativyContext>, IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public class PathFinder : AssociativyService, IPathFinder
     {
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
-            TAssociativyContext associativyContext,
-            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
+            IAssociativyContext associativyContext,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(associativyContext)
         {
-            _connectionManager = connectionManager;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
         }
@@ -63,7 +57,7 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, _associativyContext);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
                     settings.UseCache = false;
                     return FindPaths(startNodeId, targetNodeId, settings);
                 });
@@ -92,7 +86,7 @@ namespace Associativy.Services
                 if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (_connectionManager.AreNeighbours(currentNode.Id, targetNodeId))
+                    if (Context.ConnectionManager.AreNeighbours(currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -111,7 +105,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = _connectionManager.GetNeighbourIds(currentNode.Id);
+                        var neighbourIds = Context.ConnectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {

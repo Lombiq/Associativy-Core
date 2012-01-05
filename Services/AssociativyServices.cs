@@ -8,42 +8,45 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext>
-        : AssociativyService<TAssociativyContext>, IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyContext>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+    public class AssociativyServices: AssociativyService, IAssociativyServices
     {
-        public IAssociativyContext Context
+        private object _contextLocker = new object();
+        public override IAssociativyContext Context
         {
-            get { return _associativyContext; }
+            set
+            {
+                lock (_contextLocker) // This is to ensure that used services also have the same context
+                {
+                    _nodeManager.Context = value;
+                    _mind.Context = value;
+                    base.Context = value;
+                }
+            }
         }
 
-        protected readonly IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> _connectionManager;
         public IConnectionManager ConnectionManager
         {
-            get { return _connectionManager; }
+            get { return Context.ConnectionManager; }
         }
 
-        protected readonly IMind<TNodeToNodeConnectorRecord, TAssociativyContext> _mind;
+        protected readonly IMind _mind;
         public IMind Mind
         {
             get { return _mind; }
         }
 
-        protected readonly INodeManager<TAssociativyContext> _nodeManager;
+        protected readonly INodeManager _nodeManager;
         public INodeManager NodeManager
         {
             get { return _nodeManager; }
         }
 
         public AssociativyServices(
-            TAssociativyContext associativyContext,
-            IConnectionManager<TNodeToNodeConnectorRecord, TAssociativyContext> connectionManager,
-            IMind<TNodeToNodeConnectorRecord, TAssociativyContext> mind,
-            INodeManager<TAssociativyContext> nodeManager)
+            IAssociativyContext associativyContext,
+            IMind mind,
+            INodeManager nodeManager)
             : base(associativyContext)
         {
-            _connectionManager = connectionManager;
             _nodeManager = nodeManager;
             _mind = mind;
         }
