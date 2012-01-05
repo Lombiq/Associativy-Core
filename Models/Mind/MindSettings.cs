@@ -1,6 +1,8 @@
-﻿
+﻿using Orchard.Environment.Extensions;
+
 namespace Associativy.Models.Mind
 {
+    [OrchardFeature("Associativy")]
     public class MindSettings : IMindSettings
     {
         public MindAlgorithms Algorithm { get; set; }

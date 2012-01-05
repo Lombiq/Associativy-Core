@@ -1,5 +1,8 @@
-﻿namespace Associativy.Models
+﻿using Orchard.Environment.Extensions;
+
+namespace Associativy.Models
 {
+    [OrchardFeature("Associativy")]
     public abstract class NodeToNodeRecord : INodeToNodeConnectorRecord
     {
         public virtual int Id { get; set; }
