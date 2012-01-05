@@ -50,7 +50,7 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
             }
 
-            _associativeGraphEventHandler.Changed(Context);
+            _associativeGraphEventHandler.ConnectionAdded(nodeId1, nodeId2, Context);
         }
 
         public virtual void DeleteFromNode(IContent node)
@@ -69,14 +69,14 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            _associativeGraphEventHandler.Changed(Context);
+            _associativeGraphEventHandler.ConnectionsDeletedFromNode(nodeId, Context);
         }
 
         public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
-            _associativeGraphEventHandler.Changed(Context);
+            _associativeGraphEventHandler.ConnectionDeleted(id, Context);
         }
 
         public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()

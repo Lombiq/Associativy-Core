@@ -5,18 +5,14 @@ using System.Web;
 using Orchard.Environment.Extensions;
 using Orchard.ContentManagement.Handlers;
 using Associativy.Models;
+using Associativy.EventHandlers;
 
 namespace Associativy.Handlers
 {
     [OrchardFeature("Associativy")]
     public abstract class AssociativyNodeHandler : ContentHandler
     {
-        //protected virtual string FrontendEngine
-        //{
-        //    get { return ""; }
-        //}
-
-        public AssociativyNodeHandler(IAssociativyContext associativyContext)
+        public AssociativyNodeHandler(IAssociativyContext associativyContext, IAssociativeGraphEventHandler associativeGraphEventHandler)
         {
             OnActivated<AssociativyNodePart>((context, part) =>
             {
@@ -24,6 +20,16 @@ namespace Associativy.Handlers
                 {
                     part.CurrentContext = associativyContext;
                 }
+            });
+
+            OnCreated<AssociativyNodePart>((context, part) =>
+            {
+                associativeGraphEventHandler.NodeAdded(context.ContentItem, associativyContext);
+            });
+
+            OnRemoved<AssociativyNodePart>((context, part) =>
+            {
+                associativeGraphEventHandler.NodeRemoved(context.ContentItem, associativyContext);
             });
         }
     }

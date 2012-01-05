@@ -5,13 +5,13 @@ using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    public class AssociativeGraphEventMonitor : IAssociativeGraphEventMonitor
+    public class AssociativeGraphEventMonitor : AssociativeGraphEventHandlerBase, IAssociativeGraphEventMonitor
     {
         private readonly ICacheManager _cacheManager;
         private readonly ISignals _signals;
 
         /// <summary>
-        /// Stores the objects that were fed as signals.
+        /// Stores signal objects
         /// </summary>
         /// <remarks>
         /// Using a static field is maybe not the most elegant way, but it works.
@@ -36,7 +36,7 @@ namespace Associativy.Services
             aquireContext.Monitor(_signals.When(signal));
         }
 
-        public void Changed(IAssociativyContext associativyContext)
+        public override void Changed(IAssociativyContext associativyContext)
         {
             string signal;
             if (_changedSignals.TryGetValue(associativyContext.TechnicalGraphName, out signal))

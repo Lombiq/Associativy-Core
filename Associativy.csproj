@@ -586,6 +586,7 @@
     <Compile Include="Drivers\AssociativyNodePartDriver.cs" />
     <Compile Include="Drivers\SearchFormPartDriver.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventDispatcher.cs" />
+    <Compile Include="EventHandlers\AssociativeGraphEventHandlerBase.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />

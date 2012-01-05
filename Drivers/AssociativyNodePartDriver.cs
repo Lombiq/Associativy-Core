@@ -44,7 +44,7 @@ namespace Associativy.Drivers
         {
             updater.TryUpdateModel(part, Prefix, null, null);
 
-            _associativeGraphEventHandler.Changed(part.CurrentContext);
+            _associativeGraphEventHandler.NodeChanged(part.ContentItem, part.CurrentContext);
 
             return Editor(part, shapeHelper);
         }

@@ -15,6 +15,7 @@ using QuickGraph;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
@@ -42,38 +43,40 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             _graphImageService = graphImageService;
         }
 
-        //public void Index()
-        //{
-        //    var count = 2;
+        public void Index()
+        {
+            var count = 2;
+            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
+            settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
 
-        //    var sw = new Stopwatch();
-        //    sw.Start();
+            var sw = new Stopwatch();
+            sw.Start();
 
-        //    var graphs = new IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>[count];
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        graphs[i] = _mind.GetAllAssociations();
-        //    }
+            var graphs = new IUndirectedGraph<IContent, IUndirectedEdge<IContent>>[count];
+            for (int i = 0; i < count; i++)
+            {
+                graphs[i] = _mind.GetAllAssociations(settings, GraphQueryModifier);
+            }
 
-        //    sw.Stop();
-        //    var z = sw.ElapsedMilliseconds;
-        //    sw.Restart();
+            sw.Stop();
+            var z = sw.ElapsedMilliseconds;
+            sw.Restart();
 
-        //    var tasks = new Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>[count];
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        tasks[i] = Task<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>.Factory.StartNew(
-        //            _detachedDelegateBuilder.BuildBackgroundFunction<IUndirectedGraph<TNodePart, IUndirectedEdge<TNodePart>>>(
-        //                () => _mind.GetAllAssociations()
-        //            )
-        //            );
-        //    }
-        //    Task.WaitAll(tasks);
+            var tasks = new Task<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>[count];
+            for (int i = 0; i < count; i++)
+            {
+                tasks[i] = Task<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>.Factory.StartNew(
+                    _detachedDelegateBuilder.BuildBackgroundFunction<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>(
+                        () => _mind.GetAllAssociations(settings, GraphQueryModifier)
+                    )
+                    );
+            }
+            Task.WaitAll(tasks);
 
-        //    sw.Stop();
-        //    var y = sw.ElapsedMilliseconds;
-        //    int ze = 5 + 5;
-        //}
+            sw.Stop();
+            var y = sw.ElapsedMilliseconds;
+            int ze = 5 + 5;
+        }
 
         public virtual JsonResult Render()
         {
