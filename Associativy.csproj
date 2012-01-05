@@ -90,6 +90,8 @@
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mapquery.imageLayer.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mapz.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mousewheel.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\demo\basic.html" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\demo\bing.html" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\demo\data\wmts\1.0.0\NE1_HR_LC_SR_W_DR\default\10m\0\0\0.jpg" />
@@ -567,6 +569,7 @@
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\README.txt" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JITDrawer.js" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JIT.custom.min.js" />
+    <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-styles.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -654,7 +657,7 @@
   <ItemGroup>
     <None Include="Placement.info" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\JIT\Graph.cshtml" />
-    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.OpenLayers.cshtml" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\AUTHORS" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\demo\data\poly.json" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\Mapquery-0.1\demo\data\poly2.json" />
@@ -680,6 +683,7 @@
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\shrinksafe.py" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\toposort.py" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\update_dev_dir.sh" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

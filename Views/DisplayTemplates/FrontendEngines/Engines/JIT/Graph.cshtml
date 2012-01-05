@@ -6,8 +6,8 @@
 
 <script type="text/javascript">
 $(document).ready(function(){
-	$.getJSON("@Url.Action("FetchAssociations", routeData["controller"].ToString(), new { ZoomLevel = 10 })&" + $("#associativy-search-form").serialize(), function(data) {
-        $.jit.draw(data);
+	$.getJSON("@Url.Action("FetchAssociations", routeData["controller"].ToString(), new { ZoomLevel = 10 })&" + $("#associativy-search-form").serialize(), function(graphData) {
+        $.jit.draw(graphData);
     });
 });
 </script>

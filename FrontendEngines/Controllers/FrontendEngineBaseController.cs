@@ -1,25 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web.Mvc;
-using Associativy.FrontendEngines;
+using Associativy.Controllers;
 using Associativy.Models;
+using Associativy.Models.Mind;
 using Associativy.Services;
+using Associativy.Shapes;
 using Orchard;
 using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
+using Orchard.Core.Routable.Models;
+using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Orchard.Mvc;
 using Orchard.Themes;
 using QuickGraph;
-using Associativy.Models.Mind;
-using Associativy.Controllers;
-using System.Diagnostics;
-using System;
-using Orchard.Core.Routable.Models;
-using Orchard.DisplayManagement;
-using ClaySharp;
-using Associativy.Shapes;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -74,6 +71,12 @@ namespace Associativy.FrontendEngines.Controllers
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
             settings.ZoomLevel = 10;
 
+            var sw = new Stopwatch();
+            sw.Start();
+            _mind.GetAllAssociations(settings, GraphQueryModifier);
+            sw.Stop();
+
+            
             return new ShapeResult(this, _shapes.SearchResultShape(
                     _shapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
                     GraphShape(_mind.GetAllAssociations(settings, GraphQueryModifier)))
@@ -93,6 +96,10 @@ namespace Associativy.FrontendEngines.Controllers
                 settings.ZoomLevel = 10;
 
                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
+                var sw = new Stopwatch();
+                sw.Start();
+                TryGetGraph(searchForm, out graph, settings, GraphQueryModifier);
+                sw.Stop();
                 if (TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
                 {
                     return new ShapeResult(this, _shapes.SearchResultShape(
