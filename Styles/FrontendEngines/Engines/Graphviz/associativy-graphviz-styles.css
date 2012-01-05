@@ -1,7 +1,7 @@
-﻿.associativy.graphviz.graph-container
+﻿/* Mapz*/
+.associativy.graphviz.graph-container
 {
-    position: relative;
-    /* The container should be smaller than the graph and not bigger as the smallest image */
+    position: relative; /* The container should be smaller than the graph and not bigger as the smallest image */
     width: 600px;
     height: 400px;
     overflow: hidden;
@@ -9,8 +9,7 @@
 
 .associativy.graphviz.graph
 {
-    cursor: move;
-    /* The graph should be larger than the container */
+    cursor: move; /* The graph should be larger than the container */
     width: 650px;
     height: 450px;
     position: absolute;
@@ -31,4 +30,14 @@
 {
     visibility: visible;
     z-index: 20;
+}
+
+/* Mapbox */
+#associativy-graph-viewport
+{
+    width: 700px;
+    height: 500px;
+    cursor: move;
+    margin: 20px auto;
+    overflow: hidden; /*keep map contents from spilling over if JS is disabled*/
 }

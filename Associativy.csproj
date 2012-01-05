@@ -89,6 +89,7 @@
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\dracula_graph.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\raphael-min.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Dracula\seedrandom.js" />
+    <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mapbox.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mapquery.imageLayer.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mapz.js" />
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\jquery.mousewheel.js" />
@@ -689,6 +690,7 @@
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\shrinksafe.py" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\toposort.py" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\update_dev_dir.sh" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapz.cshtml" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.cshtml" />
   </ItemGroup>
   <ItemGroup />

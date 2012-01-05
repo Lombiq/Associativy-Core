@@ -1,5 +1,5 @@
 ﻿@{
-    Script.Require("Graphviz").AtHead();
+    Script.Require("Mapbox").AtHead();
     Style.Require("Graphviz");
 
     var routeData = Html.ViewContext.RouteData.Values;
@@ -9,43 +9,41 @@ $(document).ready(function(){
 	$.getJSON("@Url.Action("Render", routeData["controller"].ToString())?" + $("#associativy-search-form").serialize(), function(response) {
          var urls = response["GraphImageUrls"];
          
-         for (var i = 0; i < urls.length; i++) {
-            $("<img id='associativy-graph-layer-" + i + "' src='" + urls[i] + "' alt='' class='associativy graphviz level'>").appendTo(".associativy.graphviz.graph");
-            var img = $("#associativy-graph-layer-" + i);
-            // Otherwise Mapz is confused
-            img.attr("height", img.height());
-            img.attr("width", img.width());
+         var topLayer = $("#associativy-graph-top-layer");
+         topLayer.css("background",  "url(" + urls[0] + ") no-repeat");
+         $("<img src='" + urls[0] + "'>")
+            .load(function() {
+                topLayer.width(this.width); // .width() or .height() of the image is not working here
+                topLayer.height(this.height);
+            });
+         
+
+         for (var i = 1; i < urls.length; i++) {
+            var layer = $($("#dummy-layer").clone().appendTo("#associativy-graph-viewport"));
+            layer.attr("id", "associativy-graph-layer-" + i);
+            layer.prepend("<img src='" + urls[i] + "' alt=''>");
+            layer.find("img").first()
+                .load(function() {
+                    layer.width(this.width); // .width() or .height() of the image is not working here
+                    layer.height(this.height);
+                });
+            layer.show(0);
          }
 
-         $("#associativy-graph-layer-0").addClass("current-level");
-
-         var graph = $(".associativy.graphviz.graph");
-         var graphHeight = graph.height();
-         var graphWidth = graph.width();
-
-         $(".level").each(function() { 
-                var img = $(this);
-                var imgHeight = img.height();
-                var imgWidth = img.width();
-
-                if (imgHeight < graphHeight) {
-                    //img.css("margin-bottom", 1);
-                }
-
-//                if (originalWidth < graphWidth) {
-//                    img.width(graphWidth);
-//                }
-            });
-
-         graph.mapz({
-	        zoom : true,
-	        createmaps : false,
-	        mousewheel : true
-        })
+         $("#associativy-graph-viewport").mapbox({
+            mousewheel: true,
+            layerSplit: 8
+         }); 
     });
 });
 </script>
-<div class="associativy graphviz graph-container map-viewport">
-	<div class="associativy graphviz graph">
-	</div>
+
+<div id="associativy-graph-viewport"> 
+    <div id="associativy-graph-top-layer"> 
+    </div>
+</div>
+
+<div id="dummy-layer" class="associativy-graph-layer" style="display: none;"> 
+    <div class="mapcontent"> 
+    </div>
 </div>
