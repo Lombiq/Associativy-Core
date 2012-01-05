@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web.Mvc;
 using Associativy.Controllers;
@@ -69,7 +68,7 @@ namespace Associativy.FrontendEngines.Controllers
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = 10;
+            settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
             
             return new ShapeResult(this, _shapes.SearchResultShape(
                     _shapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
@@ -87,7 +86,7 @@ namespace Associativy.FrontendEngines.Controllers
                 _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchForm.As<SearchFormPart>().Terms).ToString();
 
                 var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-                settings.ZoomLevel = 10;
+                settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
 
                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
                 if (TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
