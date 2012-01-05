@@ -18,7 +18,7 @@ $(document).ready(function(){
                             "layer-" + i,
                             urls[i],
                             new OpenLayers.Bounds(-180, -88.759, 180, 88.759),
-                            new OpenLayers.Size(580, 288),
+                            new OpenLayers.Size(600, 400),
                             {numZoomLevels: maxZoomLevelsPerLayer + 1}
                         );
             layer.events.on({
@@ -94,5 +94,5 @@ $(document).ready(function(){
     });
 });
 </script>
-<div id="map" class="smallmap" style="height: 400px; width: 600px;">
+<div id="map" class="smallmap" style="width: 600px; height: 400px;">
 </div>
