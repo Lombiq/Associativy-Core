@@ -37,7 +37,7 @@ namespace Associativy.FrontendEngines.Controllers
                                                      && registration.Services.Where(service => service.Description.StartsWith("Associativy.FrontendEngines.Controllers.IDiscoverableFrontendEngineController")).Count() == 1
                                                   select registration).First();
 
-                var frontendEngineController = (IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>)frontendEngineRegistration.Activator.ActivateInstance(_componentContext, Enumerable.Empty<Parameter>());
+                var frontendEngineController = (IDiscoverableFrontendEngineController<TNodeToNodeConnectorRecord, TAssociativyContext>)_componentContext.ResolveComponent(frontendEngineRegistration, Enumerable.Empty<Parameter>());
                 frontendEngineController.Execute(ControllerContext.RequestContext);
             }
 
