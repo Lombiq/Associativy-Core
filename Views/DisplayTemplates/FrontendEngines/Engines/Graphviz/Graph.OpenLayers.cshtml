@@ -7,7 +7,7 @@
 $(document).ready(function(){
 	$.getJSON("@Url.Action("Render", routeData["controller"].ToString())?" + $("#associativy-search-form").serialize(), function(response) {
         /// Native OpenLayers implementation
-        var map = new OpenLayers.Map('map');
+        var map = new OpenLayers.Map("map");
         var urls = response["GraphImageUrls"];
         var maxZoomLevelsPerLayer = 3;
         var layerCount = urls.length;

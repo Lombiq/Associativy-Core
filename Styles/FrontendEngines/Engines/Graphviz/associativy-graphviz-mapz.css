@@ -31,13 +31,3 @@
     visibility: visible;
     z-index: 20;
 }
-
-/* Mapbox */
-#associativy-graph-viewport
-{
-    width: 700px;
-    height: 500px;
-    cursor: move;
-    margin: 20px auto;
-    overflow: hidden; /*keep map contents from spilling over if JS is disabled*/
-}

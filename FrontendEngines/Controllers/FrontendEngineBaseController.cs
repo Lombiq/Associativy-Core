@@ -41,10 +41,7 @@ namespace Associativy.FrontendEngines.Controllers
             get { return (query) => query.Join<RoutePartRecord>(); }
         }
 
-        protected virtual string GraphShapeTemplateName
-        {
-            get { return "FrontendEngines/Engines/" + FrontendEngine + "/Graph"; }
-        }
+        protected string _graphShapeTemplateName;
 
         public Localizer T { get; set; }
 
@@ -61,6 +58,7 @@ namespace Associativy.FrontendEngines.Controllers
             _shapeFactory = shapeFactory;
 
             T = NullLocalizer.Instance;
+            _graphShapeTemplateName = "FrontendEngines/Engines/" + FrontendEngine + "/Graph";
         }
 
         public virtual ActionResult ShowWholeGraph()
@@ -133,7 +131,7 @@ namespace Associativy.FrontendEngines.Controllers
         protected virtual dynamic GraphShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph)
         {
             return _shapeFactory.DisplayTemplate(
-                TemplateName: GraphShapeTemplateName,
+                TemplateName: _graphShapeTemplateName,
                 Model: graph,
                 Prefix: null);
         }

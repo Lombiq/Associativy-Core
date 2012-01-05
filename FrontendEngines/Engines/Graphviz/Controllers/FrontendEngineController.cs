@@ -15,6 +15,7 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
+using System.Reflection;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
@@ -40,6 +41,8 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
         {
             _detachedDelegateBuilder = detachedDelegateBuilder;
             _graphImageService = graphImageService;
+
+            _graphShapeTemplateName = "FrontendEngines/Engines/Graphviz/Graph.OpenLayers";
         }
 
         public void Index()
@@ -75,6 +78,22 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             sw.Stop();
             var y = sw.ElapsedMilliseconds;
             int ze = 5 + 5;
+        }
+
+        [RequireRequestValue("engine")]
+        public virtual ActionResult ShowWholeGraph(string engine)
+        {
+            SetEngineToUse(engine);
+
+            return base.ShowWholeGraph();
+        }
+
+        [RequireRequestValue("engine")]
+        public virtual ActionResult ShowAssociations(string engine)
+        {
+            SetEngineToUse(engine);
+
+            return base.ShowAssociations();
         }
 
         public virtual JsonResult Render()
@@ -144,5 +163,42 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 
             return graphImageUrls;
         }
+
+        protected virtual void SetEngineToUse(string engineParam)
+        {
+            // This is to ensure that no arbitrary shape template can be set from a GET param
+            string engineName = "OpenLayers";
+
+            if (!String.IsNullOrEmpty(engineParam))
+            {
+                switch (engineParam)
+                {
+                    case "Mapz":
+                        engineName = "Mapz";
+                        break;
+                    case "Mapbox":
+                        engineName = "Mapbox";
+                        break;
+                }
+            }
+
+            _graphShapeTemplateName = "FrontendEngines/Engines/Graphviz/Graph." + engineName;
+        }
+    }
+
+    [OrchardFeature("Associativy")]
+    public class RequireRequestValueAttribute : ActionMethodSelectorAttribute
+    {
+        public RequireRequestValueAttribute(string valueName)
+        {
+            ValueName = valueName;
+        }
+
+        public override bool IsValidForRequest(ControllerContext controllerContext, MethodInfo methodInfo)
+        {
+            return (controllerContext.HttpContext.Request[ValueName] != null);
+        }
+
+        public string ValueName { get; private set; }
     }
 }

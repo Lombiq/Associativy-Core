@@ -18,13 +18,13 @@ namespace Associativy.FrontendEngines.Engines.Graphviz
             // Mapz
             manifest.DefineScript("Mousewheel").SetUrl("FrontendEngines/Engines/Graphviz/jquery.mousewheel.js").SetDependencies(new string[] { "jQuery" });
             manifest.DefineScript("Mapz").SetUrl("FrontendEngines/Engines/Graphviz/jquery.mapz.js").SetDependencies(new string[] { "jQueryUI", "Mousewheel" });
-            
+            manifest.DefineStyle("Mapz").SetUrl("FrontendEngines/Engines/Graphviz/associativy-graphviz-mapz.css");
+
             // Mapbox
             manifest.DefineScript("Mapbox").SetUrl("FrontendEngines/Engines/Graphviz/jquery.mapbox.js").SetDependencies(new string[] { "jQuery", "Mousewheel" });
+            manifest.DefineStyle("Mapbox").SetUrl("FrontendEngines/Engines/Graphviz/associativy-graphviz-mapbox.css");
 
             //manifest.DefineScript("Graphviz").SetDependencies(new string[] { "Mapbox" });
-
-            manifest.DefineStyle("Graphviz").SetUrl("FrontendEngines/Engines/Graphviz/associativy-graphviz-styles.css");
         }
     }
 }

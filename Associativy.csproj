@@ -570,7 +570,8 @@
     <Content Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\README.txt" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JITDrawer.js" />
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JIT.custom.min.js" />
-    <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-styles.css" />
+    <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-mapz.css" />
+    <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-mapbox.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -692,7 +693,7 @@
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\toposort.py" />
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\update_dev_dir.sh" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapz.cshtml" />
-    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapbox.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
