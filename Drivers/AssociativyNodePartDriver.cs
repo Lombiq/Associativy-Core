@@ -1,9 +1,8 @@
-﻿using Associativy.Models;
+﻿using Associativy.EventHandlers;
+using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
-using Associativy.Services;
-using Associativy.EventHandlers;
 
 namespace Associativy.Drivers
 {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Associativy.Models;
 using Associativy.Models.Mind;
+using Orchard;
 using Orchard.ContentManagement;
 using QuickGraph;
-using Orchard;
 
 namespace Associativy.Services
 {

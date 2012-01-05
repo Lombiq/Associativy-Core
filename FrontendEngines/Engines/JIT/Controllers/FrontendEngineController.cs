@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
 using Associativy.FrontendEngines.Controllers;
-using Associativy.Models;
 using Associativy.Models.Mind;
 using Associativy.Services;
 using Associativy.Shapes;

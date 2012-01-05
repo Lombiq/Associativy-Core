@@ -1,5 +1,4 @@
-﻿using Associativy.Models;
-using Orchard;
+﻿using Orchard;
 
 namespace Associativy.FrontendEngines.Controllers
 {

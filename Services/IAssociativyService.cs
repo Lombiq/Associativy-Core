@@ -1,5 +1,4 @@
-﻿using System;
-using Associativy.Models;
+﻿using Associativy.Models;
 
 namespace Associativy.Services
 {

@@ -1,6 +1,6 @@
-﻿using Orchard;
+﻿using Associativy.Services;
+using Orchard;
 using Orchard.Localization;
-using Associativy.Services;
 
 namespace Associativy.Models
 {

@@ -1,7 +1,7 @@
-﻿using Orchard.Localization;
-using Associativy.Services;
-using Piedone.HelpfulLibraries.DependencyInjection;
+﻿using Associativy.Services;
 using Orchard.Environment.Extensions;
+using Orchard.Localization;
+using Piedone.HelpfulLibraries.DependencyInjection;
 
 namespace Associativy.Models
 {

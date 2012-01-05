@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Associativy.Models;
 using Orchard;
-using Associativy.Models;
 
 namespace Associativy.Services
 {

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
-using Associativy.Models;
 using Autofac;
 using Autofac.Core;
 using Orchard.Environment.Extensions;

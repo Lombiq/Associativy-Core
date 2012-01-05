@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Associativy.Models;
-using Orchard.ContentManagement;
 using Orchard;
+using Orchard.ContentManagement;
 
 namespace Associativy.Services
 {

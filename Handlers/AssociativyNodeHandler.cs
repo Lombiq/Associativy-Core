@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.Environment.Extensions;
-using Orchard.ContentManagement.Handlers;
-using Associativy.Models;
+﻿using System.Linq;
 using Associativy.EventHandlers;
+using Associativy.Models;
+using Orchard.ContentManagement.Handlers;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Handlers
 {

@@ -1,7 +1,10 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 using Associativy.FrontendEngines.Controllers;
 using Associativy.FrontendEngines.Engines.Graphviz.Services;
-using Associativy.Models;
 using Associativy.Models.Mind;
 using Associativy.Services;
 using Associativy.Shapes;
@@ -12,10 +15,6 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {

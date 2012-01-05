@@ -1,6 +1,6 @@
 ﻿using Associativy.Models;
-using Orchard.Events;
 using Orchard.ContentManagement;
+using Orchard.Events;
 
 namespace Associativy.EventHandlers
 {
