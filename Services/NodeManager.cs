@@ -35,7 +35,7 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> ContentQuery
         {
-            get { return _contentManager.Query(Context.ContentTypeNames); }
+            get { return _contentManager.Query(Context.ContentTypes); }
         }
 
         public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)

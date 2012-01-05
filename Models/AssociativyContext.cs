@@ -24,10 +24,10 @@ namespace Associativy.Models
             get { return _technicalGraphName; }
         }
 
-        protected string[] _contentTypeNames;
-        public string[] ContentTypeNames
+        protected string[] _contentTypes;
+        public string[] ContentTypes
         {
-            get { return _contentTypeNames; }
+            get { return _contentTypes; }
         }
 
         protected int _maxZoomLevel = 10;

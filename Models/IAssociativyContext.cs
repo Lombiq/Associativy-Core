@@ -9,7 +9,7 @@ namespace Associativy.Models
     {
         LocalizedString GraphName { get; }
         string TechnicalGraphName { get; }
-        string[] ContentTypeNames { get; }
+        string[] ContentTypes { get; }
         int MaxZoomLevel { get; }
         IConnectionManager ConnectionManager { get; }
     }
