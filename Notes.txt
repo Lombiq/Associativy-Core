@@ -3,3 +3,11 @@
 -	Logical and physical location (namespace and directory structure) of a type not always match!
 -	Calling BuildDisplay() on 55 nodes with CommonPart and RoutePart costs ~100ms. It might be slow to use this approach to build
 	graphs with possibly hundreds of items.
+-	For an Associativy module to work, it should...
+	-	Define an INodeToNodeConnectorRecord implementation
+	-	Define a handler derived from AssociativyNodeHandler
+	-	Define an interface derived from IAssociativyContext and implement it
+	-	Implement the appropriate migrations to set up node types and connector records
+	-	*Optionally* have a controller derived from a FrontendEngineController (other controller implementations can be written)
+	-	*Optionally* have a controller derived from FrontendEngineDispatcherController (other controller implementations can be written)
+	The above are not necessary if a module just wants to use Associativy services with an existing context
