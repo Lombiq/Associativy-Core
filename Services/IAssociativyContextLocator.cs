@@ -16,5 +16,7 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="technicalGraphName">The technical name of the context's graph</param>
         IAssociativyContext GetContext(string technicalGraphName);
+
+        IAssociativyContext[] GetContextsForContentType(string contentType);
     }
 }

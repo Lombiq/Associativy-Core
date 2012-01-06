@@ -6,6 +6,7 @@ namespace Associativy.Models
     [OrchardFeature("Associativy")]
     public class AssociativyNodePart : ContentPart
     {
-        public IAssociativyContext CurrentContext { get; set; }
+        // A content item can be part of multiple graphs
+        public IAssociativyContext[] ActiveContexts { get; set; }
     }
 }

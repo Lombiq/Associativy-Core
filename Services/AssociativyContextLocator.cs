@@ -26,5 +26,18 @@ namespace Associativy.Services
 
             return context;
         }
+
+        public IAssociativyContext[] GetContextsForContentType(string contentType)
+        {
+            // Might be worth storing contexts in a dictionary indexed by content types so it doesn't have to be recalculated.
+            // But with a reasonable number of contexts it takes slightly less than nothing to run...
+            var contexts = (from c in _registeredContexts
+                            where c.ContentTypes.Contains(contentType)
+                            select c).ToArray();
+
+            if (contexts.Length == 0) throw new ApplicationException("There are no Associativy contexts for the  \"" + contentType + "\" content type.");
+
+            return contexts;
+        }
     }
 }

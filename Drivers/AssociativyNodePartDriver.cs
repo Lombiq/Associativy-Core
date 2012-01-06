@@ -3,6 +3,7 @@ using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
+using System;
 
 namespace Associativy.Drivers
 {
@@ -43,7 +44,11 @@ namespace Associativy.Drivers
         {
             updater.TryUpdateModel(part, Prefix, null, null);
 
-            _associativeGraphEventHandler.NodeChanged(part.ContentItem, part.CurrentContext);
+            foreach (var context in part.ActiveContexts)
+            {
+                _associativeGraphEventHandler.NodeChanged(part.ContentItem, context); 
+            }
+            
 
             return Editor(part, shapeHelper);
         }
