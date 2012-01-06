@@ -633,7 +633,7 @@
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
     <Compile Include="Services\PathFinder.cs" />
-    <Compile Include="Shapes\Shapes.cs" />
+    <Compile Include="Shapes\FrontendShapes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Graph.cshtml" />
