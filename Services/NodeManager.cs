@@ -14,16 +14,16 @@ namespace Associativy.Services
     public class NodeManager : AssociativyService, INodeManager
     {
         protected readonly IContentManager _contentManager;
-        protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
+        protected readonly IAssociativeGraphEventHandler _graphEventHandler;
 
         public NodeManager(
             IContentManager contentManager,
             IAssociativyContext associativyContext,
-            IAssociativeGraphEventHandler associativeGraphEventHandler)
+            IAssociativeGraphEventHandler graphEventHandler)
             : base(associativyContext)
         {
             _contentManager = contentManager;
-            _associativeGraphEventHandler = associativeGraphEventHandler;
+            _graphEventHandler = graphEventHandler;
         }
 
         // Better name?

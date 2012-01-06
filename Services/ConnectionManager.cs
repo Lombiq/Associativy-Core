@@ -15,18 +15,18 @@ namespace Associativy.Services
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
-        protected readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
+        protected readonly IAssociativeGraphEventHandler _graphEventHandler;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             IAssociativyContext associativyContext,
             IContentManager contentManager,
-            IAssociativeGraphEventHandler associativeGraphEventHandler)
+            IAssociativeGraphEventHandler graphEventHandler)
             : base(associativyContext)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _contentManager = contentManager;
-            _associativeGraphEventHandler = associativeGraphEventHandler;
+            _graphEventHandler = graphEventHandler;
         }
 
         public virtual bool AreNeighbours(int nodeId1, int nodeId2)
@@ -50,7 +50,7 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
             }
 
-            _associativeGraphEventHandler.ConnectionAdded(nodeId1, nodeId2, Context);
+            _graphEventHandler.ConnectionAdded(nodeId1, nodeId2, Context);
         }
 
         public virtual void DeleteFromNode(IContent node)
@@ -69,14 +69,14 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            _associativeGraphEventHandler.ConnectionsDeletedFromNode(nodeId, Context);
+            _graphEventHandler.ConnectionsDeletedFromNode(nodeId, Context);
         }
 
         public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
-            _associativeGraphEventHandler.ConnectionDeleted(id, Context);
+            _graphEventHandler.ConnectionDeleted(id, Context);
         }
 
         public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()
