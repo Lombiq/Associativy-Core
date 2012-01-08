@@ -53,6 +53,10 @@ namespace Associativy.Services
 
         public virtual IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, IMindSettings settings)
         {
+            // It could be that this is the only caching that's really needed and can work:
+            // - With this tens of database queries can be saved.
+            // - Caching the whole graph is nice, but caching parts and their records could cause problems. None is yet known,
+            //   but it can happen.
             if (settings.UseCache)
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
