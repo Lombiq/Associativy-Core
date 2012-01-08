@@ -603,7 +603,6 @@
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs" />
-    <Compile Include="FrontendEngines\FrontendEngineControllerLocator.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
