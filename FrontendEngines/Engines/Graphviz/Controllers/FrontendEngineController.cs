@@ -8,7 +8,6 @@ using Associativy.FrontendEngines.Controllers;
 using Associativy.FrontendEngines.Engines.Graphviz.Services;
 using Associativy.Models.Mind;
 using Associativy.Services;
-using Associativy.Shapes;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
@@ -16,6 +15,7 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
+using Associativy.FrontendEngines.Shapes;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
@@ -33,11 +33,11 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
         public FrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
-            IFrontendShapes shapes,
+            IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
             IDetachedDelegateBuilder detachedDelegateBuilder,
             IGraphImageService graphImageService)
-            : base(associativyServices, orchardServices, shapes, shapeFactory)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
         {
             _detachedDelegateBuilder = detachedDelegateBuilder;
             _graphImageService = graphImageService;

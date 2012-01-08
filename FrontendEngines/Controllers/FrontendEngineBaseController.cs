@@ -6,7 +6,6 @@ using Associativy.Controllers;
 using Associativy.Models;
 using Associativy.Models.Mind;
 using Associativy.Services;
-using Associativy.Shapes;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Core.Routable.Models;
@@ -16,6 +15,7 @@ using Orchard.Localization;
 using Orchard.Mvc;
 using Orchard.Themes;
 using QuickGraph;
+using Associativy.FrontendEngines.Shapes;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -28,7 +28,7 @@ namespace Associativy.FrontendEngines.Controllers
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
-        protected readonly IFrontendShapes _shapes;
+        protected readonly IFrontendShapes _frontendShapes;
         protected readonly dynamic _shapeFactory;
 
         protected virtual string FrontendEngine
@@ -48,13 +48,13 @@ namespace Associativy.FrontendEngines.Controllers
         public FrontendEngineBaseController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
-            IFrontendShapes shapes,
+            IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory)
             : base(associativyServices)
         {
             _orchardServices = orchardServices;
             _contentManager = orchardServices.ContentManager;
-            _shapes = shapes;
+            _frontendShapes = frontendShapes;
             _shapeFactory = shapeFactory;
 
             T = NullLocalizer.Instance;
@@ -68,8 +68,8 @@ namespace Associativy.FrontendEngines.Controllers
             var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
             settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
             
-            return new ShapeResult(this, _shapes.SearchResultShape(
-                    _shapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
+            return new ShapeResult(this, _frontendShapes.SearchResultShape(
+                    _frontendShapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
                     GraphShape(_mind.GetAllAssociations(settings, GraphQueryModifier)))
                 );
         }
@@ -89,16 +89,16 @@ namespace Associativy.FrontendEngines.Controllers
                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
                 if (TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
                 {
-                    return new ShapeResult(this, _shapes.SearchResultShape(
-                            _shapes.SearchBoxShape(searchForm),
+                    return new ShapeResult(this, _frontendShapes.SearchResultShape(
+                            _frontendShapes.SearchBoxShape(searchForm),
                             GraphShape(graph))
                         );
                 }
                 else
                 {
-                    return new ShapeResult(this, _shapes.SearchResultShape(
-                            _shapes.SearchBoxShape(searchForm),
-                            _shapes.AssociationsNotFoundShape(searchForm))
+                    return new ShapeResult(this, _frontendShapes.SearchResultShape(
+                            _frontendShapes.SearchBoxShape(searchForm),
+                            _frontendShapes.AssociationsNotFoundShape(searchForm))
                         );
                 }
             }

@@ -1,7 +1,7 @@
 ﻿using Orchard;
 using Orchard.ContentManagement;
 
-namespace Associativy.Shapes
+namespace Associativy.FrontendEngines.Shapes
 {
     public interface IFrontendShapes : IDependency
     {

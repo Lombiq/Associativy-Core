@@ -3,13 +3,13 @@ using System.Web.Mvc;
 using Associativy.FrontendEngines.Controllers;
 using Associativy.Models.Mind;
 using Associativy.Services;
-using Associativy.Shapes;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
+using Associativy.FrontendEngines.Shapes;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
@@ -24,9 +24,9 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
         public FrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
-            IFrontendShapes shapes,
+            IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory)
-            : base(associativyServices, orchardServices, shapes, shapeFactory)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
         {
         }
 

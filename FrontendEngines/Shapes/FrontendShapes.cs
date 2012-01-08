@@ -4,7 +4,7 @@ using Orchard.ContentManagement;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 
-namespace Associativy.Shapes
+namespace Associativy.FrontendEngines.Shapes
 {
     [OrchardFeature("Associativy")]
     public class FrontendShapes : IFrontendShapes

@@ -1,9 +1,9 @@
 ﻿using Associativy.FrontendEngines.Controllers;
 using Associativy.Services;
-using Associativy.Shapes;
 using Orchard;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
+using Associativy.FrontendEngines.Shapes;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
@@ -18,9 +18,9 @@ namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
         public FrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
-            IFrontendShapes shapes,
+            IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory)
-            : base(associativyServices, orchardServices, shapes, shapeFactory)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
         {
         }
     }
