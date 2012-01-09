@@ -5,6 +5,7 @@
 @{
     Script.Require("Dracula").AtHead();
 
+    // Although this templating add flexibility, it's very slow (page load time goes up to 1 second with whole graph).
     Func<IContent, dynamic> addNodeShape =
         (node) =>
         {
