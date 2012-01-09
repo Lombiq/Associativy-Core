@@ -685,9 +685,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Content.AssociativyGraph-Dracula.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\EditorTemplates\Parts\SearchForm.cshtml" />
   </ItemGroup>
   <ItemGroup>

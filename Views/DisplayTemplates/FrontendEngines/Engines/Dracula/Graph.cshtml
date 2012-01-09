@@ -1,8 +1,31 @@
 ﻿@using Orchard.ContentManagement
+@using System.Dynamic;
 @model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
            
 @{
     Script.Require("Dracula").AtHead();
+
+    Func<IContent, dynamic> addNodeShape =
+        (node) =>
+        {
+            return ((dynamic)ShapeFactory).DisplayTemplate(
+                        TemplateName: "FrontendEngines/Engines/Dracula/AddNode",
+                        Model: node,
+                        Prefix: null);
+        };
+
+    Func<int, int, dynamic> addEdgeShape =
+    (sourceId, targetId) =>
+    {
+        dynamic model = new ExpandoObject();
+        model.SourceId = sourceId;
+        model.TargetId = targetId;
+        
+        return ((dynamic)ShapeFactory).DisplayTemplate(
+                    TemplateName: "FrontendEngines/Engines/Dracula/AddEdge",
+                    Model: model,
+                    Prefix: null);
+    };
 }
 
 <script type="text/javascript">
@@ -11,12 +34,12 @@ $(document).ready(function(){
 
     @foreach (var node in Model.Vertices)
     {
-        @Html.Raw("graph.addNode(\"" + node.Id + "\", { label : \"" + node.As<Orchard.ContentManagement.Aspects.ITitleAspect>().Title + "\" });")
+        @Display(addNodeShape(node));
     }
 
     @foreach (var edge in Model.Edges)
     {
-        @Html.Raw("graph.addEdge(\"" + edge.Source.Id + "\", \"" + edge.Target.Id + "\");")
+        @Display(addEdgeShape(edge.Source.Id, edge.Target.Id));
     }
 	
 	var layouter = new Graph.Layout.Spring(graph);

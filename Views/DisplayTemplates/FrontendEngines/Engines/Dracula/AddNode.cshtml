@@ -1,0 +1,4 @@
+﻿@using Orchard.ContentManagement
+@model Orchard.ContentManagement.IContent
+           
+@Html.Raw("graph.addNode(\"" + Model.Id + "\", { label : \"" + Model.As<Orchard.ContentManagement.Aspects.ITitleAspect>().Title + "\" });")
