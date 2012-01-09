@@ -16,6 +16,9 @@ using Orchard.Mvc;
 using Orchard.Themes;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
+using Associativy.FrontendEngines.NodeFilters;
+using Associativy.FrontendEngines.Services;
+using System.Diagnostics;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -24,12 +27,13 @@ namespace Associativy.FrontendEngines.Controllers
     /// </summary>
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineBaseController : AssociativyBaseController, IFrontendEngineController, IUpdateModel
+    public abstract class FrontendEngineBaseController : AssociativyBaseController, IUpdateModel
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
         protected readonly IFrontendShapes _frontendShapes;
         protected readonly dynamic _shapeFactory;
+        protected readonly IGraphFilterer _graphFilterer;
 
         protected virtual string FrontendEngine
         {
@@ -49,13 +53,15 @@ namespace Associativy.FrontendEngines.Controllers
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
-            IShapeFactory shapeFactory)
+            IShapeFactory shapeFactory,
+            IGraphFilterer graphFilterer)
             : base(associativyServices)
         {
             _orchardServices = orchardServices;
             _contentManager = orchardServices.ContentManager;
             _frontendShapes = frontendShapes;
             _shapeFactory = shapeFactory;
+            _graphFilterer = graphFilterer;
 
             T = NullLocalizer.Instance;
             _graphShapeTemplateName = "FrontendEngines/Engines/" + FrontendEngine + "/Graph";
@@ -130,6 +136,11 @@ namespace Associativy.FrontendEngines.Controllers
 
         protected virtual dynamic GraphShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            var viewModels = _graphFilterer.RunFilters(graph, FrontendEngine);
+            sw.Stop();
+
             return _shapeFactory.DisplayTemplate(
                 TemplateName: _graphShapeTemplateName,
                 Model: graph,
