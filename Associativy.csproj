@@ -619,7 +619,7 @@
     <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Models\IFrontendEngineContext.cs" />
+    <Compile Include="FrontendEngines\Models\IFrontendEngineSettings.cs" />
     <Compile Include="FrontendEngines\NodeFilters\INodeFilter.cs" />
     <Compile Include="FrontendEngines\NodeFilters\NodeFilter.cs" />
     <Compile Include="FrontendEngines\NodeFilters\TitleFilter.cs" />

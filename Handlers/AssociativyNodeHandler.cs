@@ -32,6 +32,11 @@ namespace Associativy.Handlers
                 InvokeEventHandlerWithContexts(associativyContexts[context.ContentType], (associativyContext) => graphEventHandler.NodeAdded(context.ContentItem, associativyContext));
             });
 
+            OnUpdateEditorShape<AssociativyNodePart>((context, part) =>
+            {
+                InvokeEventHandlerWithContexts(associativyContexts[context.ContentItem.ContentType], (associativyContext) => graphEventHandler.NodeChanged(context.ContentItem, associativyContext));
+            });
+
             OnRemoved<AssociativyNodePart>((context, part) =>
             {
                 InvokeEventHandlerWithContexts(associativyContexts[context.ContentType], (associativyContext) => graphEventHandler.NodeRemoved(context.ContentItem, associativyContext));

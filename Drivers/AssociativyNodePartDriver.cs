@@ -7,49 +7,34 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Drivers
 {
     [OrchardFeature("Associativy")]
+    // This driver is necessary so nodes can be "casted" to AssociativyNodePart
     public class AssociativyNodePartDriver : ContentPartDriver<AssociativyNodePart>
     {
-        private readonly IAssociativeGraphEventHandler _associativeGraphEventHandler;
-
         protected override string Prefix
         {
             get { return "Associativy.NodePart"; }
         }
 
-        public AssociativyNodePartDriver(
-            IAssociativeGraphEventHandler associativeGraphEventHandler)
-        {
-            _associativeGraphEventHandler = associativeGraphEventHandler;
-        }
+        //protected override DriverResult Display(AssociativyNodePart part, string displayType, dynamic shapeHelper)
+        //{
+        //}
 
-        protected override DriverResult Display(AssociativyNodePart part, string displayType, dynamic shapeHelper)
-        {
-            return null;
-        }
+        //// GET
+        //protected override DriverResult Editor(AssociativyNodePart part, dynamic shapeHelper)
+        //{
+        //    //return ContentShape("Parts_SearchForm",
+        //    //    () => shapeHelper.EditorTemplate(
+        //    //            TemplateName: "Parts/SearchForm",
+        //    //            Model: part,
+        //    //            Prefix: Prefix));
+        //}
 
-        // GET
-        protected override DriverResult Editor(AssociativyNodePart part, dynamic shapeHelper)
-        {
-            return null;
-            //return ContentShape("Parts_SearchForm",
-            //    () => shapeHelper.EditorTemplate(
-            //            TemplateName: "Parts/SearchForm",
-            //            Model: part,
-            //            Prefix: Prefix));
-        }
+        //// POST
+        //protected override DriverResult Editor(AssociativyNodePart part, IUpdateModel updater, dynamic shapeHelper)
+        //{
+        //    updater.TryUpdateModel(part, Prefix, null, null);
 
-        // POST
-        protected override DriverResult Editor(AssociativyNodePart part, IUpdateModel updater, dynamic shapeHelper)
-        {
-            updater.TryUpdateModel(part, Prefix, null, null);
-
-            foreach (var context in part.ActiveContexts)
-            {
-                _associativeGraphEventHandler.NodeChanged(part.ContentItem, context); 
-            }
-            
-
-            return Editor(part, shapeHelper);
-        }
+        //    return Editor(part, shapeHelper);
+        //}
     }
 }
