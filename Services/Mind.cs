@@ -345,10 +345,9 @@ namespace Associativy.Services
             {
                 foreach (var node in zoomPartitions[i])
                 {
-                    var adjacentEdges = zoomedGraph.AdjacentEdges(node);
                     // Rewiring all edges so that nodes previously connected through this nodes now get directly connected
                     // Looks unneeded and wrong
-                    //if (adjacentEdges.Count() > 1)
+                    //if (zoomedGraph.AdjacentDegree(node) > 1)
                     //{
                     //    foreach (var edge in zoomedGraph.AdjacentEdges(node))
                     //    {
