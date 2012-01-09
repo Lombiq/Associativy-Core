@@ -303,11 +303,9 @@ namespace Associativy.Services
             /// Grouping vertices by the number of their neighbours (= adjacentDegree)
             var nodes = graph.Vertices.ToList();
             var adjacentDegreeGroups = new SortedList<int, List<IContent>>();
-            var maxAdjacentDegree = 0;
             foreach (var node in nodes)
             {
                 var adjacentDegree = graph.AdjacentDegree(node);
-                if (adjacentDegree > maxAdjacentDegree) maxAdjacentDegree = adjacentDegree;
                 if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<IContent>();
                 adjacentDegreeGroups[adjacentDegree].Add(node);
             }
