@@ -604,13 +604,13 @@
     <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\FrontendEngineController.cs">
+    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\Dracula\ResourceManifest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\FrontendEngineController.cs">
+    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\GraphvizController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\Graphviz\ResourceManifest.cs">
@@ -622,12 +622,13 @@
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs">
+    <Compile Include="FrontendEngines\Engines\JIT\Controllers\JITController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FrontendEngines\Models\IFrontendEngineContext.cs" />
     <Compile Include="FrontendEngines\NodeFilters\INodeFilter.cs" />
     <Compile Include="FrontendEngines\NodeFilters\NodeFilter.cs" />
     <Compile Include="FrontendEngines\NodeFilters\TitleFilter.cs" />

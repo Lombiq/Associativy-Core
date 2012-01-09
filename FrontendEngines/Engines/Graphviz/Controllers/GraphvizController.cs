@@ -16,11 +16,12 @@ using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
+using Associativy.FrontendEngines.Services;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class GraphvizController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
     {
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
         protected readonly IGraphImageService _graphImageService;
@@ -30,14 +31,15 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             get { return "Graphviz"; }
         }
 
-        public FrontendEngineController(
+        public GraphvizController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
+            IGraphFilterer graphFilterer,
             IDetachedDelegateBuilder detachedDelegateBuilder,
             IGraphImageService graphImageService)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
         {
             _detachedDelegateBuilder = detachedDelegateBuilder;
             _graphImageService = graphImageService;

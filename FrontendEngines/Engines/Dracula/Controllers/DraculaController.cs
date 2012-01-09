@@ -4,23 +4,25 @@ using Orchard;
 using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Associativy.FrontendEngines.Shapes;
+using Associativy.FrontendEngines.Services;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class DraculaController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
     {
         protected override string FrontendEngine
         {
             get { return "Dracula"; }
         }
 
-        public FrontendEngineController(
+        public DraculaController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
-            IShapeFactory shapeFactory)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
+            IShapeFactory shapeFactory,
+            IGraphFilterer graphFilterer)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
         {
         }
     }

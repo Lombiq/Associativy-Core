@@ -10,23 +10,25 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
+using Associativy.FrontendEngines.Services;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class FrontendEngineController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class JITController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
     {
         protected override string FrontendEngine
         {
             get { return "JIT"; }
         }
 
-        public FrontendEngineController(
+        public JITController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
-            IShapeFactory shapeFactory)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory)
+            IShapeFactory shapeFactory,
+            IGraphFilterer graphFilterer)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
         {
         }
 

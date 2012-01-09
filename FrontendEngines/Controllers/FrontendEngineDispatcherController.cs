@@ -40,7 +40,7 @@ namespace Associativy.FrontendEngines.Controllers
             }
 
             // This way theming gets applied, but the result should be somehow captured.
-            ActionInvoker.InvokeAction(this.ControllerContext, "Dispatch");
+            ActionInvoker.InvokeAction(ControllerContext, "Dispatch");
         }
 
         public ViewResult Dispatch()
