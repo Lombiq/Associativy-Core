@@ -721,6 +721,8 @@
     <None Include="Scripts\FrontendEngines\Engines\Graphviz\OpenLayers-2.11\tools\update_dev_dir.sh" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapz.cshtml" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapbox.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\AddNodes.cshtml" />
+    <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\AddEdges.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

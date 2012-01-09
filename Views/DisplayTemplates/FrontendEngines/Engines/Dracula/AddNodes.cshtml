@@ -1,0 +1,7 @@
+﻿@using Orchard.ContentManagement
+@model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
+
+@foreach (var node in Model.Vertices)
+{
+    @Html.Raw("graph.addNode(\"" + node.Id + "\", { label : \"" + node.As<Orchard.ContentManagement.Aspects.ITitleAspect>().Title + "\" });")
+}

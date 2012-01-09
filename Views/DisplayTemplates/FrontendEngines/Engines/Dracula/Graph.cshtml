@@ -1,47 +1,28 @@
 ﻿@using Orchard.ContentManagement
-@using System.Dynamic;
 @model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
            
 @{
     Script.Require("Dracula").AtHead();
 
     // Although this templating add flexibility, it's very slow (page load time goes up to 1 second with whole graph).
-    Func<IContent, dynamic> addNodeShape =
-        (node) =>
-        {
-            return ((dynamic)ShapeFactory).DisplayTemplate(
-                        TemplateName: "FrontendEngines/Engines/Dracula/AddNode",
-                        Model: node,
-                        Prefix: null);
-        };
+    var addNodesShape = ((dynamic)ShapeFactory).DisplayTemplate(
+                            TemplateName: "FrontendEngines/Engines/Dracula/AddNodes",
+                            Model: Model,
+                            Prefix: null);
 
-    Func<int, int, dynamic> addEdgeShape =
-    (sourceId, targetId) =>
-    {
-        dynamic model = new ExpandoObject();
-        model.SourceId = sourceId;
-        model.TargetId = targetId;
-        
-        return ((dynamic)ShapeFactory).DisplayTemplate(
-                    TemplateName: "FrontendEngines/Engines/Dracula/AddEdge",
-                    Model: model,
-                    Prefix: null);
-    };
+    var addEdgesShape = ((dynamic)ShapeFactory).DisplayTemplate(
+                            TemplateName: "FrontendEngines/Engines/Dracula/AddEdges",
+                            Model: Model,
+                            Prefix: null);
 }
 
 <script type="text/javascript">
 $(document).ready(function(){
 	var graph = new Graph();
 
-    @foreach (var node in Model.Vertices)
-    {
-        @Display(addNodeShape(node));
-    }
+    @Display(addNodesShape)
 
-    @foreach (var edge in Model.Edges)
-    {
-        @Display(addEdgeShape(edge.Source.Id, edge.Target.Id));
-    }
+    @Display(addEdgesShape)
 	
 	var layouter = new Graph.Layout.Spring(graph);
 	layouter.layout();

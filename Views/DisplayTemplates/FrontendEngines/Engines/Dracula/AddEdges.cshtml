@@ -1,0 +1,7 @@
+﻿@using Orchard.ContentManagement
+@model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
+
+@foreach (var edge in Model.Edges)
+{
+    @Html.Raw("graph.addEdge(\"" + edge.Source.Id + "\", \"" + edge.Target.Id + "\");")
+}
