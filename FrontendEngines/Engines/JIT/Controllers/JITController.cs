@@ -15,7 +15,7 @@ using Associativy.FrontendEngines.Services;
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class JITController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class JITController : FrontendEngineBaseController
     {
         protected override string FrontendEngine
         {

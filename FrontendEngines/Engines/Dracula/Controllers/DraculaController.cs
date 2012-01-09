@@ -9,7 +9,7 @@ using Associativy.FrontendEngines.Services;
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class DraculaController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class DraculaController : FrontendEngineBaseController
     {
         protected override string FrontendEngine
         {

@@ -595,15 +595,6 @@
     <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Controllers\FrontendEngineDispatcherController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="FrontendEngines\Controllers\IDiscoverableFrontendEngineController.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaController.cs">
       <SubType>Code</SubType>
     </Compile>

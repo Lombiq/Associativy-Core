@@ -21,7 +21,7 @@ using Associativy.FrontendEngines.Services;
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class GraphvizController : FrontendEngineBaseController, IDiscoverableFrontendEngineController
+    public class GraphvizController : FrontendEngineBaseController
     {
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
         protected readonly IGraphImageService _graphImageService;
