@@ -591,26 +591,57 @@
     <Compile Include="EventHandlers\IAssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />
-    <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs" />
-    <Compile Include="FrontendEngines\Controllers\FrontendEngineDispatcherController.cs" />
-    <Compile Include="FrontendEngines\Controllers\IDiscoverableFrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\FrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Engines\Dracula\ResourceManifest.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\FrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\ResourceManifest.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\Services\GraphImageService.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs" />
-    <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs" />
-    <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
+    <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Controllers\FrontendEngineDispatcherController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Controllers\IDiscoverableFrontendEngineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Controllers\IFrontendEngineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\FrontendEngineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Dracula\ResourceManifest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\FrontendEngineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Graphviz\ResourceManifest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Graphviz\Services\GraphImageService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\JIT\Controllers\FrontendEngineController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FrontendEngines\NodeFilters\INodeFilter.cs" />
+    <Compile Include="FrontendEngines\NodeFilters\NodeFilter.cs" />
+    <Compile Include="FrontendEngines\NodeFilters\TitleFilter.cs" />
+    <Compile Include="FrontendEngines\Services\GraphFilterer.cs" />
+    <Compile Include="FrontendEngines\Services\IGraphFilterer.cs" />
+    <Compile Include="FrontendEngines\ViewModels\INodeViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\NodeViewModel.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
     <Compile Include="Models\AssociativyNodePart.cs" />
     <Compile Include="Services\AssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyService.cs" />
-    <Compile Include="Shapes\IFrontendShapes.cs" />
+    <Compile Include="FrontendEngines\Shapes\IFrontendShapes.cs" />
     <Compile Include="Models\AssociativyContext.cs" />
     <Compile Include="Models\IAssociativyContext.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
@@ -632,7 +663,7 @@
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
     <Compile Include="Services\PathFinder.cs" />
-    <Compile Include="Shapes\FrontendShapes.cs" />
+    <Compile Include="FrontendEngines\Shapes\FrontendShapes.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\Graph.cshtml" />
