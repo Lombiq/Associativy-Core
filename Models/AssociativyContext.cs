@@ -12,29 +12,10 @@ namespace Associativy.Models
     [OrchardFeature("Associativy")]
     public abstract class AssociativyContext : IAssociativyContext
     {
-        protected LocalizedString _graphName;
-        public LocalizedString GraphName
-        {
-            get { return _graphName; }
-        }
-
-        protected string _technicalGraphName;
-        public string TechnicalGraphName
-        {
-            get { return _technicalGraphName; }
-        }
-
-        protected string[] _contentTypes;
-        public string[] ContentTypes
-        {
-            get { return _contentTypes; }
-        }
-
-        protected int _maxZoomLevel = 10;
-        public int MaxZoomLevel
-        {
-            get { return _maxZoomLevel; }
-        }
+        public LocalizedString GraphName { get; protected set; }
+        public string TechnicalGraphName { get; protected set; }
+        public string[] ContentTypes { get; protected set; }
+        public int MaxZoomLevel { get; protected set; }
 
         public abstract IConnectionManager ConnectionManager
         {
