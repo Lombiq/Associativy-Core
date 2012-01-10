@@ -572,6 +572,7 @@
     <Content Include="Scripts\FrontendEngines\Engines\JIT\JIT.custom.min.js" />
     <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-mapz.css" />
     <Content Include="Styles\FrontendEngines\Engines\Graphviz\associativy-graphviz-mapbox.css" />
+    <Content Include="Styles\FrontendEngines\Engines\JIT\associativy-jit.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
