@@ -20,7 +20,7 @@
                 // init ForceDirected
                 var graph = new $jit.ForceDirected({
                     //id of the visualization container
-                    injectInto: "jit-associations",
+                    injectInto: "associativy-jit-associations",
                     //Enable zooming and panning
                     //by scrolling and DnD
                     Navigation: {
@@ -130,7 +130,7 @@
                         domElement.innerHTML = node.name;
                         var style = domElement.style;
                         style.fontSize = "0.8em";
-                        style.color = "#ddd";  
+                        style.color = "#ddd";
                     },
                     // Change node styles when DOM labels are placed
                     // or moved.
@@ -145,6 +145,11 @@
                     }
                 });
 
+                this.redraw(graph, json);
+
+                return graph;
+            },
+            redraw: function (graph, json) {
                 // load JSON data.
                 graph.loadJSON(json);
 
