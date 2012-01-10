@@ -11,12 +11,15 @@ using Orchard.Environment.Extensions;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.Services;
+using Associativy.FrontendEngines.Engines.JIT.Models;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
     public class JITController : FrontendEngineBaseController
     {
+        protected readonly IJITSetup _setup;
+
         protected override string FrontendEngine
         {
             get { return "JIT"; }
@@ -27,9 +30,11 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
-            IGraphFilterer graphFilterer)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
+            IGraphFilterer graphFilterer,
+            IJITSetup setup)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer, setup)
         {
+            _setup = setup;
         }
 
         public virtual JsonResult FetchAssociations(int zoomLevel = 0)
@@ -37,8 +42,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             var searchForm = _contentManager.New("AssociativySearchForm");
             _contentManager.UpdateEditor(searchForm, this);
 
-            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = zoomLevel;
+            var settings = MakeDefaultMindSettings();
 
             IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
             if (ModelState.IsValid)

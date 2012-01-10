@@ -96,10 +96,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
-                    return ZoomedGraph(graph, settings.ZoomLevel);
+                    return ZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
                 });
             }
-            else return ZoomedGraph(makeWholeGraph(), settings.ZoomLevel);
+            else return ZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.MaxZoomLevel);
         }
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
@@ -150,10 +150,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
-                    return ZoomedGraph(graph, settings.ZoomLevel);
+                    return ZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
                 });
             }
-            else return ZoomedGraph(makeGraph(), settings.ZoomLevel);
+            else return ZoomedGraph(makeGraph(), settings.ZoomLevel, settings.MaxZoomLevel);
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
@@ -292,7 +292,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> ZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel)
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> ZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int maxZoomLevel)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
@@ -312,12 +312,12 @@ namespace Associativy.Services
 
 
             /// Partitioning nodes into continuous zoom levels
-            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / Context.MaxZoomLevel), 0);
+            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / maxZoomLevel), 0);
             if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevel = 0;
-            var zoomPartitions = new List<List<IContent>>(Context.MaxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<IContent>>(maxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
             // all the nodes.
@@ -382,8 +382,7 @@ namespace Associativy.Services
 
         protected virtual void MakeSettings(ref IMindSettings settings)
         {
-            var workContext = _workContextAccessor.GetContext();
-            if (settings == null) settings = workContext.Resolve<IMindSettings>();
+            if (settings == null) settings = new MindSettings();
         }
     }
 }

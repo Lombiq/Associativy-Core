@@ -17,12 +17,14 @@ using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.Services;
+using Associativy.FrontendEngines.Engines.Graphviz.Models;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
     public class GraphvizController : FrontendEngineBaseController
     {
+        protected readonly IGraphvizSetup _setup;
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
         protected readonly IGraphImageService _graphImageService;
 
@@ -37,10 +39,12 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
             IGraphFilterer graphFilterer,
+            IGraphvizSetup setup,
             IDetachedDelegateBuilder detachedDelegateBuilder,
             IGraphImageService graphImageService)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer, setup)
         {
+            _setup = setup;
             _detachedDelegateBuilder = detachedDelegateBuilder;
             _graphImageService = graphImageService;
 
@@ -50,8 +54,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
         public void Index()
         {
             var count = 2;
-            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
+            var settings = MakeDefaultMindSettings();
 
             var sw = new Stopwatch();
             sw.Start();
@@ -103,7 +106,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             var searchForm = _contentManager.New("AssociativySearchForm");
             _contentManager.UpdateEditor(searchForm, this);
 
-            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
+            var settings = MakeDefaultMindSettings();
 
             List<string> graphImageUrls;
 
@@ -134,7 +137,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 
         protected virtual List<string> FetchZoomedGraphUrls(IMindSettings settings, Func<IMindSettings, IUndirectedGraph<IContent, IUndirectedEdge<IContent>>> fetchGraph)
         {
-            var graphImageUrls = new List<string>(_associativyServices.Context.MaxZoomLevel);
+            var graphImageUrls = new List<string>(settings.MaxZoomLevel);
 
             Func<int, string> getImageUrl =
                 (zoomLevel) =>
@@ -156,7 +159,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 
             var currentImageUrl = getImageUrl(1);
             int i = 1;
-            while (i < _associativyServices.Context.MaxZoomLevel && graphImageUrls[i - 1] != currentImageUrl)
+            while (i < settings.MaxZoomLevel && graphImageUrls[i - 1] != currentImageUrl)
             {
                 graphImageUrls.Add(currentImageUrl);
                 i++;

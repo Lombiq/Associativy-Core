@@ -19,6 +19,7 @@ using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.NodeFilters;
 using Associativy.FrontendEngines.Services;
 using System.Diagnostics;
+using Associativy.FrontendEngines.Models;
 
 namespace Associativy.FrontendEngines.Controllers
 {
@@ -34,6 +35,7 @@ namespace Associativy.FrontendEngines.Controllers
         protected readonly IFrontendShapes _frontendShapes;
         protected readonly dynamic _shapeFactory;
         protected readonly IGraphFilterer _graphFilterer;
+        private readonly IFrontendEngineSetup _setup;
 
         protected virtual string FrontendEngine
         {
@@ -54,7 +56,8 @@ namespace Associativy.FrontendEngines.Controllers
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
-            IGraphFilterer graphFilterer)
+            IGraphFilterer graphFilterer,
+            IFrontendEngineSetup setup)
             : base(associativyServices)
         {
             _orchardServices = orchardServices;
@@ -62,6 +65,7 @@ namespace Associativy.FrontendEngines.Controllers
             _frontendShapes = frontendShapes;
             _shapeFactory = shapeFactory;
             _graphFilterer = graphFilterer;
+            _setup = setup;
 
             T = NullLocalizer.Instance;
             _graphShapeTemplateName = "FrontendEngines/Engines/" + FrontendEngine + "/Graph";
@@ -71,12 +75,9 @@ namespace Associativy.FrontendEngines.Controllers
         {
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
-            var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-            settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
-            
             return new ShapeResult(this, _frontendShapes.SearchResultShape(
                     _frontendShapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
-                    GraphShape(_mind.GetAllAssociations(settings, GraphQueryModifier)))
+                    GraphShape(_mind.GetAllAssociations(MakeDefaultMindSettings(), GraphQueryModifier)))
                 );
         }
 
@@ -89,11 +90,8 @@ namespace Associativy.FrontendEngines.Controllers
             {
                 _orchardServices.WorkContext.Layout.Title = T("Associations for {0}", searchForm.As<SearchFormPart>().Terms).ToString();
 
-                var settings = _orchardServices.WorkContext.Resolve<IMindSettings>();
-                settings.ZoomLevel = _associativyServices.Context.MaxZoomLevel;
-
                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
-                if (TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
+                if (TryGetGraph(searchForm, out graph, MakeDefaultMindSettings(), GraphQueryModifier))
                 {
                     return new ShapeResult(this, _frontendShapes.SearchResultShape(
                             _frontendShapes.SearchBoxShape(searchForm),
@@ -175,6 +173,15 @@ namespace Associativy.FrontendEngines.Controllers
             graph = _mind.MakeAssociations(searched, settings, queryModifier);
 
             return !graph.IsVerticesEmpty;
+        }
+
+        protected virtual IMindSettings MakeDefaultMindSettings()
+        {
+            return new MindSettings()
+            {
+                ZoomLevel = _setup.MaxZoomLevel,
+                MaxZoomLevel = _setup.MaxZoomLevel
+            };
         }
     }
 }

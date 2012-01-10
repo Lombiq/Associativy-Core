@@ -15,7 +15,6 @@ namespace Associativy.Models
         public LocalizedString GraphName { get; protected set; }
         public string TechnicalGraphName { get; protected set; }
         public string[] ContentTypes { get; protected set; }
-        public int MaxZoomLevel { get; protected set; }
 
         public abstract IConnectionManager ConnectionManager
         {

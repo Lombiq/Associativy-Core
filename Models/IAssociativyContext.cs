@@ -23,11 +23,6 @@ namespace Associativy.Models
         string[] ContentTypes { get; }
 
         /// <summary>
-        /// Upper bound of the graph zoom levels (lower bound is always zero).
-        /// </summary>
-        int MaxZoomLevel { get; }
-
-        /// <summary>
         /// The IConnectionManager instance used by the context.
         /// </summary>
         IConnectionManager ConnectionManager { get; }

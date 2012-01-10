@@ -7,8 +7,13 @@ using Orchard;
 
 namespace Associativy.FrontendEngines.Models
 {
-    public interface IFrontendEngineSettings : IDependency
+    public interface IFrontendEngineSetup : IDependency
     {
         Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> GraphQueryModifier { get; }
+
+        /// <summary>
+        /// Upper bound of the graph zoom levels (lower bound is always zero).
+        /// </summary>
+        int MaxZoomLevel { get; }
     }
 }

@@ -5,12 +5,15 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.Services;
+using Associativy.FrontendEngines.Engines.Dracula.Models;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
     public class DraculaController : FrontendEngineBaseController
     {
+        protected readonly IDraculaSetup _setup;
+
         protected override string FrontendEngine
         {
             get { return "Dracula"; }
@@ -21,9 +24,11 @@ namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
-            IGraphFilterer graphFilterer)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer)
+            IGraphFilterer graphFilterer,
+            IDraculaSetup setup)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer, setup)
         {
+            _setup = setup;
         }
     }
 }
