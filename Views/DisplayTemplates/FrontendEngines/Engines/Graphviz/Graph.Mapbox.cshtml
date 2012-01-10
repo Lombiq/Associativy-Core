@@ -9,7 +9,7 @@ $(document).ready(function(){
 	$.getJSON("@Url.Action("Render", routeData["controller"].ToString())?" + $("#associativy-search-form").serialize(), function(response) {
          var urls = response["GraphImageUrls"];
          
-         var topLayer = $("#associativy-graph-top-layer");
+         var topLayer = $("#associativy-graphviz-mapbox-top-layer");
          topLayer.css("background",  "url(" + urls[0] + ") no-repeat");
          $("<img src='" + urls[0] + "'>")
             .load(function() {
@@ -19,8 +19,8 @@ $(document).ready(function(){
          
 
          for (var i = 1; i < urls.length; i++) {
-            var layer = $($("#dummy-layer").clone().appendTo("#associativy-graph-viewport"));
-            layer.attr("id", "associativy-graph-layer-" + i);
+            var layer = $($("#dummy-layer").clone().appendTo("#associativy-graphviz-mapbox-viewport"));
+            layer.attr("id", "associativy-graphviz-mapbox-layer-" + i);
             layer.prepend("<img src='" + urls[i] + "' alt=''>");
             layer.find("img").first()
                 .load(function() {
@@ -30,7 +30,7 @@ $(document).ready(function(){
             layer.show(0);
          }
 
-         $("#associativy-graph-viewport").mapbox({
+         $("#associativy-graphviz-mapbox-viewport").mapbox({
             mousewheel: true,
             layerSplit: 8
          }); 
@@ -38,12 +38,12 @@ $(document).ready(function(){
 });
 </script>
 
-<div id="associativy-graph-viewport"> 
-    <div id="associativy-graph-top-layer"> 
+<div id="associativy-graphviz-mapbox-viewport"> 
+    <div id="associativy-graphviz-mapbox-top-layer"> 
     </div>
 </div>
 
-<div id="dummy-layer" class="associativy-graph-layer" style="display: none;"> 
+<div id="dummy-layer" class="associativy-graphviz-mapbox-layer" style="display: none;"> 
     <div class="mapcontent"> 
     </div>
 </div>

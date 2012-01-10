@@ -10,20 +10,20 @@ $(document).ready(function(){
          var urls = response["GraphImageUrls"];
          
          for (var i = 0; i < urls.length; i++) {
-            $("<img id='associativy-graph-layer-" + i + "' src='" + urls[i] + "' alt='' class='associativy graphviz level'>").appendTo(".associativy.graphviz.graph");
-            var img = $("#associativy-graph-layer-" + i);
+            $("<img id='associativy-graphviz-mapz-graph-layer-" + i + "' src='" + urls[i] + "' alt='' class='associativy-graphviz-mapz-layer'>").appendTo("#associativy-graphviz-mapz-graph");
+            var img = $("#associativy-graphviz-mapz-graph-layer-" + i);
             // Otherwise Mapz is confused
             img.attr("height", img.height());
             img.attr("width", img.width());
          }
 
-         $("#associativy-graph-layer-0").addClass("current-level");
+         $("#associativy-graphviz-mapz-graph-layer-0").addClass("current");
 
-         var graph = $(".associativy.graphviz.graph");
+         var graph = $("#associativy-graphviz-mapz-graph");
          var graphHeight = graph.height();
          var graphWidth = graph.width();
 
-         $(".level").each(function() { 
+         $(".layer").each(function() { 
                 var img = $(this);
                 var imgHeight = img.height();
                 var imgWidth = img.width();
@@ -45,7 +45,7 @@ $(document).ready(function(){
     });
 });
 </script>
-<div class="associativy graphviz graph-container map-viewport">
-	<div class="associativy graphviz graph">
+<div id="associativy-graphviz-mapz-container" class="map-viewport">
+	<div id="associativy-graphviz-mapz-graph">
 	</div>
 </div>
