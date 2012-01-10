@@ -336,7 +336,9 @@ namespace Associativy.Services
 
             /// Removing all nodes that are above the specified zoom level
             IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
-            zoomedGraph.AddVerticesAndEdgeRange(graph.Edges); // Copying the original graph
+            // Copying the original graph
+            zoomedGraph.AddVertexRange(graph.Vertices); // With AddVerticesAndEdgeRange() nodes without edges wouldn't be copied
+            zoomedGraph.AddEdgeRange(graph.Edges);
 
             int i = zoomPartitions.Count - 1;
             while (i >= 0 && i > zoomLevel)
