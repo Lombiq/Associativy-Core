@@ -1,15 +1,10 @@
-﻿-	Generic services, although being an IDependency (= resolve as the same instance in the same request) resolve to different
-	instances when used with different type parameters (given the mechanism of generics, this is logical).
--	Logical and physical location (namespace and directory structure) of a type not always match!
--	Calling BuildDisplay() on 55 nodes with CommonPart and RoutePart costs ~100ms. It might be slow to use this approach to build
-	graphs with possibly hundreds of items.
+﻿-	Logical and physical location (namespace and directory structure) of a type not always match!
 -	For an Associativy module to work, it should...
 	-	Define an INodeToNodeConnectorRecord implementation
-	-	Define a handler derived from AssociativyNodeHandler
 	-	Define an interface derived from IAssociativyContext and implement it
-	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
-	-	*Optionally* have a controller derived from a FrontendEngineController (other controller implementations can be written)
-	-	*Optionally* have a controller derived from FrontendEngineDispatcherController (other controller implementations can be written)
-	The above are not necessary if a module just wants to use Associativy services with an existing context
+	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart and AssociativyNodePart attached
+	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
+	The above are not necessary if a module just wants to use Associativy services with an existing context.
 -	A content type can be listed in multiple contexts, thus a content item can be part of multiple graphs.
--	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention
+-	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention.
+-	Frontend engine configuration can be changes by implementing the engine's setup interface (e.g. IGraphvizSetup).
