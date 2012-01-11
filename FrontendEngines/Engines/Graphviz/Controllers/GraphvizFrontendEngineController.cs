@@ -17,19 +17,20 @@ using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.Engines.Graphviz.Models;
+using Associativy.FrontendEngines.Models;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class GraphvizFrontendEngineController : FrontendEngineBaseController
+    public class GraphvizFrontendEngineController : FrontendEngineControllerBase
     {
         protected readonly IGraphvizSetup _setup;
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
         protected readonly IGraphImageService _graphImageService;
 
-        protected override string FrontendEngine
+        protected override IFrontendEngineContext FrontendEngineContext
         {
-            get { return "Graphviz"; }
+            get { return new GraphvizContext(); }
         }
 
         public GraphvizFrontendEngineController(
@@ -101,7 +102,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 
         public virtual JsonResult Render()
         {
-            var searchForm = _contentManager.New("AssociativySearchForm");
+            var searchForm = _contentManager.New(FrontendEngineContext.SearchFormContentType);
             _contentManager.UpdateEditor(searchForm, this);
 
             var settings = MakeDefaultMindSettings();

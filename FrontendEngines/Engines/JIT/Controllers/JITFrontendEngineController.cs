@@ -12,17 +12,18 @@ using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
 using Associativy.FrontendEngines.Engines.JIT.Models;
 using Associativy.FrontendEngines.Engines.JIT.ViewModels;
+using Associativy.FrontendEngines.Models;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class JITFrontendEngineController : FrontendEngineBaseController
+    public class JITFrontendEngineController : FrontendEngineControllerBase
     {
         protected readonly IJITSetup _setup;
 
-        protected override string FrontendEngine
+        protected override IFrontendEngineContext FrontendEngineContext
         {
-            get { return "JIT"; }
+            get { return new JITContext(); }
         }
 
         public JITFrontendEngineController(
@@ -44,7 +45,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 
         public virtual JsonResult FetchAssociations(int zoomLevel = 0)
         {
-            var searchForm = _contentManager.New("AssociativySearchForm");
+            var searchForm = _contentManager.New(FrontendEngineContext.SearchFormContentType);
             _contentManager.UpdateEditor(searchForm, this);
 
             var settings = MakeDefaultMindSettings();

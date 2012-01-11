@@ -11,7 +11,7 @@ using Orchard.ContentManagement.Aspects;
 namespace Associativy.FrontendEngines.Engines.JIT.Models
 {
     [OrchardFeature("Associativy")]
-    public class DefaultJITSetup : FrontendEngineSetup, IJITSetup
+    public class DefaultJITSetup : FrontendEngineSetupBase, IJITSetup
     {
         public NodeViewModel SetViewModel(IContent node, NodeViewModel viewModel)
         {

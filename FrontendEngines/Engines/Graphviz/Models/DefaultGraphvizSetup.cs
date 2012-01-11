@@ -11,7 +11,7 @@ using Orchard.ContentManagement.Aspects;
 namespace Associativy.FrontendEngines.Engines.Graphviz.Models
 {
     [OrchardFeature("Associativy")]
-    public class DefaultGraphvizSetup : FrontendEngineSetup, IGraphvizSetup
+    public class DefaultGraphvizSetup : FrontendEngineSetupBase, IGraphvizSetup
     {
         public FormatVertexEventHandler<IContent> VertexFormatter
         {

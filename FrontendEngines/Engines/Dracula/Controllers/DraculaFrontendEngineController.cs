@@ -9,17 +9,18 @@ using QuickGraph;
 using Orchard.ContentManagement;
 using Associativy.FrontendEngines.Engines.Dracula.ViewModels;
 using System.Collections.Generic;
+using Associativy.FrontendEngines.Models;
 
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class DraculaFrontendEngineController : FrontendEngineBaseController
+    public class DraculaFrontendEngineController : FrontendEngineControllerBase
     {
         protected readonly IDraculaSetup _setup;
 
-        protected override string FrontendEngine
+        protected override IFrontendEngineContext FrontendEngineContext
         {
-            get { return "Dracula"; }
+            get { return new DraculaContext(); }
         }
 
         public DraculaFrontendEngineController(

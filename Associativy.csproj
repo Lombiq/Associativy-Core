@@ -584,7 +584,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
-    <Compile Include="Controllers\AssociativyBaseController.cs" />
+    <Compile Include="Controllers\AssociativyControllerBase.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\Handlers\SearchFormHandler.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\Models\DraculaContext.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\Handlers\SearchFormHandler.cs" />
+    <Compile Include="FrontendEngines\Engines\Graphviz\Models\GraphvizContext.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\Handlers\SearchFormHandler.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\Models\JITContext.cs" />
+    <Compile Include="FrontendEngines\Handlers\SearchFormHandlerBase.cs" />
+    <Compile Include="FrontendEngines\Models\IFrontendEngineContext.cs" />
     <Compile Include="RoutesBase.cs" />
     <Compile Include="Drivers\AssociativyNodePartDriver.cs" />
     <Compile Include="Drivers\SearchFormPartDriver.cs" />
@@ -594,7 +602,7 @@
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
-    <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs">
+    <Compile Include="FrontendEngines\Controllers\FrontendEngineControllerBase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaFrontendEngineController.cs">
@@ -631,13 +639,12 @@
     </Compile>
     <Compile Include="FrontendEngines\Engines\JIT\ViewModels\GraphViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\ViewModels\NodeViewModel.cs" />
-    <Compile Include="FrontendEngines\Models\FrontendEngineSetup.cs" />
+    <Compile Include="FrontendEngines\Models\FrontendEngineSetupBase.cs" />
     <Compile Include="FrontendEngines\ViewModels\GraphViewModelBase.cs" />
     <Compile Include="FrontendEngines\Models\IFrontendEngineSetup.cs" />
     <Compile Include="FrontendEngines\ViewModels\IGraphViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\NodeViewModelBase.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
-    <Compile Include="Handlers\SearchFormHandler.cs" />
     <Compile Include="Models\AssociativyNodePart.cs" />
     <Compile Include="Services\AssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyContextLocator.cs" />

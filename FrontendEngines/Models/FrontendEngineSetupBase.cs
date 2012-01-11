@@ -9,7 +9,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.FrontendEngines.Models
 {
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineSetup : IFrontendEngineSetup
+    public abstract class FrontendEngineSetupBase : IFrontendEngineSetup
     {
         public virtual Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> GraphQueryModifier
         {

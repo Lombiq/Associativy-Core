@@ -11,7 +11,7 @@ using Orchard.ContentManagement.Aspects;
 namespace Associativy.FrontendEngines.Engines.Dracula.Models
 {
     [OrchardFeature("Associativy")]
-    public class DefaultDraculaSetup : FrontendEngineSetup, IDraculaSetup
+    public class DefaultDraculaSetup : FrontendEngineSetupBase, IDraculaSetup
     {
         public NodeViewModel SetViewModel(IContent node, NodeViewModel viewModel)
         {

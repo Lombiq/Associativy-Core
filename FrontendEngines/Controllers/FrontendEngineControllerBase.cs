@@ -26,7 +26,7 @@ namespace Associativy.FrontendEngines.Controllers
     /// </summary>
     [Themed]
     [OrchardFeature("Associativy")]
-    public abstract class FrontendEngineBaseController : AssociativyBaseController, IUpdateModel
+    public abstract class FrontendEngineControllerBase : AssociativyControllerBase, IUpdateModel
     {
         protected readonly IOrchardServices _orchardServices;
         protected readonly IContentManager _contentManager;
@@ -34,16 +34,13 @@ namespace Associativy.FrontendEngines.Controllers
         protected readonly dynamic _shapeFactory;
         private readonly IFrontendEngineSetup _setup;
 
-        protected virtual string FrontendEngine
-        {
-            get { return ""; }
-        }
+        abstract protected IFrontendEngineContext FrontendEngineContext { get; }
 
         protected string _graphShapeTemplateName;
 
         public Localizer T { get; set; }
 
-        public FrontendEngineBaseController(
+        public FrontendEngineControllerBase(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
@@ -58,7 +55,7 @@ namespace Associativy.FrontendEngines.Controllers
             _setup = setup;
 
             T = NullLocalizer.Instance;
-            _graphShapeTemplateName = "FrontendEngines/Engines/" + FrontendEngine + "/Graph";
+            _graphShapeTemplateName = "FrontendEngines/Engines/" + FrontendEngineContext.Name + "/Graph";
         }
 
         public virtual ActionResult ShowWholeGraph()
@@ -66,14 +63,14 @@ namespace Associativy.FrontendEngines.Controllers
             _orchardServices.WorkContext.Layout.Title = T("The whole graph").ToString();
 
             return new ShapeResult(this, _frontendShapes.SearchResultShape(
-                    _frontendShapes.SearchBoxShape(_contentManager.New("AssociativySearchForm")),
+                    _frontendShapes.SearchBoxShape(_contentManager.New(FrontendEngineContext.SearchFormContentType)),
                     GraphShape(_mind.GetAllAssociations(MakeDefaultMindSettings(), _setup.GraphQueryModifier)))
                 );
         }
 
         public virtual ActionResult ShowAssociations()
         {
-            var searchForm = _contentManager.New("AssociativySearchForm");
+            var searchForm = _contentManager.New(FrontendEngineContext.SearchFormContentType);
             _contentManager.UpdateEditor(searchForm, this);
 
             if (ModelState.IsValid)
