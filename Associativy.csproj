@@ -597,7 +597,7 @@
     <Compile Include="FrontendEngines\Controllers\FrontendEngineBaseController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaController.cs">
+    <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaFrontendEngineController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\Dracula\Models\DefaultDraculaSetup.cs" />
@@ -607,7 +607,7 @@
     </Compile>
     <Compile Include="FrontendEngines\Engines\Dracula\ViewModels\GraphViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\ViewModels\NodeViewModel.cs" />
-    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\GraphvizController.cs">
+    <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\GraphvizFrontendEngineController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\Graphviz\Models\DefaultGraphvizSetup.cs" />
@@ -621,7 +621,7 @@
     <Compile Include="FrontendEngines\Engines\Graphviz\Services\IGraphImageService.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FrontendEngines\Engines\JIT\Controllers\JITController.cs">
+    <Compile Include="FrontendEngines\Engines\JIT\Controllers\JITFrontendEngineController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\JIT\Models\IJITSetup.cs" />

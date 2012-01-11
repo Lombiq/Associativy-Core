@@ -16,7 +16,7 @@ using Associativy.FrontendEngines.Engines.JIT.ViewModels;
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class JITController : FrontendEngineBaseController
+    public class JITFrontendEngineController : FrontendEngineBaseController
     {
         protected readonly IJITSetup _setup;
 
@@ -25,7 +25,7 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             get { return "JIT"; }
         }
 
-        public JITController(
+        public JITFrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,

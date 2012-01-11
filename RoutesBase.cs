@@ -34,7 +34,7 @@ namespace Associativy
                         ModuleName +"/Associations/{action}",
                         new RouteValueDictionary {
                                                     {"area", "Associativy"},
-                                                    {"controller", FrontendEngine},
+                                                    {"controller", FrontendEngine + "FrontendEngine"},
                                                     {"action", "Index"}
                                                 },
                         new RouteValueDictionary(),

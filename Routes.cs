@@ -9,11 +9,12 @@ namespace Associativy
     [OrchardFeature("Associativy")]
     public class Routes : IRouteProvider
     {
-        private readonly RouteCollection _routeCollection;
-
         public Routes(RouteCollection routeCollection)
         {
-            _routeCollection = routeCollection;
+            // This is to prohibit direct access to frontend engines with unpredictable results
+            routeCollection.Ignore(
+                "Associativy/{frontendEngineName}FrontendEngine/{action}"
+            );
         }
 
         public void GetRoutes(ICollection<RouteDescriptor> routes)

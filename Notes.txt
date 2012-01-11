@@ -12,4 +12,4 @@
 	-	*Optionally* have a controller derived from FrontendEngineDispatcherController (other controller implementations can be written)
 	The above are not necessary if a module just wants to use Associativy services with an existing context
 -	A content type can be listed in multiple contexts, thus a content item can be part of multiple graphs.
--	Frontend engine main controllers should be named with the EngineNameController convention
+-	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention

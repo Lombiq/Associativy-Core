@@ -21,7 +21,7 @@ using Associativy.FrontendEngines.Engines.Graphviz.Models;
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class GraphvizController : FrontendEngineBaseController
+    public class GraphvizFrontendEngineController : FrontendEngineBaseController
     {
         protected readonly IGraphvizSetup _setup;
         protected readonly IDetachedDelegateBuilder _detachedDelegateBuilder;
@@ -32,7 +32,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             get { return "Graphviz"; }
         }
 
-        public GraphvizController(
+        public GraphvizFrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
 {
     [OrchardFeature("Associativy")]
-    public class DraculaController : FrontendEngineBaseController
+    public class DraculaFrontendEngineController : FrontendEngineBaseController
     {
         protected readonly IDraculaSetup _setup;
 
@@ -22,7 +22,7 @@ namespace Associativy.FrontendEngines.Engines.Dracula.Controllers
             get { return "Dracula"; }
         }
 
-        public DraculaController(
+        public DraculaFrontendEngineController(
             IAssociativyServices associativyServices,
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
