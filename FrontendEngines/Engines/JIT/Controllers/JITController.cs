@@ -10,8 +10,8 @@ using Orchard.DisplayManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
-using Associativy.FrontendEngines.Services;
 using Associativy.FrontendEngines.Engines.JIT.Models;
+using Associativy.FrontendEngines.Engines.JIT.ViewModels;
 
 namespace Associativy.FrontendEngines.Engines.JIT.Controllers
 {
@@ -30,11 +30,16 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
-            IGraphFilterer graphFilterer,
             IJITSetup setup)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer, setup)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, setup)
         {
             _setup = setup;
+        }
+
+        protected override dynamic GraphShape(IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph)
+        {
+            // TODO: determine actual max zoom level as in GraphvizController
+            return GraphShape(new GraphViewModel() { Graph = graph, MaxZoomLevel = _setup.MaxZoomLevel });
         }
 
         public virtual JsonResult FetchAssociations(int zoomLevel = 0)
@@ -43,33 +48,28 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             _contentManager.UpdateEditor(searchForm, this);
 
             var settings = MakeDefaultMindSettings();
+            settings.ZoomLevel = zoomLevel;
 
             IUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph;
             if (ModelState.IsValid)
             {
-                if (!TryGetGraph(searchForm, out graph, settings, GraphQueryModifier))
+                if (!TryGetGraph(searchForm, out graph, settings, _setup.GraphQueryModifier))
                 {
                     return Json(null, JsonRequestBehavior.AllowGet);
                 }
             }
             else
             {
-                graph = _mind.GetAllAssociations(settings, GraphQueryModifier);
+                graph = _mind.GetAllAssociations(settings, _setup.GraphQueryModifier);
             }
 
-            var jsonData = new object[graph.VertexCount];
 
-
-            var viewNodes = new Dictionary<int, ViewNode>(graph.VertexCount);
+            var viewNodes = new Dictionary<int, NodeViewModel>(graph.VertexCount);
 
             foreach (var vertex in graph.Vertices)
             {
-                viewNodes[vertex.Id] = new ViewNode
-                {
-                    id = vertex.Id.ToString(),
-                    name = vertex.As<ITitleAspect>().Title,
-                    adjacencies = new List<string>()
-                };
+                // Setting the ContentItem causes "A circular reference was detected while serializing an object of type 'Orchard.ContentManagement.Records.ContentItemRecord'."
+                viewNodes[vertex.Id] = _setup.SetViewModel(vertex, new NodeViewModel());
             }
 
             foreach (var edge in graph.Edges)
@@ -79,14 +79,6 @@ namespace Associativy.FrontendEngines.Engines.JIT.Controllers
             }
 
             return Json(viewNodes.Values, JsonRequestBehavior.AllowGet);
-        }
-
-        protected class ViewNode
-        {
-            public string id { get; set; }
-            public string name { get; set; }
-            public List<string> adjacencies { get; set; }
-            public IDictionary<string, string> data { get; set; }
         }
     }
 }

@@ -16,7 +16,6 @@ using Orchard.Environment.Extensions;
 using Piedone.HelpfulLibraries.Tasks;
 using QuickGraph;
 using Associativy.FrontendEngines.Shapes;
-using Associativy.FrontendEngines.Services;
 using Associativy.FrontendEngines.Engines.Graphviz.Models;
 
 namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
@@ -38,11 +37,10 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             IOrchardServices orchardServices,
             IFrontendShapes frontendShapes,
             IShapeFactory shapeFactory,
-            IGraphFilterer graphFilterer,
             IGraphvizSetup setup,
             IDetachedDelegateBuilder detachedDelegateBuilder,
             IGraphImageService graphImageService)
-            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, graphFilterer, setup)
+            : base(associativyServices, orchardServices, frontendShapes, shapeFactory, setup)
         {
             _setup = setup;
             _detachedDelegateBuilder = detachedDelegateBuilder;
@@ -62,7 +60,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             var graphs = new IUndirectedGraph<IContent, IUndirectedEdge<IContent>>[count];
             for (int i = 0; i < count; i++)
             {
-                graphs[i] = _mind.GetAllAssociations(settings, GraphQueryModifier);
+                graphs[i] = _mind.GetAllAssociations(settings, _setup.GraphQueryModifier);
             }
 
             sw.Stop();
@@ -74,7 +72,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
             {
                 tasks[i] = Task<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>.Factory.StartNew(
                     _detachedDelegateBuilder.BuildBackgroundFunction<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>(
-                        () => _mind.GetAllAssociations(settings, GraphQueryModifier)
+                        () => _mind.GetAllAssociations(settings, _setup.GraphQueryModifier)
                     )
                     );
             }
@@ -117,7 +115,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
                             (currentSettings) =>
                             {
                                 IUndirectedGraph<IContent, IUndirectedEdge<IContent>> currentGraph;
-                                TryGetGraph(searchForm, out currentGraph, settings, GraphQueryModifier);
+                                TryGetGraph(searchForm, out currentGraph, settings, _setup.GraphQueryModifier);
                                 return currentGraph;
                             });
             }
@@ -127,7 +125,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
                             settings,
                             (currentSettings) =>
                             {
-                                return _mind.GetAllAssociations(settings, GraphQueryModifier);
+                                return _mind.GetAllAssociations(settings, _setup.GraphQueryModifier);
                             });
             }
 
@@ -145,13 +143,7 @@ namespace Associativy.FrontendEngines.Engines.Graphviz.Controllers
                     settings.ZoomLevel = zoomLevel;
                     return _graphImageService.ToSvg(fetchGraph(settings), algorithm =>
                             {
-                                algorithm.FormatVertex +=
-                                    (sender, e) =>
-                                    {
-                                        e.VertexFormatter.Label = e.Vertex.As<ITitleAspect>().Title;
-                                        e.VertexFormatter.Shape = QuickGraph.Graphviz.Dot.GraphvizVertexShape.Diamond;
-                                        e.VertexFormatter.Url = e.Vertex.As<IRoutableAspect>().Path;
-                                    };
+                                algorithm.FormatVertex += _setup.VertexFormatter;
                             });
                 };
 

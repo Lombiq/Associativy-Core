@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Associativy.FrontendEngines.Engines.JIT.ViewModels.GraphViewModel
+@{
     Script.Require("JIT").AtHead();
     Style.Require("JIT");
 
@@ -17,14 +18,14 @@ $(document).ready(function() {
         });
     };
 
-    loadGraph(10);
+    loadGraph(@Model.MaxZoomLevel);
 
     $( "#associativy-jit-zoom-slider" ).slider({
 		orientation: "vertical",
 		range: "min",
 		min: 0,
-		max: 10,
-		value: 10,
+		max: @Model.MaxZoomLevel,
+		value: @Model.MaxZoomLevel,
 		slide: function(event, ui) {
             loadGraph(ui.value, true);
 		}

@@ -1,7 +1,7 @@
 ﻿@using Orchard.ContentManagement
-@model QuickGraph.IUndirectedGraph<IContent, QuickGraph.IUndirectedEdge<IContent>>
+@model Associativy.FrontendEngines.Engines.Dracula.ViewModels.GraphViewModel
 
-@foreach (var edge in Model.Edges)
+@foreach (var edge in Model.Graph.Edges)
 {
     @Html.Raw("graph.addEdge(\"" + edge.Source.Id + "\", \"" + edge.Target.Id + "\");")
 }

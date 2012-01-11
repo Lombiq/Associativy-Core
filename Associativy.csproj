@@ -599,13 +599,17 @@
     <Compile Include="FrontendEngines\Engines\Dracula\Controllers\DraculaController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FrontendEngines\Engines\Dracula\Models\DefaultDraculaSetup.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\Models\IDraculaSetup.cs" />
     <Compile Include="FrontendEngines\Engines\Dracula\ResourceManifest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FrontendEngines\Engines\Dracula\ViewModels\GraphViewModel.cs" />
+    <Compile Include="FrontendEngines\Engines\Dracula\ViewModels\NodeViewModel.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Controllers\GraphvizController.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FrontendEngines\Engines\Graphviz\Models\DefaultGraphvizSetup.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\Models\IGraphvizSetup.cs" />
     <Compile Include="FrontendEngines\Engines\Graphviz\ResourceManifest.cs">
       <SubType>Code</SubType>
@@ -620,17 +624,17 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="FrontendEngines\Engines\JIT\Models\IJITSetup.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\Models\DefaultJITSetup.cs" />
     <Compile Include="FrontendEngines\Engines\JIT\ResourceManifest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FrontendEngines\Engines\JIT\ViewModels\GraphViewModel.cs" />
+    <Compile Include="FrontendEngines\Engines\JIT\ViewModels\NodeViewModel.cs" />
+    <Compile Include="FrontendEngines\Models\FrontendEngineSetup.cs" />
+    <Compile Include="FrontendEngines\ViewModels\GraphViewModelBase.cs" />
     <Compile Include="FrontendEngines\Models\IFrontendEngineSetup.cs" />
-    <Compile Include="FrontendEngines\NodeFilters\INodeFilter.cs" />
-    <Compile Include="FrontendEngines\NodeFilters\NodeFilter.cs" />
-    <Compile Include="FrontendEngines\NodeFilters\TitleFilter.cs" />
-    <Compile Include="FrontendEngines\Services\GraphFilterer.cs" />
-    <Compile Include="FrontendEngines\Services\IGraphFilterer.cs" />
-    <Compile Include="FrontendEngines\ViewModels\INodeViewModel.cs" />
-    <Compile Include="FrontendEngines\ViewModels\NodeViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\IGraphViewModel.cs" />
+    <Compile Include="FrontendEngines\ViewModels\NodeViewModelBase.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\SearchFormHandler.cs" />
     <Compile Include="Models\AssociativyNodePart.cs" />
