@@ -723,6 +723,7 @@
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Graphviz\Graph.Mapbox.cshtml" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\AddNodes.cshtml" />
     <Content Include="Views\DisplayTemplates\FrontendEngines\Engines\Dracula\AddEdges.cshtml" />
+    <Content Include="Views\AssociativyBadgeOfHonor.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
