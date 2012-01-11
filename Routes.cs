@@ -9,31 +9,20 @@ namespace Associativy
     [OrchardFeature("Associativy")]
     public class Routes : IRouteProvider
     {
+        private readonly RouteCollection _routeCollection;
+
+        public Routes(RouteCollection routeCollection)
+        {
+            _routeCollection = routeCollection;
+        }
+
         public void GetRoutes(ICollection<RouteDescriptor> routes)
         {
-            foreach (var routeDescriptor in GetRoutes())
-                routes.Add(routeDescriptor);
         }
 
         public IEnumerable<RouteDescriptor> GetRoutes()
         {
-            return new[] {
-                new RouteDescriptor {
-                    Name = "Test",
-                    Route = new Route(
-                        "AssociativyTest",
-                        new RouteValueDictionary {
-                                                    {"area", "Associativy"},
-                                                    {"controller", "Test"},
-                                                    {"action", "Index"}
-                                                },
-                        new RouteValueDictionary(),
-                        new RouteValueDictionary {
-                                                    {"area", "Associativy"}
-                                                },
-                        new MvcRouteHandler())
-                }
-            };
+            return new List<RouteDescriptor>();
         }
     }
 }

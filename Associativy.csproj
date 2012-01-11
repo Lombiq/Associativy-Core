@@ -585,6 +585,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociativyBaseController.cs" />
+    <Compile Include="RoutesBase.cs" />
     <Compile Include="Drivers\AssociativyNodePartDriver.cs" />
     <Compile Include="Drivers\SearchFormPartDriver.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventDispatcher.cs" />
