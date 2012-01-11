@@ -650,7 +650,7 @@
     <Compile Include="Services\IAssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyService.cs" />
     <Compile Include="FrontendEngines\Shapes\IFrontendShapes.cs" />
-    <Compile Include="Models\AssociativyContext.cs" />
+    <Compile Include="Models\AssociativyContextBase.cs" />
     <Compile Include="Models\IAssociativyContext.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
     <Compile Include="Models\Nodes\INodeToNodeConnectorRecord.cs" />
