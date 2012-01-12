@@ -593,6 +593,7 @@
     <Compile Include="FrontendEngines\Engines\JIT\Models\JITContext.cs" />
     <Compile Include="FrontendEngines\Handlers\SearchFormHandlerBase.cs" />
     <Compile Include="FrontendEngines\Models\IFrontendEngineContext.cs" />
+    <Compile Include="Models\AssociativyNodePart.cs" />
     <Compile Include="RoutesBase.cs" />
     <Compile Include="Drivers\AssociativyNodePartDriver.cs" />
     <Compile Include="Drivers\SearchFormPartDriver.cs" />
@@ -645,7 +646,6 @@
     <Compile Include="FrontendEngines\ViewModels\IGraphViewModel.cs" />
     <Compile Include="FrontendEngines\ViewModels\NodeViewModelBase.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
-    <Compile Include="Models\AssociativyNodePart.cs" />
     <Compile Include="Services\AssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyService.cs" />

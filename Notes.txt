@@ -2,7 +2,7 @@
 -	For an Associativy module to work, it should...
 	-	Define an INodeToNodeConnectorRecord implementation
 	-	Define an interface derived from IAssociativyContext and implement it
-	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart and AssociativyNodePart attached
+	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
 	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
 	The above are not necessary if a module just wants to use Associativy services with an existing context.
 -	A content type can be listed in multiple contexts, thus a content item can be part of multiple graphs.

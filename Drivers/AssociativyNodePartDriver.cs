@@ -7,7 +7,6 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Drivers
 {
     [OrchardFeature("Associativy")]
-    // This driver is necessary so nodes can be "casted" to AssociativyNodePart
     public class AssociativyNodePartDriver : ContentPartDriver<AssociativyNodePart>
     {
         protected override string Prefix

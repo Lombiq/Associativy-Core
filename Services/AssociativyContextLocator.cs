@@ -39,5 +39,23 @@ namespace Associativy.Services
 
             return contexts;
         }
+
+        public IDictionary<string, IList<IAssociativyContext>> GetContextsByRegisteredContentTypes()
+        {
+            if (_registeredContexts.Count() == 0) throw new ApplicationException("There are no Associativy contexts regsitered.");
+
+            var associativyContexts = new Dictionary<string, IList<IAssociativyContext>>();
+
+            foreach (var context in _registeredContexts)
+            {
+                foreach (var contentType in context.ContentTypes)
+                {
+                    if (!associativyContexts.ContainsKey(contentType)) associativyContexts[contentType] = new List<IAssociativyContext>();
+                    associativyContexts[contentType].Add(context);
+                }
+            }
+
+            return associativyContexts;
+        }
     }
 }

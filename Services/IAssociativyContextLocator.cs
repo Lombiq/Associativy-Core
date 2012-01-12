@@ -1,5 +1,6 @@
 ﻿using Associativy.Models;
 using Orchard;
+using System.Collections.Generic;
 
 namespace Associativy.Services
 {
@@ -18,5 +19,7 @@ namespace Associativy.Services
         IAssociativyContext GetContext(string technicalGraphName);
 
         IAssociativyContext[] GetContextsForContentType(string contentType);
+
+        IDictionary<string, IList<IAssociativyContext>> GetContextsByRegisteredContentTypes();
     }
 }
