@@ -5,7 +5,7 @@ using Orchard.Localization;
 namespace Associativy.Models
 {
     // Maybe also set the search form's content type from here?
-    public interface IAssociativyContext : IDependency
+    public interface IAssociativyGraphDescriptor : IDependency
     {
         /// <summary>
         /// Human-readable name of the graph.
@@ -13,7 +13,7 @@ namespace Associativy.Models
         LocalizedString GraphName { get; }
 
         /// <summary>
-        /// Name of the graph used to identify it. Must be unique across the registered contexts.
+        /// Name of the graph used to identify it. Must be unique across the registered graphDescriptors.
         /// </summary>
         string TechnicalGraphName { get; }
 
@@ -23,7 +23,7 @@ namespace Associativy.Models
         string[] ContentTypes { get; }
 
         /// <summary>
-        /// The IConnectionManager instance used by the context.
+        /// The IConnectionManager instance used by the graphDescriptor.
         /// </summary>
         IConnectionManager ConnectionManager { get; }
     }

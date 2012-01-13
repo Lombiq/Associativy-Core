@@ -35,10 +35,10 @@ namespace Associativy.Services
     /// Service for generating associations
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IMind<TNodeToNodeConnectorRecord, TAssociativyContext> : IMind
+    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface IMind<TNodeToNodeConnectorRecord, TAssociativyGraphDescriptor> : IMind
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
     }
 }

@@ -5,36 +5,36 @@ namespace Associativy.EventHandlers
 {
     public abstract class AssociativeGraphEventHandlerBase : IAssociativeGraphEventHandler
     {
-        public virtual void NodeAdded(IContent node, IAssociativyContext context)
+        public virtual void NodeAdded(IContent node, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public virtual void NodeRemoved(IContent node, IAssociativyContext context)
+        public virtual void NodeRemoved(IContent node, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public virtual void NodeChanged(IContent node, IAssociativyContext context)
+        public virtual void NodeChanged(IContent node, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionAdded(int nodeId1, int nodeId2, IAssociativyContext context)
+        public virtual void ConnectionAdded(int nodeId1, int nodeId2, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionsDeletedFromNode(int nodeId, IAssociativyContext context)
+        public virtual void ConnectionsDeletedFromNode(int nodeId, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionDeleted(int connectionId, IAssociativyContext context)
+        public virtual void ConnectionDeleted(int connectionId, IAssociativyGraphDescriptor graphDescriptor)
         {
-            Changed(context);
+            Changed(graphDescriptor);
         }
 
-        public abstract void Changed(IAssociativyContext context);
+        public abstract void Changed(IAssociativyGraphDescriptor graphDescriptor);
     }
 }

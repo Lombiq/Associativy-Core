@@ -10,23 +10,23 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class AssociativyServices: AssociativyServiceBase, IAssociativyServices
     {
-        private object _contextLocker = new object();
-        public override IAssociativyContext Context
+        private object _graphDescriptorLocker = new object();
+        public override IAssociativyGraphDescriptor GraphDescriptor
         {
             set
             {
-                lock (_contextLocker) // This is to ensure that used services also have the same context
+                lock (_graphDescriptorLocker) // This is to ensure that used services also have the same graphDescriptor
                 {
-                    _nodeManager.Context = value;
-                    _mind.Context = value;
-                    base.Context = value;
+                    _nodeManager.GraphDescriptor = value;
+                    _mind.GraphDescriptor = value;
+                    base.GraphDescriptor = value;
                 }
             }
         }
 
         public IConnectionManager ConnectionManager
         {
-            get { return Context.ConnectionManager; }
+            get { return GraphDescriptor.ConnectionManager; }
         }
 
         protected readonly IMind _mind;
@@ -42,10 +42,10 @@ namespace Associativy.Services
         }
 
         public AssociativyServices(
-            IAssociativyContext associativyContext,
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IMind mind,
             INodeManager nodeManager)
-            : base(associativyContext)
+            : base(associativyGraphDescriptor)
         {
             _nodeManager = nodeManager;
             _mind = mind;

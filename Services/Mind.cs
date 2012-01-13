@@ -25,29 +25,29 @@ namespace Associativy.Services
         protected string _cachePrefix;
         #endregion
 
-        private object _contextLocker = new object();
-        public override IAssociativyContext Context
+        private object _graphDescriptorLocker = new object();
+        public override IAssociativyGraphDescriptor GraphDescriptor
         {
             set
             {
-                lock (_contextLocker) // This is to ensure that used services also have the same context
+                lock (_graphDescriptorLocker) // This is to ensure that used services also have the same graphDescriptor
                 {
-                    _nodeManager.Context = value;
-                    _pathFinder.Context = value;
+                    _nodeManager.GraphDescriptor = value;
+                    _pathFinder.GraphDescriptor = value;
                     _cachePrefix = value.TechnicalGraphName + ".";
-                    base.Context = value; 
+                    base.GraphDescriptor = value; 
                 }
             }
         }
 
         public Mind(
-            IAssociativyContext associativyContext,
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
             INodeManager nodeManager,
             IPathFinder pathFinder,
             IWorkContextAccessor workContextAccessor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyContext)
+            : base(associativyGraphDescriptor)
         {
             _nodeManager = nodeManager;
             _pathFinder = pathFinder;
@@ -75,7 +75,7 @@ namespace Associativy.Services
                         wholeGraph.AddVertex(node.Value);
                     }
 
-                    var connections = Context.ConnectionManager.GetAll();
+                    var connections = GraphDescriptor.ConnectionManager.GetAll();
                     foreach (var connection in connections)
                     {
                         wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
@@ -89,13 +89,13 @@ namespace Associativy.Services
             {
                 var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
                  {
-                     _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
+                     _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
                      return makeWholeGraph();
                  });
 
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
                     return ZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
                 });
             }
@@ -143,13 +143,13 @@ namespace Associativy.Services
 
                 var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
                     {
-                        _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
+                        _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
                         return makeGraph();
                     });
 
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
                     return ZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
                 });
             }
@@ -163,7 +163,7 @@ namespace Associativy.Services
             var graph = GraphFactory();
 
             graph.AddVertex(node);
-            var neighbours = queryModifier(_nodeManager.GetManyQuery(Context.ConnectionManager.GetNeighbourIds(node.Id))).List();
+            var neighbours = queryModifier(_nodeManager.GetManyQuery(GraphDescriptor.ConnectionManager.GetNeighbourIds(node.Id))).List();
             foreach (var neighbour in neighbours)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
@@ -180,10 +180,10 @@ namespace Associativy.Services
 
             var graph = GraphFactory();
 
-            var commonNeighbourIds = Context.ConnectionManager.GetNeighbourIds(nodes.First().Id);
+            var commonNeighbourIds = GraphDescriptor.ConnectionManager.GetNeighbourIds(nodes.First().Id);
             var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
-            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(Context.ConnectionManager.GetNeighbourIds(node.Id)).ToList());
+            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(GraphDescriptor.ConnectionManager.GetNeighbourIds(node.Id)).ToList());
             // Same as
             //foreach (var node in remainingNodes)
             //{

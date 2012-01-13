@@ -1,10 +1,10 @@
 ﻿-	Logical and physical location (namespace and directory structure) of a type not always match!
 -	For an Associativy module to work, it should...
 	-	Define an INodeToNodeConnectorRecord implementation
-	-	Define an interface derived from IAssociativyContext and implement it
+	-	Define an interface derived from IAssociativyGraphDescriptor and implement it
 	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
 	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
-	The above are not necessary if a module just wants to use Associativy services with an existing context.
--	A content type can be listed in multiple contexts, thus a content item can be part of multiple graphs.
+	The above are not necessary if a module just wants to use Associativy services with an existing graphDescriptor.
+-	A content type can be listed in multiple graphDescriptors, thus a content item can be part of multiple graphs.
 -	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention.
 -	Frontend engine configuration can be changes by implementing the engine's setup interface (e.g. IGraphvizSetup).

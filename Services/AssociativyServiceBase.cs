@@ -5,17 +5,17 @@ namespace Associativy.Services
     public abstract class AssociativyServiceBase : IAssociativyService
     {
         // Although reference read/write is atomic, this approach might cause headaches when concurrent threads wanted to use
-        // the same service with different contexts. Revise if necessary.
-        private IAssociativyContext _associativyContext;
-        public virtual IAssociativyContext Context
+        // the same service with different graphDescriptors. Revise if necessary.
+        private IAssociativyGraphDescriptor _associativyGraphDescriptor;
+        public virtual IAssociativyGraphDescriptor GraphDescriptor
         {
-            get { return _associativyContext; }
-            set { _associativyContext = value; }
+            get { return _associativyGraphDescriptor; }
+            set { _associativyGraphDescriptor = value; }
         }
-        
-        public AssociativyServiceBase(IAssociativyContext associativyContext)
+
+        public AssociativyServiceBase(IAssociativyGraphDescriptor associativyGraphDescriptor)
         {
-            _associativyContext = associativyContext;
+            _associativyGraphDescriptor = associativyGraphDescriptor;
         }
     }
 }

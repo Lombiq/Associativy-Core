@@ -24,10 +24,10 @@ namespace Associativy.Services
     /// Deals with node-to-node path calculations
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyContext> : IPathFinder
+    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface IPathFinder<TNodeToNodeConnectorRecord, TAssociativyGraphDescriptor> : IPathFinder
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
-        where TAssociativyContext : IAssociativyContext
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
     }
 }

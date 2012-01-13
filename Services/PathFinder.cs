@@ -13,10 +13,10 @@ namespace Associativy.Services
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
-            IAssociativyContext associativyContext,
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyContext)
+            : base(associativyGraphDescriptor)
         {
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
@@ -61,7 +61,7 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, Context);
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
                     settings.UseCache = false;
                     return FindPaths(startNodeId, targetNodeId, settings);
                 });
@@ -90,7 +90,7 @@ namespace Associativy.Services
                 if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (Context.ConnectionManager.AreNeighbours(currentNode.Id, targetNodeId))
+                    if (GraphDescriptor.ConnectionManager.AreNeighbours(currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -109,7 +109,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = Context.ConnectionManager.GetNeighbourIds(currentNode.Id);
+                        var neighbourIds = GraphDescriptor.ConnectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {

@@ -18,9 +18,9 @@ namespace Associativy.Services
 
         public NodeManager(
             IContentManager contentManager,
-            IAssociativyContext associativyContext,
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IAssociativeGraphEventHandler graphEventHandler)
-            : base(associativyContext)
+            : base(associativyGraphDescriptor)
         {
             _contentManager = contentManager;
             _graphEventHandler = graphEventHandler;
@@ -35,7 +35,7 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> ContentQuery
         {
-            get { return _contentManager.Query(Context.ContentTypes); }
+            get { return _contentManager.Query(GraphDescriptor.ContentTypes); }
         }
 
         public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)

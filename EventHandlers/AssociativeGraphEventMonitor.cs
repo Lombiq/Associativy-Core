@@ -29,17 +29,17 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChanged(IAcquireContext aquireContext, IAssociativyContext associativyContext)
+        public void MonitorChanged(IAcquireContext aquireContext, IAssociativyGraphDescriptor associativyGraphDescriptor)
         {
-            var signal = associativyContext.TechnicalGraphName + "ChangedSignal";
-            _changedSignals[associativyContext.TechnicalGraphName] = signal;
+            var signal = associativyGraphDescriptor.TechnicalGraphName + "ChangedSignal";
+            _changedSignals[associativyGraphDescriptor.TechnicalGraphName] = signal;
             aquireContext.Monitor(_signals.When(signal));
         }
 
-        public override void Changed(IAssociativyContext associativyContext)
+        public override void Changed(IAssociativyGraphDescriptor associativyGraphDescriptor)
         {
             string signal;
-            if (_changedSignals.TryGetValue(associativyContext.TechnicalGraphName, out signal))
+            if (_changedSignals.TryGetValue(associativyGraphDescriptor.TechnicalGraphName, out signal))
             {
                 _signals.Trigger(signal);
             }

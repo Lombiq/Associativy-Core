@@ -19,10 +19,10 @@ namespace Associativy.Services
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            IAssociativyContext associativyContext,
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IContentManager contentManager,
             IAssociativeGraphEventHandler graphEventHandler)
-            : base(associativyContext)
+            : base(associativyGraphDescriptor)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _contentManager = contentManager;
@@ -50,7 +50,7 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
             }
 
-            _graphEventHandler.ConnectionAdded(nodeId1, nodeId2, Context);
+            _graphEventHandler.ConnectionAdded(nodeId1, nodeId2, GraphDescriptor);
         }
 
         public virtual void DeleteFromNode(IContent node)
@@ -69,14 +69,14 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            _graphEventHandler.ConnectionsDeletedFromNode(nodeId, Context);
+            _graphEventHandler.ConnectionsDeletedFromNode(nodeId, GraphDescriptor);
         }
 
         public virtual void Delete(int id)
         {
             _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
 
-            _graphEventHandler.ConnectionDeleted(id, Context);
+            _graphEventHandler.ConnectionDeleted(id, GraphDescriptor);
         }
 
         public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()

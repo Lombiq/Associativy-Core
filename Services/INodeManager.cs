@@ -41,9 +41,9 @@ namespace Associativy.Services
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    /// <typeparam name="TAssociativyContext">Type of the IAssociativyContext to use</typeparam>
-    public interface INodeManager<TAssociativyContext> : INodeManager
-        where TAssociativyContext : IAssociativyContext
+    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface INodeManager<TAssociativyGraphDescriptor> : INodeManager
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
     }
 }

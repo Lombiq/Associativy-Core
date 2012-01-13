@@ -12,41 +12,41 @@ namespace Associativy.Handlers
     [OrchardFeature("Associativy")]
     public class AssociativyNodeHandler : ContentHandler
     {
-        private readonly IDictionary<string, IList<IAssociativyContext>> _associativyContexts;
+        private readonly IDictionary<string, IList<IAssociativyGraphDescriptor>> _associativyGraphDescriptors;
         private readonly IAssociativeGraphEventHandler _graphEventHandler;
 
-        public AssociativyNodeHandler(IAssociativyContextLocator contextLocator, IAssociativeGraphEventHandler graphEventHandler)
+        public AssociativyNodeHandler(IAssociativyGraphDescriptorLocator graphDescriptorLocator, IAssociativeGraphEventHandler graphEventHandler)
         {
-            _associativyContexts = contextLocator.GetContextsByRegisteredContentTypes();
+            _associativyGraphDescriptors = graphDescriptorLocator.GetGraphDescriptorsByRegisteredContentTypes();
             _graphEventHandler = graphEventHandler;
         }
 
         protected override void Created(CreateContentContext context)
         {
-            if (!_associativyContexts.ContainsKey(context.ContentType)) return;
+            if (!_associativyGraphDescriptors.ContainsKey(context.ContentType)) return;
 
-            InvokeEventHandlerWithContexts(_associativyContexts[context.ContentType], (associativyContext) => _graphEventHandler.NodeAdded(context.ContentItem, associativyContext));
+            InvokeEventHandlerWithGraphDescriptors(_associativyGraphDescriptors[context.ContentType], (associativyGraphDescriptor) => _graphEventHandler.NodeAdded(context.ContentItem, associativyGraphDescriptor));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            if (!_associativyContexts.ContainsKey(context.ContentItem.ContentType)) return;
+            if (!_associativyGraphDescriptors.ContainsKey(context.ContentItem.ContentType)) return;
 
-            InvokeEventHandlerWithContexts(_associativyContexts[context.ContentItem.ContentType], (associativyContext) => _graphEventHandler.NodeChanged(context.ContentItem, associativyContext));
+            InvokeEventHandlerWithGraphDescriptors(_associativyGraphDescriptors[context.ContentItem.ContentType], (associativyGraphDescriptor) => _graphEventHandler.NodeChanged(context.ContentItem, associativyGraphDescriptor));
         }
 
         protected override void Removed(RemoveContentContext context)
         {
-            if (!_associativyContexts.ContainsKey(context.ContentItem.ContentType)) return;
+            if (!_associativyGraphDescriptors.ContainsKey(context.ContentItem.ContentType)) return;
 
-            InvokeEventHandlerWithContexts(_associativyContexts[context.ContentItem.ContentType], (associativyContext) => _graphEventHandler.NodeRemoved(context.ContentItem, associativyContext));
+            InvokeEventHandlerWithGraphDescriptors(_associativyGraphDescriptors[context.ContentItem.ContentType], (associativyGraphDescriptor) => _graphEventHandler.NodeRemoved(context.ContentItem, associativyGraphDescriptor));
         }
 
-        private void InvokeEventHandlerWithContexts(IList<IAssociativyContext> associativyContexts, Action<IAssociativyContext> eventHandler)
+        private void InvokeEventHandlerWithGraphDescriptors(IList<IAssociativyGraphDescriptor> associativyGraphDescriptors, Action<IAssociativyGraphDescriptor> eventHandler)
         {
-            foreach (var context in associativyContexts)
+            foreach (var graphDescriptor in associativyGraphDescriptors)
             {
-                eventHandler(context);
+                eventHandler(graphDescriptor);
             }
         }
     }

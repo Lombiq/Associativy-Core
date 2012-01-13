@@ -6,11 +6,11 @@ using Piedone.HelpfulLibraries.DependencyInjection;
 namespace Associativy.Models
 {
     /// <summary>
-    /// Describes the context in which Associativy services are run, i.e. it stores information about the purpose and database
+    /// Describes the graphDescriptor in which Associativy services are run, i.e. it stores information about the purpose and database
     /// of associations
     /// </summary>
     [OrchardFeature("Associativy")]
-    public abstract class AssociativyContextBase : IAssociativyContext
+    public abstract class AssociativyGraphDescriptorBase : IAssociativyGraphDescriptor
     {
         public LocalizedString GraphName { get; protected set; }
         public string TechnicalGraphName { get; protected set; }
@@ -23,14 +23,14 @@ namespace Associativy.Models
 
         public Localizer T { get; set; }
 
-        public AssociativyContextBase()
+        public AssociativyGraphDescriptorBase()
         {
             T = NullLocalizer.Instance;
         }
     }
 
     [OrchardFeature("Associativy")]
-    public abstract class AssociativyContextBase<TNodeToNodeConnectorRecord> : AssociativyContextBase
+    public abstract class AssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord> : AssociativyGraphDescriptorBase
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         protected readonly IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
@@ -40,12 +40,12 @@ namespace Associativy.Models
             get
             {
                 var connectionManager = _connectionManagerResolver.Value;
-                connectionManager.Context = this;
+                connectionManager.GraphDescriptor = this;
                 return connectionManager;
             }
         }
 
-        public AssociativyContextBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public AssociativyGraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
             : base()
         {
             _connectionManagerResolver = connectionManagerResolver;
