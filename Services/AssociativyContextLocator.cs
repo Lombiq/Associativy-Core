@@ -22,8 +22,6 @@ namespace Associativy.Services
                            where c.TechnicalGraphName == technicalGraphName
                            select c).FirstOrDefault();
 
-            if (context == null) throw new ApplicationException("Associativy context \"" + technicalGraphName + "\" not found");
-
             return context;
         }
 
@@ -35,15 +33,11 @@ namespace Associativy.Services
                             where c.ContentTypes.Contains(contentType)
                             select c).ToArray();
 
-            if (contexts.Length == 0) throw new ApplicationException("There are no Associativy contexts for the  \"" + contentType + "\" content type.");
-
             return contexts;
         }
 
         public IDictionary<string, IList<IAssociativyContext>> GetContextsByRegisteredContentTypes()
         {
-            if (_registeredContexts.Count() == 0) throw new ApplicationException("There are no Associativy contexts regsitered.");
-
             var associativyContexts = new Dictionary<string, IList<IAssociativyContext>>();
 
             foreach (var context in _registeredContexts)
