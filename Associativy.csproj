@@ -96,6 +96,7 @@
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
+    <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Services\AssociativyContextLocator.cs" />
     <Compile Include="Services\IAssociativyContextLocator.cs" />
