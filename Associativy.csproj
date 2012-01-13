@@ -98,6 +98,7 @@
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
+    <Compile Include="Models\ReadonlyAssociativyGraphDescriptorBase.cs" />
     <Compile Include="Services\AssociativyGraphDescriptorLocator.cs" />
     <Compile Include="Services\IAssociativyGraphDescriptorLocator.cs" />
     <Compile Include="Services\IAssociativyService.cs" />

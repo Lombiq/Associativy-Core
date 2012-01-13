@@ -4,7 +4,10 @@ using Orchard.Localization;
 
 namespace Associativy.Models
 {
-    // Maybe also set the search form's content type from here?
+    /// <summary>
+    /// Describes the graph in which Associativy services are run, i.e. it stores information about the purpose and database
+    /// of associations
+    /// </summary>
     public interface IAssociativyGraphDescriptor : IDependency
     {
         /// <summary>
