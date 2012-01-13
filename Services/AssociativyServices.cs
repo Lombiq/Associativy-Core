@@ -1,10 +1,6 @@
 ﻿using Associativy.Models;
 using Orchard.Environment.Extensions;
 
-// If circular dependencies should happen, use property injection:
-// http://www.szmyd.com.pl/blog/di-property-injection-in-orchard
-// http://code.google.com/p/autofac/wiki/CircularDependencies
-
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
@@ -17,6 +13,7 @@ namespace Associativy.Services
             {
                 lock (_graphDescriptorLocker) // This is to ensure that used services also have the same graphDescriptor
                 {
+                    _graphService.GraphDescriptor = value;
                     _nodeManager.GraphDescriptor = value;
                     _mind.GraphDescriptor = value;
                     base.GraphDescriptor = value;
@@ -27,6 +24,12 @@ namespace Associativy.Services
         public IConnectionManager ConnectionManager
         {
             get { return GraphDescriptor.ConnectionManager; }
+        }
+
+        protected readonly IGraphService _graphService;
+        public IGraphService GraphService
+        {
+            get { return _graphService; }
         }
 
         protected readonly IMind _mind;
@@ -43,10 +46,12 @@ namespace Associativy.Services
 
         public AssociativyServices(
             IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphService graphService,
             IMind mind,
             INodeManager nodeManager)
             : base(associativyGraphDescriptor)
         {
+            _graphService = graphService;
             _nodeManager = nodeManager;
             _mind = mind;
         }

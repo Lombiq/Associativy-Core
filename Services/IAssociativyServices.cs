@@ -14,6 +14,11 @@ namespace Associativy.Services
         IConnectionManager ConnectionManager { get; }
 
         /// <summary>
+        /// Performs work on graphs
+        /// </summary>
+        IGraphService GraphService { get; }
+
+        /// <summary>
         /// Service for generating associations
         /// </summary>
         IMind Mind { get; }
@@ -27,10 +32,8 @@ namespace Associativy.Services
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IAssociativyServices<TNodeToNodeConnectorRecord, TAssociativyGraphDescriptor> : IAssociativyServices
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+    public interface IAssociativyServices<TAssociativyGraphDescriptor> : IAssociativyServices
         where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
     }

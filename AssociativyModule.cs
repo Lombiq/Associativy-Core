@@ -21,7 +21,6 @@ namespace Associativy
             //builder.RegisterGeneric(typeof(NodeManager<>)).As(typeof(INodeManager<>)).InstancePerLifetimeScope();
             //builder.RegisterGeneric(typeof(PathFinder<,>)).As(typeof(IPathFinder<,>)).InstancePerLifetimeScope();
 
-
             builder.Update(componentRegistry);
         }
     }

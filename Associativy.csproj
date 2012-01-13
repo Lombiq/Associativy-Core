@@ -100,6 +100,7 @@
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Models\ReadonlyAssociativyGraphDescriptorBase.cs" />
     <Compile Include="Services\AssociativyGraphDescriptorLocator.cs" />
+    <Compile Include="Services\GraphService.cs" />
     <Compile Include="Services\IAssociativyGraphDescriptorLocator.cs" />
     <Compile Include="Services\IAssociativyService.cs" />
     <Compile Include="Models\AssociativyGraphDescriptorBase.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
+    <Compile Include="Services\IGraphService.cs" />
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\IPathFinder.cs" />
