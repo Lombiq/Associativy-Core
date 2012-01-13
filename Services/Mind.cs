@@ -377,7 +377,7 @@ namespace Associativy.Services
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
         {
-            return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>();
+            return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>(false);
         }
 
         protected virtual void MakeSettings(ref IMindSettings settings)
