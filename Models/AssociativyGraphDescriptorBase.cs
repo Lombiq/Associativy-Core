@@ -9,9 +9,12 @@ namespace Associativy.Models
     public abstract class AssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord> : IAssociativyGraphDescriptor
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        protected readonly IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
+        public virtual LocalizedString GraphName { get; protected set; }
+        public virtual string TechnicalGraphName { get; protected set; }
+        public virtual string[] ContentTypes { get; protected set; }
 
-        public override IConnectionManager ConnectionManager
+        protected readonly IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
+        public IConnectionManager ConnectionManager
         {
             get
             {
@@ -25,5 +28,7 @@ namespace Associativy.Models
         {
             _connectionManagerResolver = connectionManagerResolver;
         }
+
+        
     }
 }

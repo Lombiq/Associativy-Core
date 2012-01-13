@@ -9,15 +9,6 @@ namespace Associativy.Models
     public abstract class ReadonlyAssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord> : AssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        public LocalizedString GraphName { get; protected set; }
-        public string TechnicalGraphName { get; protected set; }
-        public string[] ContentTypes { get; protected set; }
-
-        public abstract IConnectionManager ConnectionManager
-        {
-            get;
-        }
-
         public Localizer T { get; set; }
 
         public ReadonlyAssociativyGraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
