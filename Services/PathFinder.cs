@@ -7,7 +7,7 @@ using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    public class PathFinder : AssociativyService, IPathFinder
+    public class PathFinder : AssociativyServiceBase, IPathFinder
     {
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;

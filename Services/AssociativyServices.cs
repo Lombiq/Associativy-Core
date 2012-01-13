@@ -8,7 +8,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices: AssociativyService, IAssociativyServices
+    public class AssociativyServices: AssociativyServiceBase, IAssociativyServices
     {
         private object _contextLocker = new object();
         public override IAssociativyContext Context

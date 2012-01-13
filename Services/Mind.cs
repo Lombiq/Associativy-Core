@@ -13,7 +13,7 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class Mind : AssociativyService, IMind
+    public class Mind : AssociativyServiceBase, IMind
     {
         protected readonly INodeManager _nodeManager;
         protected readonly IPathFinder _pathFinder;

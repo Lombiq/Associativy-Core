@@ -11,7 +11,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class NodeManager : AssociativyService, INodeManager
+    public class NodeManager : AssociativyServiceBase, INodeManager
     {
         protected readonly IContentManager _contentManager;
         protected readonly IAssociativeGraphEventHandler _graphEventHandler;

@@ -2,7 +2,7 @@
 
 namespace Associativy.Services
 {
-    public abstract class AssociativyService : IAssociativyService
+    public abstract class AssociativyServiceBase : IAssociativyService
     {
         // Although reference read/write is atomic, this approach might cause headaches when concurrent threads wanted to use
         // the same service with different contexts. Revise if necessary.
@@ -13,7 +13,7 @@ namespace Associativy.Services
             set { _associativyContext = value; }
         }
         
-        public AssociativyService(IAssociativyContext associativyContext)
+        public AssociativyServiceBase(IAssociativyContext associativyContext)
         {
             _associativyContext = associativyContext;
         }

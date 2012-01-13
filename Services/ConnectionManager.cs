@@ -10,7 +10,7 @@ namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
     public class ConnectionManager<TNodeToNodeConnectorRecord> 
-        : AssociativyService, IConnectionManager<TNodeToNodeConnectorRecord>
+        : AssociativyServiceBase, IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;

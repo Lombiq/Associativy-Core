@@ -108,7 +108,7 @@
     <Compile Include="Models\Mind\MindSettings.cs" />
     <Compile Include="Models\Nodes\NodeToNodeRecord.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventMonitor.cs" />
-    <Compile Include="Services\AssociativyService.cs" />
+    <Compile Include="Services\AssociativyServiceBase.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
     <Compile Include="Services\ConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
