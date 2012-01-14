@@ -9,7 +9,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class ConnectionManager<TNodeToNodeConnectorRecord> 
+    public class ConnectionManager<TNodeToNodeConnectorRecord>
         : AssociativyServiceBase, IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
@@ -70,12 +70,24 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionsDeletedFromNode(nodeId, GraphDescriptor);
         }
 
-        public virtual void Delete(int id)
+        public void Disconnect(IContent node1, IContent node2)
         {
-            _nodeToNodeRecordRepository.Delete(_nodeToNodeRecordRepository.Get(id));
-
-            _graphEventHandler.ConnectionDeleted(id, GraphDescriptor);
+            Disconnect(node1.Id, node2.Id);
         }
+
+        public void Disconnect(int nodeId1, int nodeId2)
+        {
+            var connectorRecord = _nodeToNodeRecordRepository.Fetch(connector =>
+                connector.Node1Id == nodeId1 && connector.Node2Id == nodeId2 ||
+                connector.Node1Id == nodeId2 && connector.Node2Id == nodeId1).FirstOrDefault();
+
+            if (connectorRecord == null) return;
+
+            _nodeToNodeRecordRepository.Delete(connectorRecord);
+
+            _graphEventHandler.ConnectionDeleted(nodeId1, nodeId2, GraphDescriptor);
+        }
+
 
         public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll()
         {

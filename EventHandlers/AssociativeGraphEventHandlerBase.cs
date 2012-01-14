@@ -30,7 +30,7 @@ namespace Associativy.EventHandlers
             Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionDeleted(int connectionId, IAssociativyGraphDescriptor graphDescriptor)
+        public virtual void ConnectionDeleted(int nodeId1, int nodeId2, IAssociativyGraphDescriptor graphDescriptor)
         {
             Changed(graphDescriptor);
         }

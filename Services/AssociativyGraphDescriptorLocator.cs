@@ -19,19 +19,19 @@ namespace Associativy.Services
         public IAssociativyGraphDescriptor FindGraphDescriptor(string technicalGraphName)
         {
             var graphDescriptor = (from c in _registeredGraphDescriptors
-                           where c.TechnicalGraphName == technicalGraphName
-                           select c).FirstOrDefault();
+                                   where c.TechnicalGraphName == technicalGraphName
+                                   select c).FirstOrDefault();
 
             return graphDescriptor;
         }
 
-        public IAssociativyGraphDescriptor[] FindGraphDescriptorsForContentType(string contentType)
+        public IEnumerable<IAssociativyGraphDescriptor> FindGraphDescriptorsForContentType(string contentType)
         {
             // Might be worth storing graphDescriptors in a dictionary indexed by content types so it doesn't have to be recalculated.
             // But with a reasonable number of graphDescriptors it takes slightly less than nothing to run...
-            var graphDescriptors = (from c in _registeredGraphDescriptors
-                            where c.ContentTypes.Contains(contentType)
-                            select c).ToArray();
+            var graphDescriptors = from c in _registeredGraphDescriptors
+                                   where c.ContentTypes.Contains(contentType)
+                                   select c;
 
             return graphDescriptors;
         }

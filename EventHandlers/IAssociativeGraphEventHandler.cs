@@ -21,7 +21,7 @@ namespace Associativy.EventHandlers
 
         void ConnectionsDeletedFromNode(int nodeId, IAssociativyGraphDescriptor graphDescriptor);
 
-        void ConnectionDeleted(int connectionId, IAssociativyGraphDescriptor graphDescriptor);
+        void ConnectionDeleted(int nodeId1, int nodeId2, IAssociativyGraphDescriptor graphDescriptor);
 
         /// <summary>
         /// Gets called when the associative graph has changed.

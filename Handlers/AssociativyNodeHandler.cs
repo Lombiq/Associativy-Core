@@ -40,6 +40,11 @@ namespace Associativy.Handlers
             if (!_associativyGraphDescriptors.ContainsKey(context.ContentItem.ContentType)) return;
 
             InvokeEventHandlerWithGraphDescriptors(_associativyGraphDescriptors[context.ContentItem.ContentType], (associativyGraphDescriptor) => _graphEventHandler.NodeRemoved(context.ContentItem, associativyGraphDescriptor));
+
+            foreach (var graphDescriptor in _associativyGraphDescriptors[context.ContentItem.ContentType])
+            {
+                graphDescriptor.ConnectionManager.DeleteFromNode(context.ContentItem);
+            }
         }
 
         private void InvokeEventHandlerWithGraphDescriptors(IList<IAssociativyGraphDescriptor> associativyGraphDescriptors, Action<IAssociativyGraphDescriptor> eventHandler)

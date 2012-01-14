@@ -15,7 +15,7 @@ namespace Associativy.Services
         /// <param name="technicalGraphName">The technical name of the graphDescriptor's graph</param>
         IAssociativyGraphDescriptor FindGraphDescriptor(string technicalGraphName);
 
-        IAssociativyGraphDescriptor[] FindGraphDescriptorsForContentType(string contentType);
+        IEnumerable<IAssociativyGraphDescriptor> FindGraphDescriptorsForContentType(string contentType);
 
         IDictionary<string, IList<IAssociativyGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes();
     }

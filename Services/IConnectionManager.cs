@@ -45,11 +45,9 @@ namespace Associativy.Services
         /// <param name="nodeId">The node's id</param>
         void DeleteFromNode(int nodeId);
 
-        /// <summary>
-        /// Deletes the connection
-        /// </summary>
-        /// <param name="id">Id of the connection</param>
-        void Delete(int id);
+        void Disconnect(IContent node1, IContent node2);
+
+        void Disconnect(int nodeId1, int nodeId2);
 
 
         /// <summary>
