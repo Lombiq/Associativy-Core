@@ -6,7 +6,7 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class AssociativyServices: AssociativyServiceBase, IAssociativyServices
     {
-        private object _graphDescriptorLocker = new object();
+        private readonly object _graphDescriptorLocker = new object();
         public override IAssociativyGraphDescriptor GraphDescriptor
         {
             set

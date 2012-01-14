@@ -25,7 +25,7 @@ namespace Associativy.Services
         protected string _cachePrefix;
         #endregion
 
-        private object _graphDescriptorLocker = new object();
+        private readonly object _graphDescriptorLocker = new object();
         public override IAssociativyGraphDescriptor GraphDescriptor
         {
             set
