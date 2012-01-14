@@ -13,7 +13,7 @@ namespace Associativy.Services
             set { _associativyGraphDescriptor = value; }
         }
 
-        public AssociativyServiceBase(IAssociativyGraphDescriptor associativyGraphDescriptor)
+        protected AssociativyServiceBase(IAssociativyGraphDescriptor associativyGraphDescriptor)
         {
             _associativyGraphDescriptor = associativyGraphDescriptor;
         }
