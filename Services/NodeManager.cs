@@ -26,13 +26,6 @@ namespace Associativy.Services
             _graphEventHandler = graphEventHandler;
         }
 
-        // Better name?
-        public virtual IEnumerable<string> GetSimilarTerms(string snippet, int maxCount = 10)
-        {
-            if (String.IsNullOrEmpty(snippet)) return null; // Otherwise would return the whole dataset
-            return ContentQuery.Where<RoutePartRecord>(r => r.Title.StartsWith(snippet)).Slice(maxCount).ToList().Select(item => item.As<RoutePart>().Title);
-        }
-
         public IContentQuery<ContentItem> ContentQuery
         {
             get { return _contentManager.Query(GraphDescriptor.ContentTypes); }
@@ -45,11 +38,32 @@ namespace Associativy.Services
             return ContentQuery.Where<CommonPartRecord>(r => idsCollection.Contains(r.Id));
         }
 
-        // Better name for label?
-        public virtual IContent Get(string label)
+        public virtual IEnumerable<IContent> GetSimilarNodes(string labelSnippet, int maxCount = 10, QueryHints queryHints = null)
         {
-            // Maybe rather as something like with a LIKE query?
-            return ContentQuery.Where<RoutePartRecord>(r => r.Title == label).List().FirstOrDefault();
+            if (String.IsNullOrEmpty(labelSnippet)) return null; // Otherwise would return the whole dataset
+            if (queryHints == null) queryHints = new QueryHints();
+            labelSnippet = labelSnippet.ToLowerInvariant();
+            return ContentQuery.Where<AssociativyNodeLabelPartRecord>(r => r.InvariantLabel.StartsWith(labelSnippet)).WithQueryHints(queryHints).Slice(maxCount).ToList();
+        }
+
+        public virtual IContent Get(string label, QueryHints queryHints = null)
+        {
+            if (queryHints == null) queryHints = new QueryHints();
+            label = label.ToLowerInvariant();
+            return ContentQuery.Where<AssociativyNodeLabelPartRecord>(r => r.InvariantLabel == label).WithQueryHints(queryHints).List().FirstOrDefault();
+        }
+
+        public virtual IEnumerable<IContent> GetMany(IEnumerable<string> labels, QueryHints queryHints = null)
+        {
+            if (queryHints == null) queryHints = new QueryHints();
+
+            var labelsArray = labels.ToArray();
+            for (int i = 0; i < labelsArray.Length; i++)
+            {
+                labelsArray[i] = labelsArray[i].ToLowerInvariant();
+            }
+
+            return ContentQuery.Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.InvariantLabel)).WithQueryHints(queryHints).List();
         }
     }
 }

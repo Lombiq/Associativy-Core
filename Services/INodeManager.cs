@@ -11,14 +11,6 @@ namespace Associativy.Services
     public interface INodeManager : IAssociativyService, IDependency
     {
         /// <summary>
-        /// Lists terms similar to the snippet
-        /// </summary>
-        /// <param name="snippet">The snippet to search for</param>
-        /// <param name="maxCount">Maximal number of items returned</param>
-        /// <returns>Terms similar to the snippet</returns>
-        IEnumerable<string> GetSimilarTerms(string snippet, int maxCount = 10);
-
-        /// <summary>
         /// Query for customized retrieving of nodes
         /// </summary>
         IContentQuery<ContentItem> ContentQuery { get; }
@@ -31,11 +23,21 @@ namespace Associativy.Services
         IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids);
 
         /// <summary>
+        /// Lists nodes that have labels similar to the given snippet
+        /// </summary>
+        /// <param name="labelSnippet">The snippet of the nodes's label to search for</param>
+        /// <param name="maxCount">Maximal number of items returned</param>
+        /// <returns>Terms similar to the snippet</returns>
+        IEnumerable<IContent> GetSimilarNodes(string labelSnippet, int maxCount = 10, QueryHints queryHints = null);
+
+        /// <summary>
         /// Gets the node with the specified label
         /// </summary>
         /// <param name="label"></param>
         /// <returns></returns>
-        IContent Get(string label);
+        IContent Get(string label, QueryHints queryHints = null);
+
+        IEnumerable<IContent> GetMany(IEnumerable<string> labels, QueryHints queryHints = null);
     }
 
     /// <summary>

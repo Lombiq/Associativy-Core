@@ -90,14 +90,20 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociativyControllerBase.cs" />
+    <Compile Include="Drivers\AssociativyNodeLabelPartDriver.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\AssociativeGraphEventHandlerBase.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IAssociativeGraphEventMonitor.cs" />
+    <Compile Include="Extensions\ContentTypeDefinitionBuilderExtensions.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
+    <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
+    <Compile Include="Migrations.cs" />
+    <Compile Include="Models\Nodes\AssociativyNodeLabelPart.cs" />
+    <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="Models\ReadonlyAssociativyGraphDescriptorBase.cs" />
     <Compile Include="Services\AssociativyGraphDescriptorLocator.cs" />
     <Compile Include="Services\GraphService.cs" />
