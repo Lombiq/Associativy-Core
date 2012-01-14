@@ -43,8 +43,6 @@ namespace Associativy.Services
 
         public virtual void Connect(int nodeId1, int nodeId2)
         {
-            if (_contentManager.Get(nodeId1) == null || _contentManager.Get(nodeId2) == null) return; // No such nodes exist
-
             if (!AreNeighbours(nodeId1, nodeId2))
             {
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
