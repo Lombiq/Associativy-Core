@@ -16,7 +16,7 @@ namespace Associativy.Services
             _registeredGraphDescriptors = registeredGraphDescriptors;
         }
 
-        public IAssociativyGraphDescriptor GetGraphDescriptor(string technicalGraphName)
+        public IAssociativyGraphDescriptor FindGraphDescriptor(string technicalGraphName)
         {
             var graphDescriptor = (from c in _registeredGraphDescriptors
                            where c.TechnicalGraphName == technicalGraphName
@@ -25,7 +25,7 @@ namespace Associativy.Services
             return graphDescriptor;
         }
 
-        public IAssociativyGraphDescriptor[] GetGraphDescriptorsForContentType(string contentType)
+        public IAssociativyGraphDescriptor[] FindGraphDescriptorsForContentType(string contentType)
         {
             // Might be worth storing graphDescriptors in a dictionary indexed by content types so it doesn't have to be recalculated.
             // But with a reasonable number of graphDescriptors it takes slightly less than nothing to run...
@@ -36,7 +36,7 @@ namespace Associativy.Services
             return graphDescriptors;
         }
 
-        public IDictionary<string, IList<IAssociativyGraphDescriptor>> GetGraphDescriptorsByRegisteredContentTypes()
+        public IDictionary<string, IList<IAssociativyGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes()
         {
             var associativyGraphDescriptors = new Dictionary<string, IList<IAssociativyGraphDescriptor>>();
 

@@ -17,7 +17,7 @@ namespace Associativy.Handlers
 
         public AssociativyNodeHandler(IAssociativyGraphDescriptorLocator graphDescriptorLocator, IAssociativeGraphEventHandler graphEventHandler)
         {
-            _associativyGraphDescriptors = graphDescriptorLocator.GetGraphDescriptorsByRegisteredContentTypes();
+            _associativyGraphDescriptors = graphDescriptorLocator.FindGraphDescriptorsByRegisteredContentTypes();
             _graphEventHandler = graphEventHandler;
         }
 
