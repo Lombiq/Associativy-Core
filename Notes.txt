@@ -4,7 +4,7 @@
 	-	Define an interface derived from IAssociativyGraphDescriptor and implement it
 	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
 	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
-	-	*Optionally* add AssociativyNodeLabelPart to node content types, if the nodes should be searchable by label.
+	-	*Optionally* add AssociativyNodeLabelPart to node content types, if the nodes should be searchable by label. The default implementation uses the Title as the label, so if this is not appropriate for you content type, you should write your own handler event for AssociativyNodeLabelPart.
 	The above are not necessary if a module just wants to use Associativy services with an existing graphDescriptor.
 -	A content type can be listed in multiple graphDescriptors, thus a content item can be part of multiple graphs.
 -	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention.
