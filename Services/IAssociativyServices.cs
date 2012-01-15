@@ -39,16 +39,16 @@ namespace Associativy.Services
         /// <summary>
         /// Performs work on graphs
         /// </summary>
-        IGraphService GraphService { get; }
+        new IGraphService GraphService { get; }
 
         /// <summary>
         /// Service for generating associations
         /// </summary>
-        IMind Mind { get; }
+        new IMind Mind { get; }
 
         /// <summary>
         /// Service for handling nodes
         /// </summary>
-        INodeManager NodeManager { get; }
+        new INodeManager NodeManager { get; }
     }
 }

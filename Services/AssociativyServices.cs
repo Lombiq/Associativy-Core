@@ -71,17 +71,17 @@ namespace Associativy.Services
         {
         }
 
-        public new IGraphService GraphService
+        new public IGraphService GraphService
         {
             get { return (IGraphService)_graphService; }
         }
 
-        public new IMind Mind
+        new public IMind Mind
         {
             get { return (IMind)_mind; }
         }
 
-        public new INodeManager NodeManager
+        new public INodeManager NodeManager
         {
             get { return (INodeManager)_nodeManager; }
         }
