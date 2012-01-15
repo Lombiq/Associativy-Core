@@ -8,7 +8,9 @@ namespace Associativy.Services
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    public interface INodeManager : IAssociativyService, IDependency
+    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface INodeManager<TAssociativyGraphDescriptor> : IAssociativyService
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
         /// <summary>
         /// Query for customized retrieving of nodes
@@ -43,9 +45,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface INodeManager<TAssociativyGraphDescriptor> : INodeManager
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public interface INodeManager : INodeManager<IAssociativyGraphDescriptor>, IDependency
     {
     }
 }

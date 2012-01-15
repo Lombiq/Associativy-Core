@@ -4,16 +4,19 @@ using Associativy.EventHandlers;
 using Associativy.Models;
 using Associativy.Models.Mind;
 using Orchard.Caching;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
-    public class PathFinder : AssociativyServiceBase, IPathFinder
+    [OrchardFeature("Associativy")]
+    public class PathFinder<TAssociativyGraphDescriptor> : AssociativyServiceBase, IPathFinder<TAssociativyGraphDescriptor>
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            TAssociativyGraphDescriptor associativyGraphDescriptor,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(associativyGraphDescriptor)
@@ -21,6 +24,7 @@ namespace Associativy.Services
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
         }
+
 
         #region FindPaths() auxiliary classes
         protected class PathNode
@@ -147,6 +151,18 @@ namespace Associativy.Services
 
 
             return succeededPaths;
+        }
+    }
+
+    [OrchardFeature("Associativy")]
+    public class PathFinder : PathFinder<IAssociativyGraphDescriptor>, IPathFinder
+    {
+        public PathFinder(
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            ICacheManager cacheManager)
+            : base(associativyGraphDescriptor, associativeGraphEventMonitor, cacheManager)
+        {
         }
     }
 }

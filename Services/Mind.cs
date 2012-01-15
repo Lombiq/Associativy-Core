@@ -13,11 +13,12 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class Mind : AssociativyServiceBase, IMind
+    public class Mind<TAssociativyGraphDescriptor> : AssociativyServiceBase, IMind<TAssociativyGraphDescriptor>
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
-        protected readonly INodeManager _nodeManager;
-        protected readonly IPathFinder _pathFinder;
-        protected readonly IGraphService _graphService;
+        protected readonly INodeManager<TAssociativyGraphDescriptor> _nodeManager;
+        protected readonly IPathFinder<TAssociativyGraphDescriptor> _pathFinder;
+        protected readonly IGraphService<TAssociativyGraphDescriptor> _graphService;
         protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
 
         #region Caching fields
@@ -35,16 +36,17 @@ namespace Associativy.Services
                     _nodeManager.GraphDescriptor = value;
                     _pathFinder.GraphDescriptor = value;
                     _cachePrefix = value.TechnicalGraphName + ".";
-                    base.GraphDescriptor = value; 
+                    base.GraphDescriptor = value;
                 }
             }
         }
 
+
         public Mind(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
-            INodeManager nodeManager,
-            IPathFinder pathFinder,
-            IGraphService graphService,
+            TAssociativyGraphDescriptor associativyGraphDescriptor,
+            INodeManager<TAssociativyGraphDescriptor> nodeManager,
+            IPathFinder<TAssociativyGraphDescriptor> pathFinder,
+            IGraphService<TAssociativyGraphDescriptor> graphService,
             IAssociativeGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(associativyGraphDescriptor)
@@ -55,6 +57,7 @@ namespace Associativy.Services
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
         }
+
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
             IMindSettings settings = null,
@@ -88,10 +91,10 @@ namespace Associativy.Services
             if (settings.UseCache)
             {
                 var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
-                 {
-                     _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
-                     return makeWholeGraph();
-                 });
+                {
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
+                    return makeWholeGraph();
+                });
 
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
@@ -142,10 +145,10 @@ namespace Associativy.Services
                 nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
 
                 var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
-                    {
-                        _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
-                        return makeGraph();
-                    });
+                {
+                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
+                    return makeGraph();
+                });
 
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
@@ -306,6 +309,21 @@ namespace Associativy.Services
         protected virtual void MakeSettings(ref IMindSettings settings)
         {
             if (settings == null) settings = new MindSettings();
+        }
+    }
+
+    [OrchardFeature("Associativy")]
+    public class Mind : Mind<IAssociativyGraphDescriptor>, IMind
+    {
+        public Mind(
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            INodeManager nodeManager,
+            IPathFinder pathFinder,
+            IGraphService graphService,
+            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            ICacheManager cacheManager)
+            : base(associativyGraphDescriptor, nodeManager, pathFinder, graphService, associativeGraphEventMonitor, cacheManager)
+        {
         }
     }
 }

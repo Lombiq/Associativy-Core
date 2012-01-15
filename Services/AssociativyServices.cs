@@ -4,7 +4,8 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices: AssociativyServiceBase, IAssociativyServices
+    public class AssociativyServices<TAssociativyGraphDescriptor> : AssociativyServiceBase, IAssociativyServices<TAssociativyGraphDescriptor>
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
         private readonly object _graphDescriptorLocker = new object();
         public override IAssociativyGraphDescriptor GraphDescriptor
@@ -26,34 +27,63 @@ namespace Associativy.Services
             get { return GraphDescriptor.ConnectionManager; }
         }
 
-        protected readonly IGraphService _graphService;
-        public IGraphService GraphService
+        protected readonly IGraphService<TAssociativyGraphDescriptor> _graphService;
+        public IGraphService<TAssociativyGraphDescriptor> GraphService
         {
             get { return _graphService; }
         }
 
-        protected readonly IMind _mind;
-        public IMind Mind
+        protected readonly IMind<TAssociativyGraphDescriptor> _mind;
+        public IMind<TAssociativyGraphDescriptor> Mind
         {
             get { return _mind; }
         }
 
-        protected readonly INodeManager _nodeManager;
-        public INodeManager NodeManager
+        protected readonly INodeManager<TAssociativyGraphDescriptor> _nodeManager;
+        public INodeManager<TAssociativyGraphDescriptor> NodeManager
         {
             get { return _nodeManager; }
         }
 
+
         public AssociativyServices(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
-            IGraphService graphService,
-            IMind mind,
-            INodeManager nodeManager)
+            TAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphService<TAssociativyGraphDescriptor> graphService,
+            IMind<TAssociativyGraphDescriptor> mind,
+            INodeManager<TAssociativyGraphDescriptor> nodeManager)
             : base(associativyGraphDescriptor)
         {
             _graphService = graphService;
             _nodeManager = nodeManager;
             _mind = mind;
+        }
+
+    }
+    [OrchardFeature("Associativy")]
+    public class AssociativyServices : AssociativyServices<IAssociativyGraphDescriptor>, IAssociativyServices
+    {
+        public AssociativyServices(
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphService graphService,
+            IMind mind,
+            INodeManager nodeManager)
+            : base(associativyGraphDescriptor, graphService, mind, nodeManager)
+        {
+        }
+
+        public new IGraphService GraphService
+        {
+            get { return (IGraphService)_graphService; }
+        }
+
+        public new IMind Mind
+        {
+            get { return (IMind)_mind; }
+        }
+
+        public new INodeManager NodeManager
+        {
+            get { return (INodeManager)_nodeManager; }
         }
     }
 }

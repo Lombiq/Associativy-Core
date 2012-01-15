@@ -9,8 +9,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class ConnectionManager<TNodeToNodeConnectorRecord>
-        : AssociativyServiceBase, IConnectionManager<TNodeToNodeConnectorRecord>
+    public class ConnectionManager<TNodeToNodeConnectorRecord> : AssociativyServiceBase, IConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
@@ -19,10 +18,9 @@ namespace Associativy.Services
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IContentManager contentManager,
             IAssociativeGraphEventHandler graphEventHandler)
-            : base(associativyGraphDescriptor)
+            : base(null)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
             _contentManager = contentManager;

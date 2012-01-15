@@ -11,14 +11,15 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class NodeManager : AssociativyServiceBase, INodeManager
+    public class NodeManager<TAssociativyGraphDescriptor> : AssociativyServiceBase, INodeManager<TAssociativyGraphDescriptor>
+        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
     {
         protected readonly IContentManager _contentManager;
         protected readonly IAssociativeGraphEventHandler _graphEventHandler;
 
         public NodeManager(
+            TAssociativyGraphDescriptor associativyGraphDescriptor,
             IContentManager contentManager,
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
             IAssociativeGraphEventHandler graphEventHandler)
             : base(associativyGraphDescriptor)
         {
@@ -64,6 +65,18 @@ namespace Associativy.Services
             }
 
             return ContentQuery.Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.InvariantLabel)).WithQueryHints(queryHints).List();
+        }
+    }
+
+    [OrchardFeature("Associativy")]
+    public class NodeManager : NodeManager<IAssociativyGraphDescriptor>, INodeManager
+    {
+        public NodeManager(
+            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IContentManager contentManager,
+            IAssociativeGraphEventHandler graphEventHandler)
+            : base(associativyGraphDescriptor, contentManager, graphEventHandler)
+        {
         }
     }
 }

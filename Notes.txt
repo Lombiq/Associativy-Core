@@ -10,3 +10,4 @@
 -	Frontend engine main controllers should be named with the [EngineName]FrontendEngineController convention.
 -	Frontend engine configuration can be changed by implementing the engine's setup interface (e.g. IGraphvizSetup).
 -	Associativy services are thread-safe.
+-	It's good practice to make a generic version of services so that the injected AssociativyGraphDescriptor can also be chosen upon instantiation.
