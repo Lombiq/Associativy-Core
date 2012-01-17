@@ -99,11 +99,14 @@
     <Compile Include="Extensions\ContentTypeDefinitionBuilderExtensions.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
+    <Compile Include="GraphDescription\Contexts\ContentContext.cs" />
+    <Compile Include="GraphDescription\Contexts\GraphSetupContext.cs" />
+    <Compile Include="GraphDescription\Contexts\GraphSetupContextImpl.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />
-    <Compile Include="Models\GraphContext.cs" />
-    <Compile Include="Models\GraphContextImplementation.cs" />
+    <Compile Include="GraphDescription\Contexts\GraphContext.cs" />
+    <Compile Include="GraphDescription\Contexts\GraphContextImpl.cs" />
     <Compile Include="Models\Nodes\AssociativyNodeLabelPart.cs" />
     <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="Models\ReadonlyAssociativyGraphDescriptorBase.cs" />
@@ -145,7 +148,9 @@
       <Name>Piedone.HelpfulLibraries</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="GraphDescription\Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

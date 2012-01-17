@@ -4,20 +4,20 @@ using System.Linq;
 using System.Web;
 using Orchard.Environment.Extensions;
 
-namespace Associativy.GraphDescription.Models
+namespace Associativy.GraphDescription.Contexts
 {
     [OrchardFeature("Associativy")]
     public class GraphContextImpl : GraphContext
     {
-        private string _technicalGraphName;
-        public override string TechnicalGraphName
+        private string _graphName;
+        public override string GraphName
         {
-            get { return _technicalGraphName; }
+            get { return _graphName; }
         }
 
         public GraphContextImpl(string technicalGraphName)
         {
-            _technicalGraphName = technicalGraphName;
+            _graphName = technicalGraphName;
         }
     }
 }
