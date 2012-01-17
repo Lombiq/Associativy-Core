@@ -6,7 +6,7 @@ using Piedone.HelpfulLibraries.DependencyInjection;
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public abstract class AssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord> : IAssociativyGraphDescriptor
+    public abstract class GraphDescriptorBase<TNodeToNodeConnectorRecord> : IGraphDescriptor
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         public virtual LocalizedString GraphName { get; protected set; }
@@ -24,11 +24,9 @@ namespace Associativy.Models
             }
         }
 
-        public AssociativyGraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public GraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
         {
             _connectionManagerResolver = connectionManagerResolver;
         }
-
-        
     }
 }

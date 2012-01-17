@@ -8,9 +8,9 @@ namespace Associativy.Services
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IPathFinder<TAssociativyGraphDescriptor> : IAssociativyService
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface IPathFinder<TGraphDescriptor> : IAssociativyService
+        where TGraphDescriptor : IGraphDescriptor
     {
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
@@ -25,7 +25,7 @@ namespace Associativy.Services
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    public interface IPathFinder : IPathFinder<IAssociativyGraphDescriptor>, IDependency
+    public interface IPathFinder : IPathFinder<IGraphDescriptor>, IDependency
     {
     }
 }

@@ -8,7 +8,7 @@ namespace Associativy.Models
     /// Describes the graph in which Associativy services are run, i.e. it stores information about the purpose and database
     /// of associations
     /// </summary>
-    public interface IAssociativyGraphDescriptor : IDependency
+    public interface IGraphDescriptor : IDependency
     {
         /// <summary>
         /// Human-readable name of the graph.

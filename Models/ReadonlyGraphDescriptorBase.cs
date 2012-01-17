@@ -6,12 +6,12 @@ using Piedone.HelpfulLibraries.DependencyInjection;
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public abstract class ReadonlyAssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord> : AssociativyGraphDescriptorBase<TNodeToNodeConnectorRecord>
+    public abstract class ReadonlyGraphDescriptorBase<TNodeToNodeConnectorRecord> : GraphDescriptorBase<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         public Localizer T { get; set; }
 
-        public ReadonlyAssociativyGraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public ReadonlyGraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
             : base(connectionManagerResolver)
         {
             T = NullLocalizer.Instance;

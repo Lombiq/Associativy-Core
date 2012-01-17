@@ -7,16 +7,16 @@ namespace Associativy.Services
     /// <summary>
     /// Handles registered graphDescriptors
     /// </summary>
-    public interface IAssociativyGraphDescriptorLocator : IDependency
+    public interface IGraphDescriptorLocator : IDependency
     {
         /// <summary>
         /// Returns the IAssociativyGraphDescriptor with the corresponding technical name, if it was registered
         /// </summary>
         /// <param name="technicalGraphName">The technical name of the graphDescriptor's graph</param>
-        IAssociativyGraphDescriptor FindGraphDescriptor(string technicalGraphName);
+        IGraphDescriptor FindGraphDescriptor(string technicalGraphName);
 
-        IEnumerable<IAssociativyGraphDescriptor> FindGraphDescriptorsForContentType(string contentType);
+        IEnumerable<IGraphDescriptor> FindGraphDescriptorsForContentType(string contentType);
 
-        IDictionary<string, IList<IAssociativyGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes();
+        IDictionary<string, IList<IGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes();
     }
 }

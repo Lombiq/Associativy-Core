@@ -7,6 +7,6 @@ namespace Associativy.Services
         /// <summary>
         /// The AssociativyGraphDescriptor the services use
         /// </summary>
-        IAssociativyGraphDescriptor GraphDescriptor { get; set; }
+        IGraphDescriptor GraphDescriptor { get; set; }
     }
 }

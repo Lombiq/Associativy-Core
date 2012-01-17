@@ -11,9 +11,9 @@ namespace Associativy.Services
     /// <summary>
     /// Service for generating associations
     /// </summary>
-    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IMind<TAssociativyGraphDescriptor> : IAssociativyService
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface IMind<TGraphDescriptor> : IAssociativyService
+        where TGraphDescriptor : IGraphDescriptor
     {
         /// <summary>
         /// Returns the whole association graph
@@ -36,7 +36,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for generating associations
     /// </summary>
-    public interface IMind : IMind<IAssociativyGraphDescriptor>, IDependency
+    public interface IMind : IMind<IGraphDescriptor>, IDependency
     {
     }
 }

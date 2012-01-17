@@ -6,16 +6,16 @@ namespace Associativy.Services
     {
         // Although reference read/write is atomic, this approach might cause headaches when concurrent threads wanted to use
         // the same service with different graphDescriptors. Revise if necessary.
-        private IAssociativyGraphDescriptor _associativyGraphDescriptor;
-        public virtual IAssociativyGraphDescriptor GraphDescriptor
+        private IGraphDescriptor _graphDescriptor;
+        public virtual IGraphDescriptor GraphDescriptor
         {
-            get { return _associativyGraphDescriptor; }
-            set { _associativyGraphDescriptor = value; }
+            get { return _graphDescriptor; }
+            set { _graphDescriptor = value; }
         }
 
-        protected AssociativyServiceBase(IAssociativyGraphDescriptor associativyGraphDescriptor)
+        protected AssociativyServiceBase(IGraphDescriptor graphDescriptor)
         {
-            _associativyGraphDescriptor = associativyGraphDescriptor;
+            _graphDescriptor = graphDescriptor;
         }
     }
 }

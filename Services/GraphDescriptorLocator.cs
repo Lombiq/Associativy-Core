@@ -7,16 +7,16 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyGraphDescriptorLocator : IAssociativyGraphDescriptorLocator
+    public class GraphDescriptorLocator : IGraphDescriptorLocator
     {
-        private readonly IEnumerable<IAssociativyGraphDescriptor> _registeredGraphDescriptors;
+        private readonly IEnumerable<IGraphDescriptor> _registeredGraphDescriptors;
 
-        public AssociativyGraphDescriptorLocator(IEnumerable<IAssociativyGraphDescriptor> registeredGraphDescriptors)
+        public GraphDescriptorLocator(IEnumerable<IGraphDescriptor> registeredGraphDescriptors)
         {
             _registeredGraphDescriptors = registeredGraphDescriptors;
         }
 
-        public IAssociativyGraphDescriptor FindGraphDescriptor(string technicalGraphName)
+        public IGraphDescriptor FindGraphDescriptor(string technicalGraphName)
         {
             var graphDescriptor = (from c in _registeredGraphDescriptors
                                    where c.TechnicalGraphName == technicalGraphName
@@ -25,7 +25,7 @@ namespace Associativy.Services
             return graphDescriptor;
         }
 
-        public IEnumerable<IAssociativyGraphDescriptor> FindGraphDescriptorsForContentType(string contentType)
+        public IEnumerable<IGraphDescriptor> FindGraphDescriptorsForContentType(string contentType)
         {
             // Might be worth storing graphDescriptors in a dictionary indexed by content types so it doesn't have to be recalculated.
             // But with a reasonable number of graphDescriptors it takes slightly less than nothing to run...
@@ -36,20 +36,20 @@ namespace Associativy.Services
             return graphDescriptors;
         }
 
-        public IDictionary<string, IList<IAssociativyGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes()
+        public IDictionary<string, IList<IGraphDescriptor>> FindGraphDescriptorsByRegisteredContentTypes()
         {
-            var associativyGraphDescriptors = new Dictionary<string, IList<IAssociativyGraphDescriptor>>();
+            var graphDescriptors = new Dictionary<string, IList<IGraphDescriptor>>();
 
             foreach (var graphDescriptor in _registeredGraphDescriptors)
             {
                 foreach (var contentType in graphDescriptor.ContentTypes)
                 {
-                    if (!associativyGraphDescriptors.ContainsKey(contentType)) associativyGraphDescriptors[contentType] = new List<IAssociativyGraphDescriptor>();
-                    associativyGraphDescriptors[contentType].Add(graphDescriptor);
+                    if (!graphDescriptors.ContainsKey(contentType)) graphDescriptors[contentType] = new List<IGraphDescriptor>();
+                    graphDescriptors[contentType].Add(graphDescriptor);
                 }
             }
 
-            return associativyGraphDescriptors;
+            return graphDescriptors;
         }
     }
 }

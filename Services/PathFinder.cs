@@ -9,17 +9,17 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class PathFinder<TAssociativyGraphDescriptor> : AssociativyServiceBase, IPathFinder<TAssociativyGraphDescriptor>
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public class PathFinder<TGraphDescriptor> : AssociativyServiceBase, IPathFinder<TGraphDescriptor>
+        where TGraphDescriptor : IGraphDescriptor
     {
-        protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
+        protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
-            TAssociativyGraphDescriptor associativyGraphDescriptor,
-            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            TGraphDescriptor graphDescriptor,
+            IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyGraphDescriptor)
+            : base(graphDescriptor)
         {
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
@@ -155,13 +155,13 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class PathFinder : PathFinder<IAssociativyGraphDescriptor>, IPathFinder
+    public class PathFinder : PathFinder<IGraphDescriptor>, IPathFinder
     {
         public PathFinder(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
-            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            IGraphDescriptor graphDescriptor,
+            IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyGraphDescriptor, associativeGraphEventMonitor, cacheManager)
+            : base(graphDescriptor, associativeGraphEventMonitor, cacheManager)
         {
         }
     }
