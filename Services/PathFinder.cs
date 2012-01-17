@@ -55,19 +55,18 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, IMindSettings settings)
+        public virtual IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
         {
             // It could be that this is the only caching that's really needed and can work:
             // - With this tens of database queries can be saved.
             // - Caching the whole graph is nice, but caching parts and their records could cause problems. None is yet known,
             //   but it can happen.
-            if (settings.UseCache)
+            if (useCache)
             {
-                return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
+                return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
-                    settings.UseCache = false;
-                    return FindPaths(startNodeId, targetNodeId, settings);
+                    return FindPaths(startNodeId, targetNodeId, maxDistance, false);
                 });
             }
 
@@ -91,7 +90,7 @@ namespace Associativy.Services
                 currentDistance = frontierNode.Distance;
 
                 // We can't traverse the graph further
-                if (currentDistance == settings.MaxDistance - 1)
+                if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
                     if (GraphDescriptor.ConnectionManager.AreNeighbours(currentNode.Id, targetNodeId))

@@ -17,9 +17,10 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="startNode"></param>
         /// <param name="targetNode"></param>
-        /// <param name="settings"></param>
+        /// <param name="maxDistance"></param>
+        /// <param name="useCache"></param>
         /// <returns>A list of succeeded paths, where a path is a list of the ids of the nodes on the path.</returns>
-        IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, IMindSettings settings);
+        IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
 
     }
     /// <summary>

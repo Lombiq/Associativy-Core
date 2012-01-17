@@ -59,9 +59,7 @@ namespace Associativy.Services
         }
 
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
-            IMindSettings settings = null,
-            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
+        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(IMindSettings settings = null)
         {
             MakeSettings(ref settings);
 
@@ -70,7 +68,7 @@ namespace Associativy.Services
                 {
                     var wholeGraph = _graphService.GraphFactory();
 
-                    var query = queryModifier == null ? _nodeManager.ContentQuery : queryModifier(_nodeManager.ContentQuery);
+                    var query = settings.QueryModifier(_nodeManager.ContentQuery);
                     var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
 
                     foreach (var node in nodes)
@@ -107,8 +105,7 @@ namespace Associativy.Services
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
             IEnumerable<IContent> nodes,
-            IMindSettings settings = null,
-            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier = null)
+            IMindSettings settings = null)
         {
             if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
 
@@ -117,25 +114,23 @@ namespace Associativy.Services
 
             MakeSettings(ref settings);
 
-            if (queryModifier == null) queryModifier = (query) => query;
-
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
                 () =>
                 {
                     // If there's only one node, return its neighbours
                     if (nodeCount == 1)
                     {
-                        return GetNeighboursGraph(nodes.First(), queryModifier);
+                        return GetNeighboursGraph(nodes.First(), settings.QueryModifier);
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
                     else if (settings.Algorithm == MindAlgorithms.Simple)
                     {
-                        return MakeSimpleAssocations(nodes, queryModifier);
+                        return MakeSimpleAssocations(nodes, settings.QueryModifier);
                     }
                     // Calculate the routes between two nodes
                     else
                     {
-                        return MakeSophisticatedAssociations(nodes, settings, queryModifier);
+                        return MakeSophisticatedAssociations(nodes, settings);
                     }
                 };
 
@@ -210,8 +205,7 @@ namespace Associativy.Services
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSophisticatedAssociations(
             IEnumerable<IContent> nodes,
-            IMindSettings settings,
-            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
+            IMindSettings settings)
         {
             var nodeList = nodes.ToList();
             if (nodeList.Count < 2) throw new ArgumentException("The count of nodes should be at least two.");
@@ -233,7 +227,7 @@ namespace Associativy.Services
             var graph = _graphService.GraphFactory();
             IList<IEnumerable<int>> succeededPaths;
 
-            var allPairSucceededPaths = _pathFinder.FindPaths(nodeList[0].Id, nodeList[1].Id, settings);
+            var allPairSucceededPaths = _pathFinder.FindPaths(nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache);
 
             if (allPairSucceededPaths.Count() == 0) return graph;
 
@@ -260,7 +254,7 @@ namespace Associativy.Services
                     while (n < nodeList.Count)
                     {
                         // Here could be multithreading
-                        var pairSucceededPaths = _pathFinder.FindPaths(nodeList[i].Id, nodeList[n].Id, settings);
+                        var pairSucceededPaths = _pathFinder.FindPaths(nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache);
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -281,7 +275,7 @@ namespace Associativy.Services
                 if (succeededPaths.Count() == 0) return graph;
             }
 
-            var succeededNodes = queryModifier(_nodeManager.GetManyQuery(getSucceededNodeIds((succeededPaths)))).List().ToDictionary(node => node.Id);
+            var succeededNodes = settings.QueryModifier(_nodeManager.GetManyQuery(getSucceededNodeIds((succeededPaths)))).List().ToDictionary(node => node.Id);
 
             foreach (var path in succeededPaths)
             {

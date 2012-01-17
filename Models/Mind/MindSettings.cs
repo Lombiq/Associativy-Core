@@ -1,4 +1,6 @@
 ﻿using Orchard.Environment.Extensions;
+using System;
+using Orchard.ContentManagement;
 
 namespace Associativy.Models.Mind
 {
@@ -10,6 +12,7 @@ namespace Associativy.Models.Mind
         public int ZoomLevel { get; set; }
         public int MaxZoomLevel { get; set; }
         public int MaxDistance { get; set; }
+        public Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> QueryModifier { get; set; }
 
         public MindSettings()
         {
@@ -18,6 +21,7 @@ namespace Associativy.Models.Mind
             ZoomLevel = 0;
             MaxZoomLevel = 10;
             MaxDistance = 3;
+            QueryModifier = (query) => query;
         }
     }
 }
