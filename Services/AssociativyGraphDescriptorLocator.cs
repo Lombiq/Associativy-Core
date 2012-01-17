@@ -20,7 +20,7 @@ namespace Associativy.Services
         {
             var graphDescriptor = (from c in _registeredGraphDescriptors
                                    where c.TechnicalGraphName == technicalGraphName
-                                   select c).FirstOrDefault();
+                                   select c).LastOrDefault(); // Last, so descriptors can be overridden
 
             return graphDescriptor;
         }

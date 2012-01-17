@@ -14,7 +14,6 @@ namespace Associativy
             // by Orchard.
             var builder = new ContainerBuilder();
 
-
             builder.RegisterGeneric(typeof(AssociativyServices<>)).As(typeof(IAssociativyServices<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(ConnectionManager<>)).As(typeof(IConnectionManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GraphService<>)).As(typeof(IGraphService<>)).InstancePerLifetimeScope();
