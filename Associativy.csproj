@@ -102,6 +102,8 @@
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />
+    <Compile Include="Models\GraphContext.cs" />
+    <Compile Include="Models\GraphContextImplementation.cs" />
     <Compile Include="Models\Nodes\AssociativyNodeLabelPart.cs" />
     <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="Models\ReadonlyAssociativyGraphDescriptorBase.cs" />
