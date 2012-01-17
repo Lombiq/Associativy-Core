@@ -11,17 +11,17 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class NodeManager<TAssociativyGraphDescriptor> : AssociativyServiceBase, INodeManager<TAssociativyGraphDescriptor>
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public class NodeManager<TGraphDescriptor> : AssociativyServiceBase, INodeManager<TGraphDescriptor>
+        where TGraphDescriptor : IGraphDescriptor
     {
         protected readonly IContentManager _contentManager;
-        protected readonly IAssociativeGraphEventHandler _graphEventHandler;
+        protected readonly IGraphEventHandler _graphEventHandler;
 
         public NodeManager(
-            TAssociativyGraphDescriptor associativyGraphDescriptor,
+            TGraphDescriptor graphDescriptor,
             IContentManager contentManager,
-            IAssociativeGraphEventHandler graphEventHandler)
-            : base(associativyGraphDescriptor)
+            IGraphEventHandler graphEventHandler)
+            : base(graphDescriptor)
         {
             _contentManager = contentManager;
             _graphEventHandler = graphEventHandler;
@@ -69,13 +69,13 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class NodeManager : NodeManager<IAssociativyGraphDescriptor>, INodeManager
+    public class NodeManager : NodeManager<IGraphDescriptor>, INodeManager
     {
         public NodeManager(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphDescriptor graphDescriptor,
             IContentManager contentManager,
-            IAssociativeGraphEventHandler graphEventHandler)
-            : base(associativyGraphDescriptor, contentManager, graphEventHandler)
+            IGraphEventHandler graphEventHandler)
+            : base(graphDescriptor, contentManager, graphEventHandler)
         {
         }
     }

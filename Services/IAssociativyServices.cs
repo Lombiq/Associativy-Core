@@ -6,9 +6,9 @@ namespace Associativy.Services
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    /// <typeparam name="TAssociativyGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IAssociativyServices<TAssociativyGraphDescriptor> : IAssociativyService
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
+    public interface IAssociativyServices<TGraphDescriptor> : IAssociativyService
+        where TGraphDescriptor : IGraphDescriptor
     {
         /// <summary>
         /// Service for dealing with connections between nodes
@@ -18,23 +18,23 @@ namespace Associativy.Services
         /// <summary>
         /// Performs work on graphs
         /// </summary>
-        IGraphService<TAssociativyGraphDescriptor> GraphService { get; }
+        IGraphService<TGraphDescriptor> GraphService { get; }
 
         /// <summary>
         /// Service for generating associations
         /// </summary>
-        IMind<TAssociativyGraphDescriptor> Mind { get; }
+        IMind<TGraphDescriptor> Mind { get; }
 
         /// <summary>
         /// Service for handling nodes
         /// </summary>
-        INodeManager<TAssociativyGraphDescriptor> NodeManager { get; }
+        INodeManager<TGraphDescriptor> NodeManager { get; }
     }
 
     /// <summary>
     /// Service collector for Associativy services
     /// </summary>
-    public interface IAssociativyServices : IAssociativyServices<IAssociativyGraphDescriptor>, IDependency
+    public interface IAssociativyServices : IAssociativyServices<IGraphDescriptor>, IDependency
     {
         /// <summary>
         /// Performs work on graphs

@@ -4,11 +4,11 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyServices<TAssociativyGraphDescriptor> : AssociativyServiceBase, IAssociativyServices<TAssociativyGraphDescriptor>
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public class AssociativyServices<TGraphDescriptor> : AssociativyServiceBase, IAssociativyServices<TGraphDescriptor>
+        where TGraphDescriptor : IGraphDescriptor
     {
         private readonly object _graphDescriptorLocker = new object();
-        public override IAssociativyGraphDescriptor GraphDescriptor
+        public override IGraphDescriptor GraphDescriptor
         {
             set
             {
@@ -27,31 +27,31 @@ namespace Associativy.Services
             get { return GraphDescriptor.ConnectionManager; }
         }
 
-        protected readonly IGraphService<TAssociativyGraphDescriptor> _graphService;
-        public IGraphService<TAssociativyGraphDescriptor> GraphService
+        protected readonly IGraphService<TGraphDescriptor> _graphService;
+        public IGraphService<TGraphDescriptor> GraphService
         {
             get { return _graphService; }
         }
 
-        protected readonly IMind<TAssociativyGraphDescriptor> _mind;
-        public IMind<TAssociativyGraphDescriptor> Mind
+        protected readonly IMind<TGraphDescriptor> _mind;
+        public IMind<TGraphDescriptor> Mind
         {
             get { return _mind; }
         }
 
-        protected readonly INodeManager<TAssociativyGraphDescriptor> _nodeManager;
-        public INodeManager<TAssociativyGraphDescriptor> NodeManager
+        protected readonly INodeManager<TGraphDescriptor> _nodeManager;
+        public INodeManager<TGraphDescriptor> NodeManager
         {
             get { return _nodeManager; }
         }
 
 
         public AssociativyServices(
-            TAssociativyGraphDescriptor associativyGraphDescriptor,
-            IGraphService<TAssociativyGraphDescriptor> graphService,
-            IMind<TAssociativyGraphDescriptor> mind,
-            INodeManager<TAssociativyGraphDescriptor> nodeManager)
-            : base(associativyGraphDescriptor)
+            TGraphDescriptor graphDescriptor,
+            IGraphService<TGraphDescriptor> graphService,
+            IMind<TGraphDescriptor> mind,
+            INodeManager<TGraphDescriptor> nodeManager)
+            : base(graphDescriptor)
         {
             _graphService = graphService;
             _nodeManager = nodeManager;
@@ -60,14 +60,14 @@ namespace Associativy.Services
 
     }
     [OrchardFeature("Associativy")]
-    public class AssociativyServices : AssociativyServices<IAssociativyGraphDescriptor>, IAssociativyServices
+    public class AssociativyServices : AssociativyServices<IGraphDescriptor>, IAssociativyServices
     {
         public AssociativyServices(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphDescriptor graphDescriptor,
             IGraphService graphService,
             IMind mind,
             INodeManager nodeManager)
-            : base(associativyGraphDescriptor, graphService, mind, nodeManager)
+            : base(graphDescriptor, graphService, mind, nodeManager)
         {
         }
 

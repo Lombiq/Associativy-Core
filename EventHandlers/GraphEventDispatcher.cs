@@ -1,13 +1,13 @@
 ﻿
 namespace Associativy.EventHandlers
 {
-    // If needed, needs to handle the associativyGraphDescriptor
+    // If needed, needs to handle the graphDescriptor
     //[OrchardFeature("Associativy")]
-    //public class AssociativeGraphEventDispatcher : IAssociativeGraphEventDispatcher
+    //public class GraphEventDispatcher : IAssociativeGraphEventDispatcher
     //{
     //    public event EventHandler ChangedEvent;
 
-    //    public void Changed(IAssociativyGraphDescriptor associativyGraphDescriptor)
+    //    public void Changed(IAssociativyGraphDescriptor graphDescriptor)
     //    {
     //        if (ChangedEvent != null)
     //        {

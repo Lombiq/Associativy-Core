@@ -5,7 +5,7 @@ using Orchard.Caching;
 
 namespace Associativy.Services
 {
-    public class AssociativeGraphEventMonitor : AssociativeGraphEventHandlerBase, IAssociativeGraphEventMonitor
+    public class GraphEventMonitor : GraphEventHandlerBase, IGraphEventMonitor
     {
         private readonly ICacheManager _cacheManager;
         private readonly ISignals _signals;
@@ -21,7 +21,7 @@ namespace Associativy.Services
         /// </remarks>
         private static ConcurrentDictionary<string, string> _changedSignals = new ConcurrentDictionary<string, string>();
 
-        public AssociativeGraphEventMonitor(
+        public GraphEventMonitor(
             ICacheManager cacheManager,
             ISignals signals)
         {
@@ -29,17 +29,17 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChanged(IAcquireContext aquireContext, IAssociativyGraphDescriptor associativyGraphDescriptor)
+        public void MonitorChanged(IAcquireContext aquireContext, IGraphDescriptor graphDescriptor)
         {
-            var signal = associativyGraphDescriptor.TechnicalGraphName + "ChangedSignal";
-            _changedSignals[associativyGraphDescriptor.TechnicalGraphName] = signal;
+            var signal = graphDescriptor.TechnicalGraphName + "ChangedSignal";
+            _changedSignals[graphDescriptor.TechnicalGraphName] = signal;
             aquireContext.Monitor(_signals.When(signal));
         }
 
-        public override void Changed(IAssociativyGraphDescriptor associativyGraphDescriptor)
+        public override void Changed(IGraphDescriptor graphDescriptor)
         {
             string signal;
-            if (_changedSignals.TryGetValue(associativyGraphDescriptor.TechnicalGraphName, out signal))
+            if (_changedSignals.TryGetValue(graphDescriptor.TechnicalGraphName, out signal))
             {
                 _signals.Trigger(signal);
             }

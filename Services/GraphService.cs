@@ -10,12 +10,12 @@ using Orchard.ContentManagement;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphService<TAssociativyGraphDescriptor> : AssociativyServiceBase, IGraphService<TAssociativyGraphDescriptor>
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public class GraphService<TGraphDescriptor> : AssociativyServiceBase, IGraphService<TGraphDescriptor>
+        where TGraphDescriptor : IGraphDescriptor
     {
         public GraphService(
-            TAssociativyGraphDescriptor associativyGraphDescriptor)
-            : base(associativyGraphDescriptor)
+            TGraphDescriptor graphDescriptor)
+            : base(graphDescriptor)
         {
         }
 
@@ -109,11 +109,11 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class GraphService : GraphService<IAssociativyGraphDescriptor>, IGraphService
+    public class GraphService : GraphService<IGraphDescriptor>, IGraphService
     {
         public GraphService(
-            IAssociativyGraphDescriptor associativyGraphDescriptor)
-            : base(associativyGraphDescriptor)
+            IGraphDescriptor graphDescriptor)
+            : base(graphDescriptor)
         {
         }
     }

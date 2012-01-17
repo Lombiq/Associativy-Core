@@ -9,7 +9,7 @@ namespace Associativy.EventHandlers
     /// methods through IAssociativeGraphEventHandler instances then there is no proper way for class A to hook into B's events.
     /// See Associativy.Services.Mind how IGraphEventDispatcher can be used to circumvent the problem.
     /// </summary>
-    public interface IAssociativeGraphEventDispatcher : IAssociativeGraphEventHandler
+    public interface IGraphEventDispatcher : IGraphEventHandler
     {
         event EventHandler ChangedEvent;
     }

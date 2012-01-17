@@ -14,12 +14,12 @@ namespace Associativy.Services
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
-        protected readonly IAssociativeGraphEventHandler _graphEventHandler;
+        protected readonly IGraphEventHandler _graphEventHandler;
 
         public ConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             IContentManager contentManager,
-            IAssociativeGraphEventHandler graphEventHandler)
+            IGraphEventHandler graphEventHandler)
             : base(null)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;

@@ -13,13 +13,13 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class Mind<TAssociativyGraphDescriptor> : AssociativyServiceBase, IMind<TAssociativyGraphDescriptor>
-        where TAssociativyGraphDescriptor : IAssociativyGraphDescriptor
+    public class Mind<TGraphDescriptor> : AssociativyServiceBase, IMind<TGraphDescriptor>
+        where TGraphDescriptor : IGraphDescriptor
     {
-        protected readonly INodeManager<TAssociativyGraphDescriptor> _nodeManager;
-        protected readonly IPathFinder<TAssociativyGraphDescriptor> _pathFinder;
-        protected readonly IGraphService<TAssociativyGraphDescriptor> _graphService;
-        protected readonly IAssociativeGraphEventMonitor _associativeGraphEventMonitor;
+        protected readonly INodeManager<TGraphDescriptor> _nodeManager;
+        protected readonly IPathFinder<TGraphDescriptor> _pathFinder;
+        protected readonly IGraphService<TGraphDescriptor> _graphService;
+        protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
@@ -27,7 +27,7 @@ namespace Associativy.Services
         #endregion
 
         private readonly object _graphDescriptorLocker = new object();
-        public override IAssociativyGraphDescriptor GraphDescriptor
+        public override IGraphDescriptor GraphDescriptor
         {
             set
             {
@@ -43,13 +43,13 @@ namespace Associativy.Services
 
 
         public Mind(
-            TAssociativyGraphDescriptor associativyGraphDescriptor,
-            INodeManager<TAssociativyGraphDescriptor> nodeManager,
-            IPathFinder<TAssociativyGraphDescriptor> pathFinder,
-            IGraphService<TAssociativyGraphDescriptor> graphService,
-            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            TGraphDescriptor graphDescriptor,
+            INodeManager<TGraphDescriptor> nodeManager,
+            IPathFinder<TGraphDescriptor> pathFinder,
+            IGraphService<TGraphDescriptor> graphService,
+            IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyGraphDescriptor)
+            : base(graphDescriptor)
         {
             _nodeManager = nodeManager;
             _pathFinder = pathFinder;
@@ -313,16 +313,16 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class Mind : Mind<IAssociativyGraphDescriptor>, IMind
+    public class Mind : Mind<IGraphDescriptor>, IMind
     {
         public Mind(
-            IAssociativyGraphDescriptor associativyGraphDescriptor,
+            IGraphDescriptor graphDescriptor,
             INodeManager nodeManager,
             IPathFinder pathFinder,
             IGraphService graphService,
-            IAssociativeGraphEventMonitor associativeGraphEventMonitor,
+            IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(associativyGraphDescriptor, nodeManager, pathFinder, graphService, associativeGraphEventMonitor, cacheManager)
+            : base(graphDescriptor, nodeManager, pathFinder, graphService, associativeGraphEventMonitor, cacheManager)
         {
         }
     }
