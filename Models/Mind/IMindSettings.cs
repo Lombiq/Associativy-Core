@@ -1,4 +1,6 @@
 ﻿using Orchard;
+using Orchard.ContentManagement;
+using System;
 
 namespace Associativy.Models.Mind
 {
@@ -20,5 +22,10 @@ namespace Associativy.Models.Mind
         int MaxZoomLevel { get; set; }
 
         int MaxDistance { get; set; }
+
+        /// <summary>
+        /// Use this to customize the query which is run against content items, e. g. to specify the version to use or to eager-load records to enhance performance
+        /// </summary>
+        Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> QueryModifier { get; set; }
     }
 }
