@@ -4,6 +4,6 @@ namespace Associativy.GraphDescription.Contexts
 {
     public interface IContentContext
     {
-        string GraphName { get; }
+        string ContentType { get; }
     }
 }

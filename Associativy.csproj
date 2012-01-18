@@ -103,9 +103,11 @@
     <Compile Include="GraphDescription\Contexts\DescribeContext.cs" />
     <Compile Include="GraphDescription\Contexts\DescribeContextImpl.cs" />
     <Compile Include="GraphDescription\Contexts\DescribeFor.cs" />
+    <Compile Include="GraphDescription\Contexts\DescribeForImpl.cs" />
     <Compile Include="GraphDescription\Contexts\IContentContext.cs" />
     <Compile Include="GraphDescription\Contexts\IGraphContext.cs" />
     <Compile Include="GraphDescription\GraphDescriptor.cs" />
+    <Compile Include="GraphDescription\IGraphProvider.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />
