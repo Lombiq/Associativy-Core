@@ -7,7 +7,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for dealing with connections between nodes
     /// </summary>
-    public interface IConnectionManager : IAssociativyService
+    public interface IConnectionManager
     {
         /// <summary>
         /// Checks if the nodes are neighbours (= directly connected to each other)

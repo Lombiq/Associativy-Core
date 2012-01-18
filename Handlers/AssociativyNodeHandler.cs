@@ -6,19 +6,19 @@ using Associativy.Services;
 using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
 using System.Diagnostics;
-using Associativy.GraphDescription;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Handlers
 {
     [OrchardFeature("Associativy")]
     public class AssociativyNodeHandler : ContentHandler
     {
-        private readonly IGraphDescriptorManager _graphDescriptorManager;
+        private readonly IGraphProviderManager _graphProviderManager;
         private readonly IGraphEventHandler _graphEventHandler;
 
-        public AssociativyNodeHandler(IGraphDescriptorManager graphDescriptorManager, IGraphEventHandler graphEventHandler)
+        public AssociativyNodeHandler(IGraphProviderManager graphProviderManager, IGraphEventHandler graphEventHandler)
         {
-            _graphDescriptorManager = graphDescriptorManager;
+            _graphProviderManager = graphProviderManager;
             _graphEventHandler = graphEventHandler;
         }
 
@@ -29,27 +29,27 @@ namespace Associativy.Handlers
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            if (!_graphDescriptors.ContainsKey(context.ContentItem.ContentType)) return;
-
-            InvokeEventHandlerWithGraphDescriptors(_graphDescriptors[context.ContentItem.ContentType], (graphDescriptor) => _graphEventHandler.NodeChanged(context.ContentItem, graphDescriptor));
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext) => _graphEventHandler.NodeChanged(context.ContentItem, graphContext));
         }
 
         protected override void Removed(RemoveContentContext context)
         {
-            if (!_graphDescriptors.ContainsKey(context.ContentItem.ContentType)) return;
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext) =>
+                {
+                    _graphEventHandler.NodeRemoved(context.ContentItem, graphContext);
+                });
 
-            InvokeEventHandlerWithGraphDescriptors(_graphDescriptors[context.ContentItem.ContentType], (graphDescriptor) => _graphEventHandler.NodeRemoved(context.ContentItem, graphDescriptor));
-
-            foreach (var graphDescriptor in _graphDescriptors[context.ContentItem.ContentType])
-            {
-                graphDescriptor.ConnectionManager.DeleteFromNode(context.ContentItem);
-            }
+            // For now connections should remanin intact
+            //foreach (var graphDescriptor in _graphDescriptors[context.ContentItem.ContentType])
+            //{
+            //    graphDescriptor.ConnectionManager.DeleteFromNode(context.ContentItem);
+            //}
         }
 
         private void TryInvokeEventHandler(string contentType, Action<IGraphContext> eventHandler)
         {
-            IEnumerable<IGraphDescriptor> descriptors;
-            if (!_graphDescriptorManager.TryFindDescriptorsForContentType(new ContentContext(contentType), out descriptors)) return;
+            IEnumerable<IGraphProvider> descriptors;
+            if (!_graphProviderManager.TryFindProvidersForContentType(new ContentContext(contentType), out descriptors)) return;
 
             foreach (var descriptor in descriptors)
             {

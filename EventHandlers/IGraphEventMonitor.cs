@@ -1,6 +1,6 @@
 ﻿using Associativy.Models;
 using Orchard.Caching;
-using Associativy.GraphDescription;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.EventHandlers
 {

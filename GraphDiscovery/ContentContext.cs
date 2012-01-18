@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using Orchard.Environment.Extensions;
 
-namespace Associativy.GraphDescription
+namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
     public class ContentContext : IContentContext

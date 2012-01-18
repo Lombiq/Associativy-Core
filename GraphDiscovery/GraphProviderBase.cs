@@ -2,13 +2,14 @@
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Piedone.HelpfulLibraries.DependencyInjection;
-using Associativy.GraphDescription;
+using Associativy.GraphDiscovery;
 using System.Collections.Generic;
+using Associativy.Models;
 
-namespace Associativy.Models
+namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
-    public abstract class GraphDescriptorBase<TNodeToNodeConnectorRecord> : IGraphDescriptor
+    public abstract class GraphProviderBase<TNodeToNodeConnectorRecord> : IGraphProvider
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
         public virtual string GraphName { get; protected set; }
@@ -21,17 +22,13 @@ namespace Associativy.Models
             get
             {
                 var connectionManager = _connectionManagerResolver.Value;
-                connectionManager.GraphDescriptor = this;
                 return connectionManager;
             }
         }
 
-        IGraphContext SupportedGraphContext { get; protected set; }
-        IEnumerable<IContentContext> SupportedContentContexts { get; protected set; }
-
         public Localizer T { get; set; }
 
-        public GraphDescriptorBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public GraphProviderBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
         {
             _connectionManagerResolver = connectionManagerResolver;
 
