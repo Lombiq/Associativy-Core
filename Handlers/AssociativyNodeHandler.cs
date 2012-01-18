@@ -6,26 +6,27 @@ using Associativy.Services;
 using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
 using System.Diagnostics;
+using Associativy.GraphDescription;
+using Associativy.GraphDescription.Services;
+using Associativy.GraphDescription.Contexts;
 
 namespace Associativy.Handlers
 {
     [OrchardFeature("Associativy")]
     public class AssociativyNodeHandler : ContentHandler
     {
-        private readonly IDictionary<string, IList<IGraphDescriptor>> _graphDescriptors;
+        private readonly IGraphDescriptorManager _graphDescriptorManager;
         private readonly IGraphEventHandler _graphEventHandler;
 
-        public AssociativyNodeHandler(IGraphDescriptorManager graphDescriptorLocator, IGraphEventHandler graphEventHandler)
+        public AssociativyNodeHandler(IGraphDescriptorManager graphDescriptorManager, IGraphEventHandler graphEventHandler)
         {
-            _graphDescriptors = graphDescriptorLocator.FindGraphDescriptorsByRegisteredContentTypes();
+            _graphDescriptorManager = graphDescriptorManager;
             _graphEventHandler = graphEventHandler;
         }
 
         protected override void Created(CreateContentContext context)
         {
-            if (!_graphDescriptors.ContainsKey(context.ContentType)) return;
-
-            InvokeEventHandlerWithGraphDescriptors(_graphDescriptors[context.ContentType], (graphDescriptor) => _graphEventHandler.NodeAdded(context.ContentItem, graphDescriptor));
+            TryInvokeEventHandler(context.ContentType, (graphContext) => _graphEventHandler.NodeAdded(context.ContentItem, graphContext));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
@@ -47,11 +48,14 @@ namespace Associativy.Handlers
             }
         }
 
-        private void InvokeEventHandlerWithGraphDescriptors(IList<IGraphDescriptor> graphDescriptors, Action<IGraphDescriptor> eventHandler)
+        private void TryInvokeEventHandler(string contentType, Action<IGraphContext> eventHandler)
         {
-            foreach (var graphDescriptor in graphDescriptors)
+            IEnumerable<IGraphDescriptor> descriptors;
+            if (!_graphDescriptorManager.TryFindDescriptorsForContentType(new ContentContext(contentType), out descriptors)) return;
+
+            foreach (var descriptor in descriptors)
             {
-                eventHandler(graphDescriptor);
+                eventHandler(new GraphContext(descriptor.GraphName));
             }
         }
     }

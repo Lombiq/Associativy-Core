@@ -12,23 +12,23 @@ namespace Associativy.GraphDescription
     public class GraphDescriptor
     {
         /// <summary>
-        /// Human-readable name of the graph
-        /// </summary>
-        LocalizedString DisplayName { get; set; }
-
-        /// <summary>
         /// Name of the graph used to identify it. Must be unique across the registered graphDescriptors.
         /// </summary>
-        string Name { get; set; }
+        public string GraphName { get; set; }
+
+        /// <summary>
+        /// Human-readable name of the graph
+        /// </summary>
+        public LocalizedString DisplayName { get; set; }
 
         /// <summary>
         /// The types of the content items stored by the graph
         /// </summary>
-        string[] ContentTypes { get; set; }
+        public string[] ContentTypes { get; set; }
 
         /// <summary>
         /// The IConnectionManager instance used by the graph
         /// </summary>
-        IConnectionManager ConnectionManager { get; set; }
+        public IConnectionManager ConnectionManager { get; set; }
     }
 }

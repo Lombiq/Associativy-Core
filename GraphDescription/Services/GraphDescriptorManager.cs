@@ -10,17 +10,22 @@ namespace Associativy.GraphDescription.Services
     [OrchardFeature("Associativy")]
     public class GraphDescriptorManager : IGraphDescriptorManager
     {
-        private readonly IEnumerable<IGraphDescriptor> _registeredGraphDescriptors;
+        private readonly IEnumerable<IGraphProvider> _registeredGraphDescriptors;
 
-        public GraphDescriptorManager(IEnumerable<IGraphDescriptor> registeredGraphDescriptors)
+        public GraphDescriptorManager(IEnumerable<IGraphProvider> graphProviders)
         {
-            _registeredGraphDescriptors = registeredGraphDescriptors;
-            CompileDescriptors();
+            _registeredGraphDescriptors = graphProviders;
+
+            // This maybe not in ctor...
+            var context = new DescribeContextImpl();
+            foreach (var provider in graphProviders)
+            {
+                provider.Describe(context);
+            }
+
+            
         }
 
-        public void CompileDescriptors()
-        {
-        }
 
         public IGraphDescriptor FindGraphDescriptor(string technicalGraphName)
         {

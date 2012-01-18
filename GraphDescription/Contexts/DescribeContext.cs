@@ -10,7 +10,6 @@ namespace Associativy.GraphDescription.Contexts
     public abstract class DescribeContext
     {
         public abstract DescribeFor For(string graphName);
-        public abstract GraphDescriptor Describe(IGraphContext graphContext);
-        public abstract IEnumerable<GraphDescriptor> Describe(IContentContext contentContext);
+        public abstract IEnumerable<GraphDescriptor> Describe();
     }
 }
