@@ -15,7 +15,7 @@ namespace Associativy.Handlers
         private readonly IDictionary<string, IList<IGraphDescriptor>> _graphDescriptors;
         private readonly IGraphEventHandler _graphEventHandler;
 
-        public AssociativyNodeHandler(IGraphDescriptorLocator graphDescriptorLocator, IGraphEventHandler graphEventHandler)
+        public AssociativyNodeHandler(IGraphDescriptorManager graphDescriptorLocator, IGraphEventHandler graphEventHandler)
         {
             _graphDescriptors = graphDescriptorLocator.FindGraphDescriptorsByRegisteredContentTypes();
             _graphEventHandler = graphEventHandler;

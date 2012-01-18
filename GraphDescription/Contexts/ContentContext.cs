@@ -7,11 +7,14 @@ using Orchard.Environment.Extensions;
 namespace Associativy.GraphDescription.Contexts
 {
     [OrchardFeature("Associativy")]
-    public abstract class ContentContext
+    public class ContentContext : IContentContext
     {
-        /// <summary>
-        /// Name of the graph used to identify it
-        /// </summary>
-        public abstract string GraphName { get; }
+        private readonly string _contentType;
+        public string ContentType { get; }
+
+        public ContentContext(string contentType)
+        {
+            _contentType = contentType;
+        }
     }
 }

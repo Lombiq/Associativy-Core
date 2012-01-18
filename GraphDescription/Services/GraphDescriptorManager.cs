@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Associativy.Models;
 using Orchard.Environment.Extensions;
+using Associativy.GraphDescription.Contexts;
 
-namespace Associativy.Services
+namespace Associativy.GraphDescription.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphDescriptorLocator : IGraphDescriptorLocator
+    public class GraphDescriptorManager : IGraphDescriptorManager
     {
         private readonly IEnumerable<IGraphDescriptor> _registeredGraphDescriptors;
 
-        public GraphDescriptorLocator(IEnumerable<IGraphDescriptor> registeredGraphDescriptors)
+        public GraphDescriptorManager(IEnumerable<IGraphDescriptor> registeredGraphDescriptors)
         {
             _registeredGraphDescriptors = registeredGraphDescriptors;
+            CompileDescriptors();
+        }
+
+        public void CompileDescriptors()
+        {
         }
 
         public IGraphDescriptor FindGraphDescriptor(string technicalGraphName)
@@ -50,6 +56,16 @@ namespace Associativy.Services
             }
 
             return graphDescriptors;
+        }
+
+        public GraphDescriptor FindGraphDescriptor(IGraphContext graphContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<GraphDescriptor> FindGraphDescriptors(IContentContext contentContext)
+        {
+            throw new NotImplementedException();
         }
     }
 }

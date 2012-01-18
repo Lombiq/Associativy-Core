@@ -110,9 +110,9 @@
     <Compile Include="Models\Nodes\AssociativyNodeLabelPart.cs" />
     <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="Models\ReadonlyGraphDescriptorBase.cs" />
-    <Compile Include="Services\GraphDescriptorLocator.cs" />
+    <Compile Include="Services\GraphDescriptorManager.cs" />
     <Compile Include="Services\GraphService.cs" />
-    <Compile Include="Services\IGraphDescriptorLocator.cs" />
+    <Compile Include="Services\IGraphDescriptorManager.cs" />
     <Compile Include="Services\IAssociativyService.cs" />
     <Compile Include="Models\GraphDescriptorBase.cs" />
     <Compile Include="Models\IGraphDescriptor.cs" />
