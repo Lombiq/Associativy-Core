@@ -2,6 +2,7 @@
 using Associativy.EventHandlers;
 using Associativy.Models;
 using Orchard.Caching;
+using Associativy.GraphDescription;
 
 namespace Associativy.Services
 {
@@ -29,17 +30,17 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChanged(IAcquireContext aquireContext, IGraphDescriptor graphDescriptor)
+        public void MonitorChanged(IAcquireContext aquireContext, IGraphContext graphContext)
         {
-            var signal = graphDescriptor.TechnicalGraphName + "ChangedSignal";
-            _changedSignals[graphDescriptor.TechnicalGraphName] = signal;
+            var signal = graphContext.GraphName + "ChangedSignal";
+            _changedSignals[graphContext.GraphName] = signal;
             aquireContext.Monitor(_signals.When(signal));
         }
 
-        public override void Changed(IGraphDescriptor graphDescriptor)
+        public override void Changed(IGraphContext graphContext)
         {
             string signal;
-            if (_changedSignals.TryGetValue(graphDescriptor.TechnicalGraphName, out signal))
+            if (_changedSignals.TryGetValue(graphContext.GraphName, out signal))
             {
                 _signals.Trigger(signal);
             }

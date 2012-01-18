@@ -35,7 +35,7 @@ namespace Associativy.Services
                 {
                     _nodeManager.GraphDescriptor = value;
                     _pathFinder.GraphDescriptor = value;
-                    _cachePrefix = value.TechnicalGraphName + ".";
+                    _cachePrefix = value.GraphName + ".";
                     base.GraphDescriptor = value;
                 }
             }

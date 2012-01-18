@@ -1,6 +1,7 @@
 ﻿using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.Events;
+using Associativy.GraphDescription;
 
 namespace Associativy.EventHandlers
 {
@@ -11,21 +12,21 @@ namespace Associativy.EventHandlers
     /// </summary>
     public interface IGraphEventHandler : IEventHandler
     {
-        void NodeAdded(IContent node, IGraphDescriptor graphDescriptor);
+        void NodeAdded(IContent node, IGraphContext graphContext);
 
-        void NodeRemoved(IContent node, IGraphDescriptor graphDescriptor);
+        void NodeRemoved(IContent node, IGraphContext graphContext);
 
-        void NodeChanged(IContent node, IGraphDescriptor graphDescriptor);
+        void NodeChanged(IContent node, IGraphContext graphContext);
 
-        void ConnectionAdded(int nodeId1, int nodeId2, IGraphDescriptor graphDescriptor);
+        void ConnectionAdded(int nodeId1, int nodeId2, IGraphContext graphContext);
 
-        void ConnectionsDeletedFromNode(int nodeId, IGraphDescriptor graphDescriptor);
+        void ConnectionsDeletedFromNode(int nodeId, IGraphContext graphContext);
 
-        void ConnectionDeleted(int nodeId1, int nodeId2, IGraphDescriptor graphDescriptor);
+        void ConnectionDeleted(int nodeId1, int nodeId2, IGraphContext graphContext);
 
         /// <summary>
         /// Gets called when the associative graph has changed.
         /// </summary>
-        void Changed(IGraphDescriptor graphDescriptor);
+        void Changed(IGraphContext graphContext);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Associativy.Services;
 using Orchard;
 using Orchard.Localization;
+using Associativy.GraphDescription;
+using System.Collections.Generic;
 
 namespace Associativy.Models
 {
@@ -11,14 +13,14 @@ namespace Associativy.Models
     public interface IGraphDescriptor : IDependency
     {
         /// <summary>
-        /// Human-readable name of the graph.
-        /// </summary>
-        LocalizedString GraphName { get; }
-
-        /// <summary>
         /// Name of the graph used to identify it. Must be unique across the registered graphDescriptors.
         /// </summary>
-        string TechnicalGraphName { get; }
+        string GraphName { get; }
+
+        /// <summary>
+        /// Human-readable name of the graph.
+        /// </summary>
+        LocalizedString DisplayName { get; }
 
         /// <summary>
         /// The types of the content items stored by the graph.
@@ -29,5 +31,9 @@ namespace Associativy.Models
         /// The IConnectionManager instance used by the graphDescriptor.
         /// </summary>
         IConnectionManager ConnectionManager { get; }
+
+        IGraphContext SupportedGraphContext { get; }
+
+        IEnumerable<IContentContext> SupportedContentContexts { get; }
     }
 }
