@@ -9,15 +9,7 @@ namespace Associativy.GraphDiscovery
     [OrchardFeature("Associativy")]
     public class GraphContext : IGraphContext
     {
-        private string _providerName;
-        public string ProviderName
-        {
-            get { return _providerName; }
-        }
-
-        public GraphContext(string providerName)
-        {
-            _providerName = providerName;
-        }
+        public string GraphName { get; set; }
+        public IEnumerable<string> ContentTypes { get; set; }
     }
 }

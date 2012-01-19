@@ -6,32 +6,32 @@ namespace Associativy.EventHandlers
 {
     public abstract class GraphEventHandlerBase : IGraphEventHandler
     {
-        public virtual void NodeAdded(IContent node, IGraphContext graphContext)
+        public virtual void NodeAdded(IGraphContext graphContext, IContent node)
         {
             Changed(graphContext);
         }
 
-        public virtual void NodeRemoved(IContent node, IGraphContext graphContext)
+        public virtual void NodeRemoved(IGraphContext graphContext, IContent node)
         {
             Changed(graphContext);
         }
 
-        public virtual void NodeChanged(IContent node, IGraphContext graphContext)
+        public virtual void NodeChanged(IGraphContext graphContext, IContent node)
         {
             Changed(graphContext);
         }
 
-        public virtual void ConnectionAdded(int nodeId1, int nodeId2, IGraphContext graphContext)
+        public virtual void ConnectionAdded(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
             Changed(graphContext);
         }
 
-        public virtual void ConnectionsDeletedFromNode(int nodeId, IGraphContext graphContext)
+        public virtual void ConnectionsDeletedFromNode(IGraphContext graphContext, int nodeId)
         {
             Changed(graphContext);
         }
 
-        public virtual void ConnectionDeleted(int nodeId1, int nodeId2, IGraphContext graphContext)
+        public virtual void ConnectionDeleted(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
             Changed(graphContext);
         }

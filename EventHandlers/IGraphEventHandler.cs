@@ -12,17 +12,17 @@ namespace Associativy.EventHandlers
     /// </summary>
     public interface IGraphEventHandler : IEventHandler
     {
-        void NodeAdded(IContent node, IGraphContext graphContext);
+        void NodeAdded(IGraphContext graphContext, IContent node);
 
-        void NodeRemoved(IContent node, IGraphContext graphContext);
+        void NodeRemoved(IGraphContext graphContext, IContent node);
 
-        void NodeChanged(IContent node, IGraphContext graphContext);
+        void NodeChanged(IGraphContext graphContext, IContent node);
 
-        void ConnectionAdded(int nodeId1, int nodeId2, IGraphContext graphContext);
+        void ConnectionAdded(IGraphContext graphContext, int nodeId1, int nodeId2);
 
-        void ConnectionsDeletedFromNode(int nodeId, IGraphContext graphContext);
+        void ConnectionsDeletedFromNode(IGraphContext graphContext, int nodeId);
 
-        void ConnectionDeleted(int nodeId1, int nodeId2, IGraphContext graphContext);
+        void ConnectionDeleted(IGraphContext graphContext, int nodeId1, int nodeId2);
 
         /// <summary>
         /// Gets called when the associative graph has changed.

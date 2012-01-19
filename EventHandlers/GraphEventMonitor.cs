@@ -30,17 +30,17 @@ namespace Associativy.Services
             _signals = signals;
         }
 
-        public void MonitorChanged(IAcquireContext aquireContext, IGraphContext graphContext)
+        public void MonitorChanged(IGraphContext graphContext, IAcquireContext aquireContext)
         {
-            var signal = graphContext.ProviderName + "ChangedSignal";
-            _changedSignals[graphContext.ProviderName] = signal;
+            var signal = graphContext.GraphName + "ChangedSignal";
+            _changedSignals[graphContext.GraphName] = signal;
             aquireContext.Monitor(_signals.When(signal));
         }
 
         public override void Changed(IGraphContext graphContext)
         {
             string signal;
-            if (_changedSignals.TryGetValue(graphContext.ProviderName, out signal))
+            if (_changedSignals.TryGetValue(graphContext.GraphName, out signal))
             {
                 _signals.Trigger(signal);
             }

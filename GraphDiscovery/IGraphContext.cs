@@ -10,6 +10,11 @@ namespace Associativy.GraphDiscovery
         /// <summary>
         /// Name of the graph used to identify it
         /// </summary>
-        string ProviderName { get; }
+        string GraphName { get; }
+
+        /// <summary>
+        /// The types of the content items stored by the graph
+        /// </summary>
+        IEnumerable<string> ContentTypes { get; }
     }
 }

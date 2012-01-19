@@ -6,6 +6,6 @@ namespace Associativy.EventHandlers
 {
     public interface IGraphEventMonitor : IGraphEventHandler
     {
-        void MonitorChanged(IAcquireContext aquireContext, IGraphContext graphContext);
+        void MonitorChanged(IGraphContext graphContext, IAcquireContext aquireContext);
     }
 }

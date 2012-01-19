@@ -10,15 +10,8 @@ using Orchard.ContentManagement;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphService<TGraphDescriptor> : AssociativyServiceBase, IGraphService<TGraphDescriptor>
-        where TGraphDescriptor : IGraphDescriptor
+    public class GraphService : IGraphService
     {
-        public GraphService(
-            TGraphDescriptor graphDescriptor)
-            : base(graphDescriptor)
-        {
-        }
-
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
         {
             return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>(false);
@@ -105,16 +98,6 @@ namespace Associativy.Services
 
 
             return zoomPartitions;
-        }
-    }
-
-    [OrchardFeature("Associativy")]
-    public class GraphService : GraphService<IGraphDescriptor>, IGraphService
-    {
-        public GraphService(
-            IGraphDescriptor graphDescriptor)
-            : base(graphDescriptor)
-        {
         }
     }
 }

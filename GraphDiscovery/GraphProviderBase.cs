@@ -12,15 +12,12 @@ namespace Associativy.GraphDiscovery
     public abstract class GraphProviderBase<TNodeToNodeConnectorRecord> : IGraphProvider
         where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
     {
-        public virtual string GraphName { get; protected set; }
-        public virtual LocalizedString DisplayName { get; protected set; }
-        public virtual string[] ContentTypes { get; protected set; }
-
         protected readonly IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
-        public IConnectionManager ConnectionManager
+        protected IConnectionManager ConnectionManager
         {
             get
             {
+                // Cache the resolved service maybe?
                 var connectionManager = _connectionManagerResolver.Value;
                 return connectionManager;
             }
@@ -33,6 +30,11 @@ namespace Associativy.GraphDiscovery
             _connectionManagerResolver = connectionManagerResolver;
 
             T = NullLocalizer.Instance;
+        }
+
+        public virtual void Describe(GraphDescriptor descriptor)
+        {
+            descriptor.ConnectionManager = ConnectionManager;
         }
     }
 }
