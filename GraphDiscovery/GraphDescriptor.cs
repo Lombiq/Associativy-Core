@@ -18,21 +18,26 @@ namespace Associativy.GraphDiscovery
         /// <summary>
         /// Name of the graph provider used to identify it
         /// </summary>
-        public virtual string GraphName { get; set; }
+        public virtual string GraphName { get; protected set; }
 
         /// <summary>
         /// Human-readable name of the graph
         /// </summary>
-        public virtual LocalizedString DisplayGraphName { get; set; }
+        public virtual LocalizedString DisplayGraphName { get; protected set; }
 
         /// <summary>
         /// The types of the content items stored by the graph
         /// </summary>
-        public virtual IEnumerable<string> ContentTypes { get; set; }
+        public virtual IEnumerable<string> ContentTypes { get; protected set; }
 
         /// <summary>
         /// The IConnectionManager instance used by the provider
         /// </summary>
-        public virtual IConnectionManager ConnectionManager { get; set; }
+        public virtual IConnectionManager ConnectionManager { get; protected set; }
+
+        public virtual IGraphContext ProduceContext()
+        {
+            return new GraphContext { GraphName = GraphName, ContentTypes = ContentTypes };
+        }
     }
 }

@@ -100,6 +100,7 @@
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="GraphDiscovery\GraphContext.cs" />
+    <Compile Include="GraphDiscovery\GraphDescribeContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />

@@ -4,6 +4,8 @@ using System.Linq;
 using Associativy.Models;
 using Orchard.Environment.Extensions;
 using System.Diagnostics;
+using Orchard.Localization;
+using Associativy.Services;
 
 namespace Associativy.GraphDiscovery
 {
@@ -11,22 +13,21 @@ namespace Associativy.GraphDiscovery
     public class GraphManager : IGraphManager
     {
         private readonly IEnumerable<IGraphProvider> _registeredProviders;
-        private readonly List<GraphDescriptorImpl> _graphDescriptors = new List<GraphDescriptorImpl>();
+        private GraphDescribeContextImpl _describeContext;
 
         public GraphManager(IEnumerable<IGraphProvider> registeredProviders)
         {
             _registeredProviders = registeredProviders;
-            CompileProviders(); // Maybe should be called elsewhere, lazily...
+            CompileProviders(); // Maybe should be called elsewhere, lazily, but is freaking fast (15 ticks).
         }
 
         private void CompileProviders()
         {
-            // Not so fast (1/2 ms), so should be lazy instead
+            _describeContext = new GraphDescribeContextImpl();
+
             foreach (var provider in _registeredProviders)
             {
-                var descriptor = new GraphDescriptorImpl();
-                provider.Describe(descriptor);
-                _graphDescriptors.Add(descriptor);
+                provider.Describe(_describeContext);
             }
         }
 
@@ -38,7 +39,8 @@ namespace Associativy.GraphDiscovery
         public IEnumerable<GraphDescriptor> FindDescriptors(IGraphContext graphContext)
         {
             // That's very fast (few dozen ticks), so there's no point in caching anything.
-            IEnumerable<GraphDescriptorImpl> descriptors = _graphDescriptors;
+            // If it gets heavy, could be stored in an instance cache by context.
+            IEnumerable<GraphDescriptorImpl> descriptors = _describeContext.GraphDescriptors;
 
             if (!String.IsNullOrEmpty(graphContext.GraphName))
             {
@@ -63,8 +65,29 @@ namespace Associativy.GraphDiscovery
         }
 
 
+        private class GraphDescribeContextImpl : GraphDescribeContext
+        {
+            private readonly List<GraphDescriptorImpl> _graphDescriptors = new List<GraphDescriptorImpl>();
+            public List<GraphDescriptorImpl> GraphDescriptors
+            {
+                get { return _graphDescriptors; }
+            }
+            
+            public override void As(string graphName, LocalizedString displayGraphName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
+            {
+                _graphDescriptors.Add(new GraphDescriptorImpl(graphName, displayGraphName, contentTypes, connectionManager));
+            }
+        }
+
         private class GraphDescriptorImpl : GraphDescriptor
         {
+            public GraphDescriptorImpl(string graphName, LocalizedString displayGraphName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
+            {
+                GraphName = graphName;
+                DisplayGraphName = displayGraphName;
+                ContentTypes = contentTypes;
+                ConnectionManager = connectionManager;
+            }
         }
     }
 }

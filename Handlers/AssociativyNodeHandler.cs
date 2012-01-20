@@ -53,6 +53,8 @@ namespace Associativy.Handlers
 
             foreach (var descriptor in descriptors)
             {
+                // descriptor.ProduceContext() could be erroneous as the context with only the current content type is needed,
+                // not all content types stored by the graph.
                 context.GraphName = descriptor.GraphName;
                 eventHandler(context);
             }

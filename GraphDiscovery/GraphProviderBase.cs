@@ -5,6 +5,7 @@ using Piedone.HelpfulLibraries.DependencyInjection;
 using Associativy.GraphDiscovery;
 using System.Collections.Generic;
 using Associativy.Models;
+using System.Diagnostics;
 
 namespace Associativy.GraphDiscovery
 {
@@ -17,9 +18,7 @@ namespace Associativy.GraphDiscovery
         {
             get
             {
-                // Cache the resolved service maybe?
-                var connectionManager = _connectionManagerResolver.Value;
-                return connectionManager;
+                return _connectionManagerResolver.Value;
             }
         }
 
@@ -32,9 +31,6 @@ namespace Associativy.GraphDiscovery
             T = NullLocalizer.Instance;
         }
 
-        public virtual void Describe(GraphDescriptor descriptor)
-        {
-            descriptor.ConnectionManager = ConnectionManager;
-        }
+        public abstract void Describe(GraphDescribeContext describeContext);
     }
 }

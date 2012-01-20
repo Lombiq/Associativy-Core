@@ -8,6 +8,6 @@ namespace Associativy.GraphDiscovery
 {
     public interface IGraphProvider : IDependency
     {
-        void Describe(GraphDescriptor descriptor);
+        void Describe(GraphDescribeContext describeContext);
     }
 }
