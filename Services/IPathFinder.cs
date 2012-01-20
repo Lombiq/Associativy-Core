@@ -2,15 +2,14 @@
 using Associativy.Models;
 using Associativy.Models.Mind;
 using Orchard;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IPathFinder<TGraphDescriptor> : IAssociativyService
-        where TGraphDescriptor : IGraphDescriptor
+    public interface IPathFinder : IDependency
     {
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
@@ -20,13 +19,7 @@ namespace Associativy.Services
         /// <param name="maxDistance"></param>
         /// <param name="useCache"></param>
         /// <returns>A list of succeeded paths, where a path is a list of the ids of the nodes on the path.</returns>
-        IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
+        IEnumerable<IEnumerable<int>> FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
 
-    }
-    /// <summary>
-    /// Deals with node-to-node path calculations
-    /// </summary>
-    public interface IPathFinder : IPathFinder<IGraphDescriptor>, IDependency
-    {
     }
 }

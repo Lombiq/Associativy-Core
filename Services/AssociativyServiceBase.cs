@@ -1,21 +1,20 @@
-﻿using Associativy.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Orchard.Environment.Extensions;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
-    public abstract class AssociativyServiceBase : IAssociativyService
+    [OrchardFeature("Associativy")]
+    public abstract class AssociativyServiceBase
     {
-        // Although reference read/write is atomic, this approach might cause headaches when concurrent threads wanted to use
-        // the same service with different graphDescriptors. Revise if necessary.
-        private IGraphDescriptor _graphDescriptor;
-        public virtual IGraphDescriptor GraphDescriptor
-        {
-            get { return _graphDescriptor; }
-            set { _graphDescriptor = value; }
-        }
+        protected readonly IGraphManager _graphManager;
 
-        protected AssociativyServiceBase(IGraphDescriptor graphDescriptor)
+        protected AssociativyServiceBase(IGraphManager graphManager)
         {
-            _graphDescriptor = graphDescriptor;
+            _graphManager = graphManager;
         }
     }
 }

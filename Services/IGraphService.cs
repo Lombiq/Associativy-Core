@@ -12,19 +12,10 @@ namespace Associativy.Services
     /// <summary>
     /// Performs work on graphs
     /// </summary>
-    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface IGraphService<TGraphDescriptor> : IAssociativyService
-        where TGraphDescriptor : IGraphDescriptor
+    public interface IGraphService : IDependency
     {
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory();
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int maxZoomLevel);
         int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int maxZoomLevel);
-    }
-
-    /// <summary>
-    /// Performs work on graphs
-    /// </summary>
-    public interface IGraphService : IGraphService<IGraphDescriptor>, IDependency
-    {
     }
 }

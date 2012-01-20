@@ -5,21 +5,21 @@ using Associativy.Models;
 using Associativy.Models.Mind;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class PathFinder<TGraphDescriptor> : AssociativyServiceBase, IPathFinder<TGraphDescriptor>
-        where TGraphDescriptor : IGraphDescriptor
+    public class PathFinder : AssociativyServiceBase, IPathFinder
     {
         protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
-            TGraphDescriptor graphDescriptor,
+            IGraphManager graphManager,
             IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
-            : base(graphDescriptor)
+            : base(graphManager)
         {
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
@@ -55,7 +55,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual IEnumerable<IEnumerable<int>> FindPaths(int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
+        public virtual IEnumerable<IEnumerable<int>> FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
         {
             // It could be that this is the only caching that's really needed and can work:
             // - With this tens of database queries can be saved.
@@ -65,10 +65,12 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(ctx, GraphDescriptor);
-                    return FindPaths(startNodeId, targetNodeId, maxDistance, false);
+                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
+                    return FindPaths(graphContext, startNodeId, targetNodeId, maxDistance, false);
                 });
             }
+
+            var descriptor = _graphManager.FindLastDescriptor(graphContext);
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<IList<int>>();
@@ -93,7 +95,7 @@ namespace Associativy.Services
                 if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (GraphDescriptor.ConnectionManager.AreNeighbours(currentNode.Id, targetNodeId))
+                    if (descriptor.ConnectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -112,7 +114,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = GraphDescriptor.ConnectionManager.GetNeighbourIds(currentNode.Id);
+                        var neighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {
@@ -150,18 +152,6 @@ namespace Associativy.Services
 
 
             return succeededPaths;
-        }
-    }
-
-    [OrchardFeature("Associativy")]
-    public class PathFinder : PathFinder<IGraphDescriptor>, IPathFinder
-    {
-        public PathFinder(
-            IGraphDescriptor graphDescriptor,
-            IGraphEventMonitor associativeGraphEventMonitor,
-            ICacheManager cacheManager)
-            : base(graphDescriptor, associativeGraphEventMonitor, cacheManager)
-        {
         }
     }
 }

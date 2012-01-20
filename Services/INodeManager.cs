@@ -2,27 +2,26 @@
 using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    /// <typeparam name="TGraphDescriptor">Type of the IAssociativyGraphDescriptor to use</typeparam>
-    public interface INodeManager<TGraphDescriptor> : IAssociativyService
-        where TGraphDescriptor : IGraphDescriptor
+    public interface INodeManager : IDependency
     {
         /// <summary>
         /// Query for customized retrieving of nodes
         /// </summary>
-        IContentQuery<ContentItem> ContentQuery { get; }
+        IContentQuery<ContentItem> GetContentQuery(IGraphContext graphContext);
 
         /// <summary>
         /// Query for retrieving multiple items
         /// </summary>
         /// <param name="ids">Ids of nodes</param>
         /// <returns></returns>
-        IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids);
+        IContentQuery<ContentItem> GetManyContentQuery(IGraphContext graphContext, IEnumerable<int> ids);
 
         /// <summary>
         /// Lists nodes that have labels similar to the given snippet
@@ -30,22 +29,15 @@ namespace Associativy.Services
         /// <param name="labelSnippet">The snippet of the nodes's label to search for</param>
         /// <param name="maxCount">Maximal number of items returned</param>
         /// <returns>Terms similar to the snippet</returns>
-        IEnumerable<IContent> GetSimilarNodes(string labelSnippet, int maxCount = 10, QueryHints queryHints = null);
+        IEnumerable<IContent> GetSimilarNodes(IGraphContext graphContext, string labelSnippet, int maxCount = 10, QueryHints queryHints = null);
 
         /// <summary>
         /// Gets the node with the specified label
         /// </summary>
         /// <param name="label"></param>
         /// <returns></returns>
-        IContent Get(string label, QueryHints queryHints = null);
+        IContent Get(IGraphContext graphContext, string label, QueryHints queryHints = null);
 
-        IEnumerable<IContent> GetMany(IEnumerable<string> labels, QueryHints queryHints = null);
-    }
-
-    /// <summary>
-    /// Service for handling nodes
-    /// </summary>
-    public interface INodeManager : INodeManager<IGraphDescriptor>, IDependency
-    {
+        IEnumerable<IContent> GetMany(IGraphContext graphContext, IEnumerable<string> labels, QueryHints queryHints = null);
     }
 }
