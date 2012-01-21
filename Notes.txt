@@ -12,3 +12,4 @@
 -	Associativy services are thread-safe.
 -	By convention modules using Associativy are named Associativy.Instances.ModuleName, but this is not mandatory.
 -	Since frontend engine page parts are added dynamically (not with migrations) they don't require a Driver.
+-	All frontend engine page types should include EngineCommonPart.
