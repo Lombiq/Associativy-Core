@@ -29,7 +29,7 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> GetContentQuery(IGraphContext graphContext)
         {
-            return _contentManager.Query(_graphManager.FindLastDescriptor(graphContext).ContentTypes.ToArray());
+            return _contentManager.Query(_graphManager.FindLastProvider(graphContext).ContentTypes.ToArray());
         }
 
         public IContentQuery<ContentItem> GetManyContentQuery(IGraphContext graphContext, IEnumerable<int> ids)

@@ -5,6 +5,12 @@ using System.Web;
 
 namespace Associativy.GraphDiscovery
 {
+    /// <summary>
+    /// Describes under what circumstances is a graph used
+    /// </summary>
+    /// <remarks>
+    /// For frontend engines to work properly, IGraphContext implementations should be marked with the Serializable attribute.
+    /// </remarks>
     public interface IGraphContext
     {
         /// <summary>

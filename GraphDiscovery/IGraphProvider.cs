@@ -6,8 +6,26 @@ using System.Collections.Generic;
 
 namespace Associativy.GraphDiscovery
 {
-    public interface IGraphProvider : IDependency
+    public interface IGraphProvider : IAssociativyProvider
     {
-        void Describe(GraphDescribeContext describeContext);
+        /// <summary>
+        /// Name of the graph provider used to identify it
+        /// </summary>
+        string GraphName { get; }
+
+        /// <summary>
+        /// Human-readable name of the graph
+        /// </summary>
+        LocalizedString DisplayGraphName { get; }
+
+        /// <summary>
+        /// The types of the content items stored by the graph
+        /// </summary>
+        IEnumerable<string> ContentTypes { get; }
+
+        /// <summary>
+        /// The IConnectionManager instance used by the provider
+        /// </summary>
+        IConnectionManager ConnectionManager { get; }
     }
 }

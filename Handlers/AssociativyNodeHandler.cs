@@ -38,24 +38,24 @@ namespace Associativy.Handlers
             TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext) => _graphEventHandler.NodeRemoved(graphContext, context.ContentItem));
 
             // For now connections should remanin intact
-            //foreach (var graphDescriptor in _graphDescriptors[context.ContentItem.ContentType])
+            //foreach (var grapProvider in _grapProviders[context.ContentItem.ContentType])
             //{
-            //    graphDescriptor.ConnectionManager.DeleteFromNode(context.ContentItem);
+            //    grapProvider.ConnectionManager.DeleteFromNode(context.ContentItem);
             //}
         }
 
         private void TryInvokeEventHandler(string contentType, Action<IGraphContext> eventHandler)
         {
             var context = new GraphContext { ContentTypes = new string[] { contentType }};
-            var descriptors = _graphManager.FindDescriptors(context);
+            var providers = _graphManager.FindProviders(context);
 
-            if (descriptors.Count() == 0) return;
+            if (providers.Count() == 0) return;
 
-            foreach (var descriptor in descriptors)
+            foreach (var provider in providers)
             {
-                // descriptor.ProduceContext() could be erroneous as the context with only the current content type is needed,
+                // provider.ProduceContext() could be erroneous as the context with only the current content type is needed,
                 // not all content types stored by the graph.
-                context.GraphName = descriptor.GraphName;
+                context.GraphName = provider.GraphName;
                 eventHandler(context);
             }
         }

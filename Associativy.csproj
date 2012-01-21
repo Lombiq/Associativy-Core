@@ -100,9 +100,12 @@
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="GraphDiscovery\GraphContext.cs" />
-    <Compile Include="GraphDiscovery\GraphDescribeContext.cs" />
-    <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
+    <Compile Include="GraphDiscovery\IAssociativyProvider.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
+    <Compile Include="GraphDiscovery\GraphProviderExtensions.cs" />
+    <Compile Include="GraphDiscovery\IProviderFilterer.cs" />
+    <Compile Include="GraphDiscovery\ProviderFilterer.cs" />
+    <Compile Include="GraphDiscovery\ProviderFiltererExtensions.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />

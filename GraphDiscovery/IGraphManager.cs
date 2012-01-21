@@ -9,8 +9,8 @@ namespace Associativy.GraphDiscovery
     /// </summary>
     public interface IGraphManager : IDependency
     {
-        GraphDescriptor FindLastDescriptor(IGraphContext graphContext);
+        IGraphProvider FindLastProvider(IGraphContext graphContext);
 
-        IEnumerable<GraphDescriptor> FindDescriptors(IGraphContext graphContext);
+        IEnumerable<IGraphProvider> FindProviders(IGraphContext graphContext);
     }
 }
