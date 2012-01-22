@@ -16,7 +16,7 @@ namespace Associativy.Services
         /// </summary>
         /// <remarks>
         /// Using a static field is maybe not the most elegant way, but it works.
-        /// It's crucial that this bag stays alive at least as long as the ISignals instance. Since ISignals is an 
+        /// It's crucial that this dictionary stays alive at least as long as the ISignals instance. Since ISignals is an 
         /// ISingletonDependency this field could store an ISingletonDependency as well, but statics, just as ISingletonDependencys
         /// live as long as the shell.
         /// </remarks>
