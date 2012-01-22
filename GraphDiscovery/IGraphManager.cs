@@ -12,5 +12,7 @@ namespace Associativy.GraphDiscovery
         IGraphProvider FindLastProvider(IGraphContext graphContext);
 
         IEnumerable<IGraphProvider> FindProviders(IGraphContext graphContext);
+
+        IEnumerable<IGraphProvider> FindLastProvidersByGraphs(IGraphContext graphContext);
     }
 }

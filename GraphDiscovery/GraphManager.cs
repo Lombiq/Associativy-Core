@@ -35,5 +35,17 @@ namespace Associativy.GraphDiscovery
 
             return _providerFilterer.FilterByMatchingGraphContext(_registeredProviders, graphContext);
         }
+
+        public IEnumerable<IGraphProvider> FindLastProvidersByGraphs(IGraphContext graphContext)
+        {
+            var providers = new Dictionary<string, IGraphProvider>();
+
+            foreach (var provider in FindProviders(graphContext))
+            {
+                if(!String.IsNullOrEmpty(provider.GraphName)) providers[provider.GraphName] = provider;
+            }
+
+            return providers.Values;
+        }
     }
 }
