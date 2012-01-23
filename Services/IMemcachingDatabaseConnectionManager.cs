@@ -9,6 +9,7 @@ namespace Associativy.Services
     public interface IMemcachingDatabaseConnectionManager<TNodeToNodeConnectorRecord> : IDatabaseConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
-        void LoadConnections();
+        void TryLoadConnections();
+        void ReloadConnections();
     }
 }

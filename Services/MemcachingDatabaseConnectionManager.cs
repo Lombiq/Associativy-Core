@@ -29,20 +29,27 @@ namespace Associativy.Services
             : base(nodeToNodeRecordRepository, contentManager, graphEventHandler)
         {
             // Although this happens once in the shell life time, should be called lazily or hooked into events, e.g. IOrchardShellEvents
-            LoadConnections();
+            TryLoadConnections();
         }
 
 
-        public void LoadConnections()
+        public void TryLoadConnections()
         {
             if (_connections.IsEmpty)
             {
-                // This apparently uses ~75KB memory with the test set of 80 connections.
-                foreach (var connector in _nodeToNodeRecordRepository.Table)
-                {
-                    StoreMemoryConnection(connector.Node1Id, connector.Node2Id);
-                } 
+                ReloadConnections();
             }
+        }
+
+        public void ReloadConnections()
+        {
+            _connections.Clear();
+
+            // This apparently uses ~75KB memory with the test set of 80 connections.
+            foreach (var connector in _nodeToNodeRecordRepository.Table)
+            {
+                StoreMemoryConnection(connector.Node1Id, connector.Node2Id);
+            } 
         }
 
 
@@ -61,15 +68,16 @@ namespace Associativy.Services
 
         public override void Connect(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
-            StoreMemoryConnection(nodeId1, nodeId2);
-
             base.Connect(graphContext, nodeId1, nodeId2);
+
+            StoreMemoryConnection(nodeId1, nodeId2);
         }
 
 
         public override void DeleteFromNode(IGraphContext graphContext, int nodeId)
         {
-            // No check here, could be a problem...
+            base.DeleteFromNode(graphContext, nodeId);
+
             ConcurrentDictionary<int, object> subDictionary;
             if (_connections.TryRemove(nodeId, out subDictionary))
             {
@@ -79,18 +87,16 @@ namespace Associativy.Services
                     _connections[neighbourId].TryRemove(neighbourId, out currentObject);
                 }
             }
-
-            base.DeleteFromNode(graphContext, nodeId);
         }
 
         public override void Disconnect(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
+            base.Disconnect(graphContext, nodeId1, nodeId2);
+
             object currentObject;
 
             _connections[nodeId1].TryRemove(nodeId2, out currentObject);
             _connections[nodeId2].TryRemove(nodeId1, out currentObject);
-
-            base.Disconnect(graphContext, nodeId1, nodeId2);
         }
 
 
@@ -101,7 +107,11 @@ namespace Associativy.Services
 
         public override IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
         {
-            return _connections[nodeId].Keys;
+            ConcurrentDictionary<int, object> subDictionary;
+
+            if (_connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
+
+            return Enumerable.Empty<int>();
         }
 
 
