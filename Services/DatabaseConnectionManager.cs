@@ -17,6 +17,7 @@ namespace Associativy.Services
         protected readonly IContentManager _contentManager;
         protected readonly IGraphEventHandler _graphEventHandler;
 
+
         public DatabaseConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             IContentManager contentManager,
@@ -27,6 +28,7 @@ namespace Associativy.Services
             _graphEventHandler = graphEventHandler;
         }
 
+
         public virtual bool AreNeighbours(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
             return _nodeToNodeRecordRepository.Count(connector =>
@@ -34,10 +36,6 @@ namespace Associativy.Services
                 connector.Node1Id == nodeId2 && connector.Node2Id == nodeId1) != 0;
         }
 
-        public virtual void Connect(IGraphContext graphContext, IContent node1, IContent node2)
-        {
-            Connect(graphContext, node1.Id, node2.Id);
-        }
 
         public virtual void Connect(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
@@ -49,10 +47,6 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionAdded(graphContext, nodeId1, nodeId2);
         }
 
-        public virtual void DeleteFromNode(IGraphContext graphContext, IContent node)
-        {
-            DeleteFromNode(graphContext, node.Id);
-        }
 
         public virtual void DeleteFromNode(IGraphContext graphContext, int nodeId)
         {
@@ -68,12 +62,7 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionsDeletedFromNode(graphContext, nodeId);
         }
 
-        public void Disconnect(IGraphContext graphContext, IContent node1, IContent node2)
-        {
-            Disconnect(graphContext, node1.Id, node2.Id);
-        }
-
-        public void Disconnect(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual void Disconnect(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
             var connectorRecord = _nodeToNodeRecordRepository.Fetch(connector =>
                 connector.Node1Id == nodeId1 && connector.Node2Id == nodeId2 ||
@@ -89,9 +78,10 @@ namespace Associativy.Services
 
         public virtual IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
-            var records = _nodeToNodeRecordRepository.Table.ToList();
-            return records.Select(r => (INodeToNodeConnector)r).ToList();
+            // Without .ToList(), "No persister for: Associativy.Models.INodeToNodeConnector" is thrown
+            return _nodeToNodeRecordRepository.Table.ToList().Select(r => (INodeToNodeConnector)r);
         }
+
 
         public virtual IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
         {

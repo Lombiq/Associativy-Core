@@ -10,14 +10,14 @@ using System.Diagnostics;
 namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
-    public abstract class GraphProviderBase<TNodeToNodeConnectorRecord> : IGraphProvider
-        where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
+    public abstract class GraphProviderBase<TConnectionManager> : IGraphProvider
+        where TConnectionManager : IConnectionManager
     {
         public virtual string GraphName { get; protected set; }
         public virtual LocalizedString DisplayGraphName { get; protected set; }
         public virtual IEnumerable<string> ContentTypes { get; protected set; }
 
-        private readonly IResolve<IDatabaseConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
+        private readonly IResolve<TConnectionManager> _connectionManagerResolver;
         public virtual IConnectionManager ConnectionManager
         {
             get
@@ -28,7 +28,7 @@ namespace Associativy.GraphDiscovery
 
         public Localizer T { get; set; }
 
-        public GraphProviderBase(IResolve<IDatabaseConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public GraphProviderBase(IResolve<TConnectionManager> connectionManagerResolver)
         {
             _connectionManagerResolver = connectionManagerResolver;
 
