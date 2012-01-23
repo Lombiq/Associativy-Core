@@ -15,6 +15,7 @@ namespace Associativy
             var builder = new ContainerBuilder();
 
             builder.RegisterGeneric(typeof(DatabaseConnectionManager<>)).As(typeof(IDatabaseConnectionManager<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(MemcachingDatabaseConnectionManager<>)).As(typeof(IMemcachingDatabaseConnectionManager<>)).InstancePerLifetimeScope();
 
             builder.Update(componentRegistry);
         }
