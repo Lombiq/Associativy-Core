@@ -17,7 +17,7 @@ namespace Associativy.GraphDiscovery
         public virtual LocalizedString DisplayGraphName { get; protected set; }
         public virtual IEnumerable<string> ContentTypes { get; protected set; }
 
-        private readonly IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
+        private readonly IResolve<IDatabaseConnectionManager<TNodeToNodeConnectorRecord>> _connectionManagerResolver;
         public virtual IConnectionManager ConnectionManager
         {
             get
@@ -28,7 +28,7 @@ namespace Associativy.GraphDiscovery
 
         public Localizer T { get; set; }
 
-        public GraphProviderBase(IResolve<IConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
+        public GraphProviderBase(IResolve<IDatabaseConnectionManager<TNodeToNodeConnectorRecord>> connectionManagerResolver)
         {
             _connectionManagerResolver = connectionManagerResolver;
 

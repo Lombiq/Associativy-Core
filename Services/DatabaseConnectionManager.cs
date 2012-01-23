@@ -10,14 +10,14 @@ using Associativy.GraphDiscovery;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class ConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager<TNodeToNodeConnectorRecord>
+    public class DatabaseConnectionManager<TNodeToNodeConnectorRecord> : IDatabaseConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
         protected readonly IGraphEventHandler _graphEventHandler;
 
-        public ConnectionManager(
+        public DatabaseConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             IContentManager contentManager,
             IGraphEventHandler graphEventHandler)

@@ -123,9 +123,10 @@
     <Compile Include="Models\Nodes\NodeToNodeConnectorRecord.cs" />
     <Compile Include="EventHandlers\GraphEventMonitor.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
-    <Compile Include="Services\ConnectionManager.cs" />
+    <Compile Include="Services\DatabaseConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
+    <Compile Include="Services\IDatabaseConnectionManager.cs" />
     <Compile Include="Services\IGraphService.cs" />
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />

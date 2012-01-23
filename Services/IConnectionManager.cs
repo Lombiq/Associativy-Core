@@ -71,13 +71,4 @@ namespace Associativy.Services
         /// <returns>The count of all the directly connected (= neighbour) nodes</returns>
         int GetNeighbourCount(IGraphContext graphContext, int nodeId);
     }
-
-    /// <summary>
-    /// Service for dealing with connections between nodes
-    /// </summary>
-    /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    public interface IConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager
-        where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
-    {
-    }
 }
