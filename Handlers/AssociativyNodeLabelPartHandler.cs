@@ -16,12 +16,15 @@ namespace Associativy.Handlers
 
             OnCreating<AssociativyNodeLabelPart>((context, part) =>
             {
-                part.Label = context.ContentItem.As<ITitleAspect>().Title;
+                // .Has<> doesn't work here
+                var titleAspect = context.ContentItem.As<ITitleAspect>();
+                if (titleAspect != null) part.Label = titleAspect.Title;
             });
 
             OnUpdateEditorShape<AssociativyNodeLabelPart>((context, part) =>
             {
-                part.Label = context.ContentItem.As<ITitleAspect>().Title;
+                var titleAspect = context.ContentItem.As<ITitleAspect>();
+                if (titleAspect != null) part.Label = context.ContentItem.As<ITitleAspect>().Title;
             });
         }
     }
