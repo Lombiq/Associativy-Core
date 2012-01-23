@@ -1,15 +1,16 @@
 ﻿-	Logical and physical location (namespace and directory structure) of a type not always match!
 -	For an Associativy module to work, it should...
-	-	Define an INodeToNodeConnectorRecord implementation
+	-	Define an INodeToNodeConnector implementation
 	-	Define an interface derived from IGraphProvider and implement it
 	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
 	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
 	-	*Optionally* add AssociativyNodeLabelPart to node content types, if the nodes should be searchable by label. The default implementation uses the Title as the label, so if this is not appropriate for you content type, you should write your own handler event for AssociativyNodeLabelPart.
-	The above are not necessary if a module just wants to use Associativy services with an existing grapProvider.
--	A content type can be listed in multiple grapProviders, thus a content item can be part of multiple graphs.
+	The above are not necessary if a module just wants to use Associativy services with an existing graphProvider.
+-	A content type can be listed in multiple graphProviders, thus a content item can be part of multiple graphs.
 -	Frontend engine main controllers should be named with the [EngineName]EngineController convention.
 -	Frontend engine configuration can be changed by implementing the engine's setup interface (e.g. IGraphvizSetup).
 -	Associativy services are thread-safe.
 -	By convention modules using Associativy are named Associativy.Instances.ModuleName, but this is not mandatory.
 -	Since frontend engine page parts are added dynamically (not with migrations) they don't require a Driver.
 -	All frontend engine page types should include EngineCommonPart.
+-	Further good visualization libraries: http://jsplumb.org, http://code.google.com/p/canviz/
