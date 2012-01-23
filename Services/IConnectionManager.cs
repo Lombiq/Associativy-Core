@@ -52,10 +52,10 @@ namespace Associativy.Services
 
 
         /// <summary>
-        /// Returns all connector records
+        /// Returns all connector objects
         /// </summary>
-        /// <returns>All connector records</returns>
-        IEnumerable<INodeToNodeConnectorRecord> GetAll(IGraphContext graphContext);
+        /// <returns>All connector objects</returns>
+        IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext);
 
         /// <summary>
         /// Returns the ids of all the directly connected (= neighbour) nodes
@@ -77,7 +77,7 @@ namespace Associativy.Services
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     public interface IConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
     }
 }

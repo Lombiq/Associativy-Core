@@ -11,7 +11,7 @@ namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
     public class ConnectionManager<TNodeToNodeConnectorRecord> : IConnectionManager<TNodeToNodeConnectorRecord>
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IContentManager _contentManager;
@@ -87,10 +87,10 @@ namespace Associativy.Services
         }
 
 
-        public virtual IEnumerable<INodeToNodeConnectorRecord> GetAll(IGraphContext graphContext)
+        public virtual IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
             var records = _nodeToNodeRecordRepository.Table.ToList();
-            return records.Select(r => (INodeToNodeConnectorRecord)r).ToList();
+            return records.Select(r => (INodeToNodeConnector)r).ToList();
         }
 
         public virtual IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)

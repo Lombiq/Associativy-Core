@@ -118,9 +118,9 @@
     <Compile Include="GraphDiscovery\GraphProviderBase.cs" />
     <Compile Include="GraphDiscovery\IGraphProvider.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
-    <Compile Include="Models\Nodes\INodeToNodeConnectorRecord.cs" />
+    <Compile Include="Models\Nodes\INodeToNodeConnector.cs" />
     <Compile Include="Models\Mind\MindSettings.cs" />
-    <Compile Include="Models\Nodes\NodeToNodeRecord.cs" />
+    <Compile Include="Models\Nodes\NodeToNodeConnectorRecord.cs" />
     <Compile Include="EventHandlers\GraphEventMonitor.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
     <Compile Include="Services\ConnectionManager.cs" />

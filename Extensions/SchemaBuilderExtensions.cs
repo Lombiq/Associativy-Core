@@ -10,7 +10,7 @@ namespace Associativy.Extensions
     public static class SchemaBuilderExtensions
     {
         public static SchemaBuilder CreateNodeToNodeConnectorRecordTable<TNodeToNodeConnectorRecord>(this SchemaBuilder schemaBuilder)
-            where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+            where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
         {
             schemaBuilder.CreateTable(typeof(TNodeToNodeConnectorRecord).Name,
                 table => table

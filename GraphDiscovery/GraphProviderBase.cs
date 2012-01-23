@@ -11,7 +11,7 @@ namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
     public abstract class GraphProviderBase<TNodeToNodeConnectorRecord> : IGraphProvider
-        where TNodeToNodeConnectorRecord : INodeToNodeConnectorRecord, new()
+        where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
         public virtual string GraphName { get; protected set; }
         public virtual LocalizedString DisplayGraphName { get; protected set; }

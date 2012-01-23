@@ -3,7 +3,7 @@
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public abstract class NodeToNodeRecord : INodeToNodeConnectorRecord
+    public abstract class NodeToNodeConnectorRecord : INodeToNodeConnector
     {
         public virtual int Id { get; set; }
         public virtual int Node1Id { get; set; }

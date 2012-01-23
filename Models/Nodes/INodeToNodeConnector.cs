@@ -1,6 +1,6 @@
 ﻿namespace Associativy.Models
 {
-    public interface INodeToNodeConnectorRecord
+    public interface INodeToNodeConnector
     {
         int Id { get; set; }
         int Node1Id { get; set; }
