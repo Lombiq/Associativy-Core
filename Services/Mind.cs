@@ -44,7 +44,7 @@ namespace Associativy.Services
 
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
-            IGraphContext graphContext, 
+            IGraphContext graphContext,
             IMindSettings settings = null)
         {
             var provider = _graphManager.FindLastProvider(graphContext);
@@ -272,12 +272,24 @@ namespace Associativy.Services
 
             var succeededNodes = settings.QueryModifier(_nodeManager.GetManyContentQuery(graphContext, getSucceededNodeIds((succeededPaths)))).List().ToDictionary(node => node.Id);
 
+            graph.AddVertexRange(succeededNodes.Values);
+
             foreach (var path in succeededPaths)
             {
                 var pathList = path.ToList();
                 for (int i = 1; i < pathList.Count; i++)
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]));
+                    // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
+                    // different order of source and dest are recognized as different edges.
+                    // See issue: http://quickgraph.codeplex.com/workitem/21805
+                    var newEdge = new UndirectedEdge<IContent>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]);
+                    IUndirectedEdge<IContent> reversedNewEdge;
+
+                    // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
+                    if (!graph.TryGetEdge(succeededNodes[pathList[i]], succeededNodes[pathList[i - 1]], out reversedNewEdge))
+                    {
+                        graph.AddEdge(newEdge);
+                    }
                 }
             }
 
