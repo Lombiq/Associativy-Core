@@ -25,26 +25,24 @@ namespace Associativy.Handlers
 
         protected override void Created(CreateContentContext context)
         {
-            TryInvokeEventHandler(context.ContentType, (graphContext) => _graphEventHandler.NodeAdded(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentType, (graphContext, graphProvider) => _graphEventHandler.NodeAdded(graphContext, context.ContentItem));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext) => _graphEventHandler.NodeChanged(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphProvider) => _graphEventHandler.NodeChanged(graphContext, context.ContentItem));
         }
 
         protected override void Removed(RemoveContentContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext) => _graphEventHandler.NodeRemoved(graphContext, context.ContentItem));
-
-            // For now connections should remanin intact
-            //foreach (var grapProvider in _grapProviders[context.ContentItem.ContentType])
-            //{
-            //    grapProvider.ConnectionManager.DeleteFromNode(context.ContentItem);
-            //}
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphProvider) =>
+                {
+                    graphProvider.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
+                    _graphEventHandler.NodeRemoved(graphContext, context.ContentItem);
+                });
         }
 
-        private void TryInvokeEventHandler(string contentType, Action<IGraphContext> eventHandler)
+        private void TryInvokeEventHandler(string contentType, Action<IGraphContext, IGraphProvider> eventHandler)
         {
             var context = new GraphContext { ContentTypes = new string[] { contentType }};
             var providers = _graphManager.FindProviders(context);
@@ -56,7 +54,7 @@ namespace Associativy.Handlers
                 // provider.ProduceContext() could be erroneous as the context with only the current content type is needed,
                 // not all content types stored by the graph.
                 context.GraphName = provider.GraphName;
-                eventHandler(context);
+                eventHandler(context, provider);
             }
         }
     }

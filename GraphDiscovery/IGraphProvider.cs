@@ -9,7 +9,7 @@ namespace Associativy.GraphDiscovery
     public interface IGraphProvider : IAssociativyProvider
     {
         /// <summary>
-        /// Name of the graph provider used to identify it
+        /// Name of the graph the provider supports
         /// </summary>
         string GraphName { get; }
 
@@ -24,7 +24,7 @@ namespace Associativy.GraphDiscovery
         IEnumerable<string> ContentTypes { get; }
 
         /// <summary>
-        /// The IConnectionManager instance used by the provider
+        /// The IConnectionManager instance used to discover connections in the graph
         /// </summary>
         IConnectionManager ConnectionManager { get; }
     }
