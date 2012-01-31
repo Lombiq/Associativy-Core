@@ -129,11 +129,9 @@
     <Compile Include="Services\IAssociativyServices.cs" />
     <Compile Include="Services\IDatabaseConnectionManager.cs" />
     <Compile Include="Services\IGraphService.cs" />
-    <Compile Include="Services\IMemcachingDatabaseConnectionManager.cs" />
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\IPathFinder.cs" />
-    <Compile Include="Services\MemcachingDatabaseConnectionManager.cs" />
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
     <Compile Include="Services\PathFinder.cs" />
