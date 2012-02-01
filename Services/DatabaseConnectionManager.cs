@@ -19,6 +19,7 @@ namespace Associativy.Services
     /// eventually cause users to observe inconsistencies (as the memcache won't be updated if the DB is updated from a different
     /// isntance); DB will remain consistent though.
     /// Currently there is no real way to support a web farm scenario, see: http://orchard.codeplex.com/workitem/17361
+    /// However, this will work just as in a single-server environment with proper cloud hosting like Gearhost.
     /// </remarks>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     [OrchardFeature("Associativy")]    
