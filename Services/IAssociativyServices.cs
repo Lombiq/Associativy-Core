@@ -1,5 +1,6 @@
 ﻿using Associativy.Models;
 using Orchard;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
@@ -8,6 +9,11 @@ namespace Associativy.Services
     /// </summary>
     public interface IAssociativyServices : IDependency
     {
+        /// <summary>
+        /// Handles registered graphs
+        /// </summary>
+        IGraphManager GraphManager { get; }
+
         /// <summary>
         /// Performs work on graphs
         /// </summary>

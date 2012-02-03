@@ -1,11 +1,18 @@
 ﻿using Associativy.Models;
 using Orchard.Environment.Extensions;
+using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
     public class AssociativyServices : IAssociativyServices
     {
+        protected readonly IGraphManager _graphManager;
+        public IGraphManager GraphManager
+        {
+            get { return _graphManager; }
+        }
+
         protected readonly IGraphService _graphService;
         public IGraphService GraphService
         {
@@ -26,10 +33,12 @@ namespace Associativy.Services
 
 
         public AssociativyServices(
+            IGraphManager graphManager,
             IGraphService graphService,
             IMind mind,
             INodeManager nodeManager)
         {
+            _graphManager = graphManager;
             _graphService = graphService;
             _nodeManager = nodeManager;
             _mind = mind;
