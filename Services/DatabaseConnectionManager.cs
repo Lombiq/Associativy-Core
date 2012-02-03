@@ -32,7 +32,7 @@ namespace Associativy.Services
 
         // The inner dictionary should really be a concurrent HashSet
         // Race conditionas could occure, revise if necessary.
-        protected static ConcurrentDictionary<int, ConcurrentDictionary<int, object>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, object>>();
+        protected static readonly ConcurrentDictionary<int, ConcurrentDictionary<int, object>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, object>>();
 
 
         public DatabaseConnectionManager(
@@ -169,7 +169,7 @@ namespace Associativy.Services
         }
 
 
-        protected void StoreMemoryConnection(int node1Id, int node2Id)
+        private static void StoreMemoryConnection(int node1Id, int node2Id)
         {
             Action<int, int> storeConnection =
                 (id1, id2) =>

@@ -1,7 +1,7 @@
 ﻿-	Logical and physical location (namespace and directory structure) of a type not always match!
 -	For an Associativy module to work, it should...
 	-	Define an INodeToNodeConnector implementation
-	-	Define an interface derived from IGraphProvider and implement it
+	-	Define an implementation of IGraphProvider
 	-	Implement the appropriate migrations to set up node types and connector records; nodes should have CommonPart attached
 	-	*Optionally* define routes to frontend engine controllers. This could be simply done by inheriting from RoutesBase and setting ModuleName
 	-	*Optionally* add AssociativyNodeLabelPart to node content types, if the nodes should be searchable by label. The default implementation uses the Title as the label, so if this is not appropriate for you content type, you should write your own handler event for AssociativyNodeLabelPart.

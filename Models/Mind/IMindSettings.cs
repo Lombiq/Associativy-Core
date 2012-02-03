@@ -4,7 +4,7 @@ using System;
 
 namespace Associativy.Models.Mind
 {
-    public enum MindAlgorithms
+    public enum MindAlgorithm
     {
         Simple,
         Sophisticated
@@ -12,7 +12,7 @@ namespace Associativy.Models.Mind
 
     public interface IMindSettings
     {
-        MindAlgorithms Algorithm { get; set; }
+        MindAlgorithm Algorithm { get; set; }
         bool UseCache { get; set; }
         int ZoomLevel { get; set; }
 

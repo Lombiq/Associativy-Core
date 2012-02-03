@@ -16,7 +16,7 @@ namespace Associativy.Models
             set
             {
                 Record.Label = value;
-                Record.InvariantLabel = value.ToLowerInvariant();
+                Record.UpperInvariantLabel = value.ToUpperInvariant();
             }
         }
     }

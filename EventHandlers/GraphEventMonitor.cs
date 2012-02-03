@@ -8,7 +8,6 @@ namespace Associativy.Services
 {
     public class GraphEventMonitor : GraphEventHandlerBase, IGraphEventMonitor
     {
-        private readonly ICacheManager _cacheManager;
         private readonly ISignals _signals;
 
         /// <summary>
@@ -22,11 +21,8 @@ namespace Associativy.Services
         /// </remarks>
         private static ConcurrentDictionary<string, string> _changedSignals = new ConcurrentDictionary<string, string>();
 
-        public GraphEventMonitor(
-            ICacheManager cacheManager,
-            ISignals signals)
+        public GraphEventMonitor(ISignals signals)
         {
-            _cacheManager = cacheManager;
             _signals = signals;
         }
 

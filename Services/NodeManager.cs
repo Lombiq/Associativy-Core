@@ -43,15 +43,15 @@ namespace Associativy.Services
         {
             if (String.IsNullOrEmpty(labelSnippet)) return null; // Otherwise would return the whole dataset
             if (queryHints == null) queryHints = new QueryHints();
-            labelSnippet = labelSnippet.ToLowerInvariant();
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.InvariantLabel.StartsWith(labelSnippet)).WithQueryHints(queryHints).Slice(maxCount).ToList();
+            labelSnippet = labelSnippet.ToUpperInvariant();
+            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel.StartsWith(labelSnippet)).WithQueryHints(queryHints).Slice(maxCount).ToList();
         }
 
         public virtual IContent Get(IGraphContext graphContext, string label, QueryHints queryHints = null)
         {
             if (queryHints == null) queryHints = new QueryHints();
-            label = label.ToLowerInvariant();
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.InvariantLabel == label).WithQueryHints(queryHints).List().FirstOrDefault();
+            label = label.ToUpperInvariant();
+            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel == label).WithQueryHints(queryHints).List().FirstOrDefault();
         }
 
         public virtual IEnumerable<IContent> GetMany(IGraphContext graphContext, IEnumerable<string> labels, QueryHints queryHints = null)
@@ -61,10 +61,10 @@ namespace Associativy.Services
             var labelsArray = labels.ToArray();
             for (int i = 0; i < labelsArray.Length; i++)
             {
-                labelsArray[i] = labelsArray[i].ToLowerInvariant();
+                labelsArray[i] = labelsArray[i].ToUpperInvariant();
             }
 
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.InvariantLabel)).WithQueryHints(queryHints).List();
+            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.UpperInvariantLabel)).WithQueryHints(queryHints).List();
         }
     }
 }

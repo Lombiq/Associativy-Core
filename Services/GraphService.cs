@@ -12,7 +12,7 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class GraphService : IGraphService
     {
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
+        public IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
         {
             return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>(false);
         }

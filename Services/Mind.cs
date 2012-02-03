@@ -112,9 +112,9 @@ namespace Associativy.Services
                         return GetNeighboursGraph(graphContext, provider, nodes.First(), settings.QueryModifier);
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
-                    else if (settings.Algorithm == MindAlgorithms.Simple)
+                    else if (settings.Algorithm == MindAlgorithm.Simple)
                     {
-                        return MakeSimpleAssocations(graphContext, provider, nodes, settings.QueryModifier);
+                        return MakeSimpleAssociations(graphContext, provider, nodes, settings.QueryModifier);
                     }
                     // Calculate the routes between two nodes
                     else
@@ -161,7 +161,7 @@ namespace Associativy.Services
             return graph;
         }
 
-        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssocations(
+        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssociations(
             IGraphContext graphContext,
             IGraphProvider provider,
             IEnumerable<IContent> nodes,
@@ -296,18 +296,18 @@ namespace Associativy.Services
             return graph;
         }
 
-        protected virtual string MakeCacheKey(string name, IMindSettings settings)
+        protected string MakeCacheKey(string name, IMindSettings settings)
         {
             return MakeCacheKey(name)
                 + "MindSettings:" + settings.Algorithm + settings.MaxDistance;
         }
 
-        protected virtual string MakeCacheKey(string name)
+        protected string MakeCacheKey(string name)
         {
             return _cachePrefix + name;
         }
 
-        protected virtual void MakeSettings(ref IMindSettings settings)
+        protected void MakeSettings(ref IMindSettings settings)
         {
             if (settings == null) settings = new MindSettings();
         }

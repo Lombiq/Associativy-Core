@@ -16,12 +16,12 @@ namespace Associativy.Migrations
                 table => table
                     .ContentPartRecord()
                     .Column<string>("Label") // Labels can't be unique, as all graphs' nodes' labels are stored here
-                    .Column<string>("InvariantLabel")
+                    .Column<string>("UpperInvariantLabel")
                 );
 
             SchemaBuilder.AlterTable(typeof(AssociativyNodeLabelPartRecord).Name,
                 table => table
-                    .CreateIndex("InvariantLabel", new string[] { "InvariantLabel" })
+                    .CreateIndex("UpperInvariantLabel", new string[] { "UpperInvariantLabel" })
                 );
 
 

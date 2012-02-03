@@ -13,9 +13,9 @@ namespace Associativy.GraphDiscovery
     public abstract class GraphProviderBase<TConnectionManager> : IGraphProvider
         where TConnectionManager : IConnectionManager
     {
-        public virtual string GraphName { get; protected set; }
-        public virtual LocalizedString DisplayGraphName { get; protected set; }
-        public virtual IEnumerable<string> ContentTypes { get; protected set; }
+        public string GraphName { get; protected set; }
+        public LocalizedString DisplayGraphName { get; protected set; }
+        public IEnumerable<string> ContentTypes { get; protected set; }
 
         private readonly IResolve<TConnectionManager> _connectionManagerResolver;
         public virtual IConnectionManager ConnectionManager
@@ -28,7 +28,7 @@ namespace Associativy.GraphDiscovery
 
         public Localizer T { get; set; }
 
-        public GraphProviderBase(IResolve<TConnectionManager> connectionManagerResolver)
+        protected GraphProviderBase(IResolve<TConnectionManager> connectionManagerResolver)
         {
             _connectionManagerResolver = connectionManagerResolver;
 
