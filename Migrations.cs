@@ -4,12 +4,22 @@ using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 using Orchard.Environment.Extensions;
+using Orchard.Core.Settings.Metadata.Records;
+using Orchard.Data;
+using System.Linq;
 
 namespace Associativy.Migrations
 {
     [OrchardFeature("Associativy")]
     public class Migrations : DataMigrationImpl
     {
+        private readonly IRepository<ContentPartDefinitionRecord> _partDefinitionRepository;
+
+        public Migrations(IRepository<ContentPartDefinitionRecord> partDefinitionRepository)
+        {
+            _partDefinitionRepository = partDefinitionRepository;
+        }
+
         public int Create()
         {
             SchemaBuilder.CreateTable(typeof(AssociativyNodeLabelPartRecord).Name,
@@ -23,6 +33,9 @@ namespace Associativy.Migrations
                 table => table
                     .CreateIndex("UpperInvariantLabel", new string[] { "UpperInvariantLabel" })
                 );
+
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, part => part.Attachable(false));
+            _partDefinitionRepository.Fetch(p => p.Name == typeof(AssociativyNodeLabelPart).Name).FirstOrDefault().Hidden = true;
 
 
             return 1;
