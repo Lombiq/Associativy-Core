@@ -43,8 +43,6 @@ namespace Associativy.GraphDiscovery
 
         public IEnumerable<GraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
-            // That's very fast (~70 ticks), so there's no point in caching anything.
-            // If it gets heavy, could be stored in an instance cache by context.
             return _providerFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
         }
 
