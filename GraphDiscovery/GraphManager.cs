@@ -13,39 +13,64 @@ namespace Associativy.GraphDiscovery
     public class GraphManager : IGraphManager
     {
         private readonly IEnumerable<IGraphProvider> _registeredProviders;
-        private readonly IProviderFilterer _providerFilterer;
+        private readonly IDescriptorFilterer _providerFilterer;
+
+        private readonly List<GraphDescriptor> _descriptors;
+        private List<GraphDescriptor> Descriptors
+        {
+            get
+            {
+                if (_descriptors.Count == 0) DescribeGraphs();
+                return _descriptors;
+            }
+        }
+        
 
         public GraphManager(
             IEnumerable<IGraphProvider> registeredProviders,
-            IProviderFilterer providerFilterer)
+            IDescriptorFilterer providerFilterer)
         {
             _registeredProviders = registeredProviders;
             _providerFilterer = providerFilterer;
+            _descriptors = new List<GraphDescriptor>();
         }
 
-        public IGraphProvider FindLastProvider(IGraphContext graphContext)
+
+        public GraphDescriptor FindGraph(IGraphContext graphContext)
         {
-            return FindProviders(graphContext).LastOrDefault();
+            return FindGraphs(graphContext).LastOrDefault();
         }
 
-        public IEnumerable<IGraphProvider> FindProviders(IGraphContext graphContext)
+        public IEnumerable<GraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
-            // That's very fast (~70 ticks), so there's no point in caching anything.
-            // If it gets heavy, could be stored in an instance cache by context.
-
-            return _providerFilterer.FilterByMatchingGraphContext(_registeredProviders, graphContext);
+            return _providerFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
         }
 
-        public IEnumerable<IGraphProvider> FindLastProvidersByGraphs(IGraphContext graphContext)
+        public IEnumerable<GraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
         {
-            var providers = new Dictionary<string, IGraphProvider>();
+            var descriptors = new Dictionary<string, GraphDescriptor>();
 
-            foreach (var provider in FindProviders(graphContext))
+            foreach (var descriptor in FindGraphs(graphContext))
             {
-                if(!String.IsNullOrEmpty(provider.GraphName)) providers[provider.GraphName] = provider;
+                if(!String.IsNullOrEmpty(descriptor.GraphName)) descriptors[descriptor.GraphName] = descriptor;
             }
 
-            return providers.Values;
+            return descriptors.Values;
+        }
+
+        private void DescribeGraphs()
+        {
+            foreach (var provider in _registeredProviders)
+            {
+                var descriptor = new GraphDescriptorImpl();
+                provider.Describe(descriptor);
+                descriptor.Freeze();
+                _descriptors.Add(descriptor);
+            }
+        }
+
+        private class GraphDescriptorImpl : GraphDescriptor
+        {
         }
     }
 }

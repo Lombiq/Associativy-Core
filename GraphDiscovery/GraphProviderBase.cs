@@ -13,12 +13,8 @@ namespace Associativy.GraphDiscovery
     public abstract class GraphProviderBase<TConnectionManager> : IGraphProvider
         where TConnectionManager : IConnectionManager
     {
-        public string GraphName { get; protected set; }
-        public LocalizedString DisplayGraphName { get; protected set; }
-        public IEnumerable<string> ContentTypes { get; protected set; }
-
         private readonly IResolve<TConnectionManager> _connectionManagerResolver;
-        public virtual IConnectionManager ConnectionManager
+        protected IConnectionManager ConnectionManager
         {
             get
             {
@@ -34,5 +30,7 @@ namespace Associativy.GraphDiscovery
 
             T = NullLocalizer.Instance;
         }
+
+        public abstract void Describe(GraphDescriptor graphDescriptor);
     }
 }
