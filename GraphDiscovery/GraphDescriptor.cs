@@ -46,8 +46,8 @@ namespace Associativy.GraphDiscovery
             get { return _graphName; }
             set
             {
-                _graphName = value;
                 ThrowIfFrozen();
+                _graphName = value;
             }
         }
 
@@ -62,8 +62,8 @@ namespace Associativy.GraphDiscovery
             get { return _displayGraphName; }
             set
             {
-                _displayGraphName = value;
                 ThrowIfFrozen();
+                _displayGraphName = value;
             }
         }
 
@@ -78,8 +78,8 @@ namespace Associativy.GraphDiscovery
             get { return _contentTypes; }
             set
             {
-                _contentTypes = value;
                 ThrowIfFrozen();
+                _contentTypes = value;
             }
         }
 
@@ -95,8 +95,8 @@ namespace Associativy.GraphDiscovery
             get { return _connectionManager; }
             set
             {
-                _connectionManager = value;
                 ThrowIfFrozen();
+                _connectionManager = value;
             }
         }
     }
