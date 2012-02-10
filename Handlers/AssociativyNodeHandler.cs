@@ -25,36 +25,36 @@ namespace Associativy.Handlers
 
         protected override void Created(CreateContentContext context)
         {
-            TryInvokeEventHandler(context.ContentType, (graphContext, graphProvider) => _graphEventHandler.NodeAdded(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.NodeAdded(graphContext, context.ContentItem));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphProvider) => _graphEventHandler.NodeChanged(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.NodeChanged(graphContext, context.ContentItem));
         }
 
         protected override void Removed(RemoveContentContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphProvider) =>
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) =>
                 {
-                    graphProvider.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
+                    graphDescriptor.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
                     _graphEventHandler.NodeRemoved(graphContext, context.ContentItem);
                 });
         }
 
-        private void TryInvokeEventHandler(string contentType, Action<IGraphContext, IGraphProvider> eventHandler)
+        private void TryInvokeEventHandler(string contentType, Action<IGraphContext, GraphDescriptor> eventHandler)
         {
             var context = new GraphContext { ContentTypes = new string[] { contentType }};
-            var providers = _graphManager.FindProviders(context);
+            var descriptors = _graphManager.FindGraphs(context);
 
-            if (providers.Count() == 0) return;
+            if (descriptors.Count() == 0) return;
 
-            foreach (var provider in providers)
+            foreach (var descriptor in descriptors)
             {
-                // provider.ProduceContext() could be erroneous as the context with only the current content type is needed,
+                // descriptor.ProduceContext() could be erroneous as the context with only the current content type is needed,
                 // not all content types stored by the graph.
-                context.GraphName = provider.GraphName;
-                eventHandler(context, provider);
+                context.GraphName = descriptor.GraphName;
+                eventHandler(context, descriptor);
             }
         }
     }

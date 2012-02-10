@@ -70,7 +70,7 @@ namespace Associativy.Services
                 });
             }
 
-            var provider = _graphManager.FindLastProvider(graphContext);
+            var descriptor = _graphManager.FindGraph(graphContext);
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<IList<int>>();
@@ -95,7 +95,7 @@ namespace Associativy.Services
                 if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (provider.ConnectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
+                    if (descriptor.ConnectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -114,7 +114,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = provider.ConnectionManager.GetNeighbourIds(graphContext, currentNode.Id);
+                        var neighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {

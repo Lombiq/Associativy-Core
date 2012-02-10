@@ -47,7 +47,7 @@ namespace Associativy.Services
             IGraphContext graphContext,
             IMindSettings settings = null)
         {
-            var provider = _graphManager.FindLastProvider(graphContext);
+            var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeWholeGraph =
@@ -63,7 +63,7 @@ namespace Associativy.Services
                         wholeGraph.AddVertex(node.Value);
                     }
 
-                    var connections = provider.ConnectionManager.GetAll(graphContext);
+                    var connections = descriptor.ConnectionManager.GetAll(graphContext);
                     foreach (var connection in connections)
                     {
                         wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
@@ -100,7 +100,7 @@ namespace Associativy.Services
             var nodeCount = nodes.Count();
             if (nodeCount == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
-            var provider = _graphManager.FindLastProvider(graphContext);
+            var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
@@ -109,17 +109,17 @@ namespace Associativy.Services
                     // If there's only one node, return its neighbours
                     if (nodeCount == 1)
                     {
-                        return GetNeighboursGraph(graphContext, provider, nodes.First(), settings.QueryModifier);
+                        return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings.QueryModifier);
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
                     else if (settings.Algorithm == MindAlgorithm.Simple)
                     {
-                        return MakeSimpleAssociations(graphContext, provider, nodes, settings.QueryModifier);
+                        return MakeSimpleAssociations(graphContext, descriptor, nodes, settings.QueryModifier);
                     }
                     // Calculate the routes between two nodes
                     else
                     {
-                        return MakeSophisticatedAssociations(graphContext, provider, nodes, settings);
+                        return MakeSophisticatedAssociations(graphContext, descriptor, nodes, settings);
                     }
                 };
 
@@ -145,14 +145,14 @@ namespace Associativy.Services
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
             IGraphContext graphContext,
-            IGraphProvider provider,
+            GraphDescriptor descriptor,
             IContent node,
             Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
         {
             var graph = _graphService.GraphFactory();
 
             graph.AddVertex(node);
-            var neighbours = queryModifier(_nodeManager.GetManyContentQuery(graphContext, provider.ConnectionManager.GetNeighbourIds(graphContext, node.Id))).List();
+            var neighbours = queryModifier(_nodeManager.GetManyContentQuery(graphContext, descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id))).List();
             foreach (var neighbour in neighbours)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
@@ -163,7 +163,7 @@ namespace Associativy.Services
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssociations(
             IGraphContext graphContext,
-            IGraphProvider provider,
+            GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
             Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
         {
@@ -171,10 +171,10 @@ namespace Associativy.Services
 
             var graph = _graphService.GraphFactory();
 
-            var commonNeighbourIds = provider.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
+            var commonNeighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
             var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
             remainingNodes.RemoveAt(0);
-            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(provider.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
+            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
             // Same as
             //foreach (var node in remainingNodes)
             //{
@@ -198,7 +198,7 @@ namespace Associativy.Services
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSophisticatedAssociations(
             IGraphContext graphContext,
-            IGraphProvider provider,
+            GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
             IMindSettings settings)
         {
