@@ -55,7 +55,8 @@ namespace Associativy.Services
                 {
                     var wholeGraph = _graphService.GraphFactory();
 
-                    var query = settings.QueryModifier(_nodeManager.GetContentQuery(graphContext));
+                    var query =_nodeManager.GetContentQuery(graphContext);
+                    settings.QueryModifier(query);
                     var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
 
                     foreach (var node in nodes)
@@ -151,12 +152,16 @@ namespace Associativy.Services
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IContent node,
-            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
+            Action<IContentQuery<ContentItem>> queryModifier)
         {
             var graph = _graphService.GraphFactory();
 
             graph.AddVertex(node);
-            var neighbours = queryModifier(_nodeManager.GetManyContentQuery(graphContext, descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id))).List();
+
+            var query = _nodeManager.GetManyContentQuery(graphContext, descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id));
+            queryModifier(query);
+            var neighbours = query.List();
+            
             foreach (var neighbour in neighbours)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
@@ -169,7 +174,7 @@ namespace Associativy.Services
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
-            Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> queryModifier)
+            Action<IContentQuery<ContentItem>> queryModifier)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
@@ -187,7 +192,9 @@ namespace Associativy.Services
 
             if (commonNeighbourIds.Count() == 0) return graph;
 
-            var commonNeighbours = queryModifier(_nodeManager.GetManyContentQuery(graphContext, commonNeighbourIds)).List();
+            var query = _nodeManager.GetManyContentQuery(graphContext, commonNeighbourIds);
+            queryModifier(query);
+            var commonNeighbours = query.List();
 
             foreach (var node in nodes)
             {
@@ -274,7 +281,9 @@ namespace Associativy.Services
                 if (succeededPaths.Count() == 0) return graph;
             }
 
-            var succeededNodes = settings.QueryModifier(_nodeManager.GetManyContentQuery(graphContext, getSucceededNodeIds((succeededPaths)))).List().ToDictionary(node => node.Id);
+            var query = _nodeManager.GetManyContentQuery(graphContext, getSucceededNodeIds((succeededPaths)));
+            settings.QueryModifier(query);
+            var succeededNodes = query.List().ToDictionary(node => node.Id);
 
             graph.AddVertexRange(succeededNodes.Values);
 

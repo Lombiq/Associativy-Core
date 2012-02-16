@@ -26,6 +26,6 @@ namespace Associativy.Models.Mind
         /// <summary>
         /// Use this to customize the query which is run against content items, e. g. to specify the version to use or to eager-load records to enhance performance
         /// </summary>
-        Func<IContentQuery<ContentItem>, IContentQuery<ContentItem>> QueryModifier { get; set; }
+        Action<IContentQuery<ContentItem>> QueryModifier { get; set; }
     }
 }
