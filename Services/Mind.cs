@@ -66,7 +66,11 @@ namespace Associativy.Services
                     var connections = descriptor.ConnectionManager.GetAll(graphContext);
                     foreach (var connection in connections)
                     {
-                        wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
+                        // Since the QueryModifier could have removed items, this check is necessary
+                        if (nodes.ContainsKey(connection.Node1Id) && nodes.ContainsKey(connection.Node2Id))
+                        {
+                            wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
+                        }
                     }
 
                     return wholeGraph;
@@ -279,16 +283,23 @@ namespace Associativy.Services
                 var pathList = path.ToList();
                 for (int i = 1; i < pathList.Count; i++)
                 {
-                    // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
-                    // different order of source and dest are recognized as different edges.
-                    // See issue: http://quickgraph.codeplex.com/workitem/21805
-                    var newEdge = new UndirectedEdge<IContent>(succeededNodes[pathList[i - 1]], succeededNodes[pathList[i]]);
-                    IUndirectedEdge<IContent> reversedNewEdge;
+                    var node1Id = pathList[i - 1];
+                    var node2Id = pathList[i];
 
-                    // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
-                    if (!graph.TryGetEdge(succeededNodes[pathList[i]], succeededNodes[pathList[i - 1]], out reversedNewEdge))
+                    // Since the QueryModifier could have removed items, this check is necessary
+                    if (succeededNodes.ContainsKey(node1Id) && succeededNodes.ContainsKey(node2Id))
                     {
-                        graph.AddEdge(newEdge);
+                        // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
+                        // different order of source and dest are recognized as different edges.
+                        // See issue: http://quickgraph.codeplex.com/workitem/21805
+                        var newEdge = new UndirectedEdge<IContent>(succeededNodes[node1Id], succeededNodes[node2Id]);
+                        IUndirectedEdge<IContent> reversedNewEdge;
+
+                        // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
+                        if (!graph.TryGetEdge(succeededNodes[node2Id], succeededNodes[node1Id], out reversedNewEdge))
+                        {
+                            graph.AddEdge(newEdge);
+                        }
                     }
                 }
             }
