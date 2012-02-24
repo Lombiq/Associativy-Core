@@ -2,6 +2,7 @@
 using Orchard.ContentManagement.Drivers;
 using Orchard.Environment.Extensions;
 using Associativy.Models;
+using Orchard.ContentManagement.Handlers;
 
 namespace Associativy.Drivers
 {
@@ -14,12 +15,12 @@ namespace Associativy.Drivers
             get { return "Associativy.NodeLabelPart"; }
         }
 
-        protected override void Exporting(AssociativyNodeLabelPart part, Orchard.ContentManagement.Handlers.ExportContentContext context)
+        protected override void Exporting(AssociativyNodeLabelPart part, ExportContentContext context)
         {
             context.Element(part.PartDefinition.Name).SetAttributeValue("Label", part.Label);
         }
 
-        protected override void Importing(AssociativyNodeLabelPart part, Orchard.ContentManagement.Handlers.ImportContentContext context)
+        protected override void Importing(AssociativyNodeLabelPart part, ImportContentContext context)
         {
             part.Label = context.Attribute(part.PartDefinition.Name, "Label");
         }
