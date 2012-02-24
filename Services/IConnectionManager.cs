@@ -68,4 +68,37 @@ namespace Associativy.Services
         /// <returns>The count of all the directly connected (= neighbour) nodes</returns>
         int GetNeighbourCount(IGraphContext graphContext, int nodeId);
     }
+
+    public static class ConnectionManagerExtensions
+    {
+        public static void Connect<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node1, IContent node2)
+            where TConnectionManager : IConnectionManager
+        {
+            connectionManager.Connect(graphContext, node1.Id, node2.Id);
+        }
+
+        public static void DeleteFromNode<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
+            where TConnectionManager : IConnectionManager
+        {
+            connectionManager.DeleteFromNode(graphContext, node.Id);
+        }
+
+        public static void Disconnect<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node1, IContent node2)
+            where TConnectionManager : IConnectionManager
+        {
+            connectionManager.Disconnect(graphContext, node1.Id, node2.Id);
+        }
+
+        public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
+            where TConnectionManager : IConnectionManager
+        {
+            return connectionManager.GetNeighbourIds(graphContext, node.Id);
+        }
+
+        public static int GetNeighbourCount<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
+            where TConnectionManager : IConnectionManager
+        {
+            return connectionManager.GetNeighbourCount(graphContext, node.Id);
+        }
+    }
 }
