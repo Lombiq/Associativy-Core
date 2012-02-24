@@ -1,10 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using Associativy.EventHandlers;
 using Associativy.Models;
 using Orchard.Caching;
 using Associativy.GraphDiscovery;
 
-namespace Associativy.Services
+namespace Associativy.EventHandlers
 {
     public class GraphEventMonitor : GraphEventHandlerBase, IGraphEventMonitor
     {
