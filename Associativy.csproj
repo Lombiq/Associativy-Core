@@ -100,7 +100,6 @@
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />
     <Compile Include="GraphDiscovery\GraphContext.cs" />
-    <Compile Include="GraphDiscovery\GraphContextExtensions.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptorExtensions.cs" />
