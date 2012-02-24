@@ -5,7 +5,6 @@ using Associativy.EventHandlers;
 using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.Core.Common.Models;
-using Orchard.Core.Routable.Models;
 using Orchard.Environment.Extensions;
 using Associativy.GraphDiscovery;
 
