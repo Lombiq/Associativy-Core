@@ -20,6 +20,5 @@ namespace Associativy.Services
         /// <param name="useCache"></param>
         /// <returns>A list of succeeded paths, where a path is a list of the ids of the nodes on the path.</returns>
         IEnumerable<IEnumerable<int>> FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
-
     }
 }

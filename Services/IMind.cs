@@ -17,16 +17,16 @@ namespace Associativy.Services
         /// <summary>
         /// Returns the whole association graph
         /// </summary>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
+        /// <param name="settings">Mind settings</param>
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(IGraphContext graphContext, IMindSettings settings = null);
 
         /// <summary>
-        /// Makes associations after the specified terms
+        /// Makes associations upon the specified nodes
         /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
+        /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
+        /// <param name="nodes">The nodes to search associations between</param>
+        /// <param name="settings">Mind settings</param>
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(IGraphContext graphContext, IEnumerable<IContent> nodes, IMindSettings settings = null);
     }
 }

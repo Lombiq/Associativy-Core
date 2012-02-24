@@ -14,8 +14,24 @@ namespace Associativy.Services
     /// </summary>
     public interface IGraphService : IDependency
     {
+        /// <summary>
+        /// Creates a new graph object
+        /// </summary>
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory();
+
+        /// <summary>
+        /// Creates a graph zoomed to the specified level from the given graph
+        /// </summary>
+        /// <param name="graph">The original graph</param>
+        /// <param name="zoomLevel">Level to zoom into</param>
+        /// <param name="maxZoomLevel">Maximal zoom level</param>
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int maxZoomLevel);
+
+        /// <summary>
+        /// Computes the amount of real zoom levels for a graph for a given maximal zoom level
+        /// </summary>
+        /// <param name="graph">The graph to check</param>
+        /// <param name="maxZoomLevel">Maximal zoom level to use</param>
         int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int maxZoomLevel);
     }
 }
