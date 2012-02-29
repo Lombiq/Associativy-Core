@@ -25,11 +25,11 @@ namespace Associativy.EventHandlers
             _signals = signals;
         }
 
-        public void MonitorChanged(IGraphContext graphContext, IAcquireContext aquireContext)
+        public void MonitorChanged(IGraphContext graphContext, IAcquireContext acquireContext)
         {
             var signal = graphContext.GraphName + "ChangedSignal";
             _changedSignals[graphContext.GraphName] = signal;
-            aquireContext.Monitor(_signals.When(signal));
+            acquireContext.Monitor(_signals.When(signal));
         }
 
         public override void Changed(IGraphContext graphContext)
