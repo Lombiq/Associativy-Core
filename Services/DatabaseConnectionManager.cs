@@ -91,11 +91,9 @@ namespace Associativy.Services
             if (!AreNeighbours(graphContext, nodeId1, nodeId2))
             {
                 _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
+                StoreMemoryConnection(nodeId1, nodeId2);
+                _graphEventHandler.ConnectionAdded(graphContext, nodeId1, nodeId2);
             }
-
-            StoreMemoryConnection(nodeId1, nodeId2);
-
-            _graphEventHandler.ConnectionAdded(graphContext, nodeId1, nodeId2);
         }
 
 
