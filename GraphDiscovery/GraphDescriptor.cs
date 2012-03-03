@@ -100,4 +100,16 @@ namespace Associativy.GraphDiscovery
             }
         }
     }
+
+    [OrchardFeature("Associativy")]
+    public static class GraphDescriptorExtensions
+    {
+        /// <summary>
+        /// Creates the maximal context the descriptor supports
+        /// </summary>
+        public static IGraphContext ProduceMaximalContext(this GraphDescriptor descriptor)
+        {
+            return new GraphContext { GraphName = descriptor.GraphName, ContentTypes = descriptor.ContentTypes };
+        }
+    }
 }

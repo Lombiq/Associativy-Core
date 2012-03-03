@@ -56,7 +56,7 @@ namespace Associativy.Services
                     var wholeGraph = _graphService.GraphFactory();
 
                     var query =_nodeManager.GetContentQuery(graphContext);
-                    settings.QueryModifier(query);
+                    settings.ModifyQuery(query);
                     var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
 
                     foreach (var node in nodes)
@@ -114,12 +114,12 @@ namespace Associativy.Services
                     // If there's only one node, return its neighbours
                     if (nodeCount == 1)
                     {
-                        return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings.QueryModifier);
+                        return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings.ModifyQuery);
                     }
                     // Simply calculate the intersection of the neighbours of the nodes
                     else if (settings.Algorithm == MindAlgorithm.Simple)
                     {
-                        return MakeSimpleAssociations(graphContext, descriptor, nodes, settings.QueryModifier);
+                        return MakeSimpleAssociations(graphContext, descriptor, nodes, settings.ModifyQuery);
                     }
                     // Calculate the routes between two nodes
                     else
@@ -152,7 +152,7 @@ namespace Associativy.Services
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IContent node,
-            Action<IContentQuery<ContentItem>> queryModifier)
+            QueryModifer queryModifier)
         {
             var graph = _graphService.GraphFactory();
 
@@ -174,7 +174,7 @@ namespace Associativy.Services
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
-            Action<IContentQuery<ContentItem>> queryModifier)
+            QueryModifer queryModifier)
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
@@ -282,7 +282,7 @@ namespace Associativy.Services
             }
 
             var query = _nodeManager.GetManyContentQuery(graphContext, getSucceededNodeIds((succeededPaths)));
-            settings.QueryModifier(query);
+            settings.ModifyQuery(query);
             var succeededNodes = query.List().ToDictionary(node => node.Id);
 
             graph.AddVertexRange(succeededNodes.Values);

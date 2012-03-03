@@ -10,6 +10,8 @@ namespace Associativy.Models.Mind
         Sophisticated
     }
 
+    public delegate void QueryModifer(IContentQuery<ContentItem> query);
+
     public interface IMindSettings
     {
         MindAlgorithm Algorithm { get; set; }
@@ -26,6 +28,6 @@ namespace Associativy.Models.Mind
         /// <summary>
         /// Use this to customize the query which is run against content items, e. g. to specify the version to use or to eager-load records to enhance performance
         /// </summary>
-        Action<IContentQuery<ContentItem>> QueryModifier { get; set; }
+        QueryModifer ModifyQuery { get; set; }
     }
 }

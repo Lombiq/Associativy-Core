@@ -12,7 +12,7 @@ namespace Associativy.Models.Mind
         public int ZoomLevel { get; set; }
         public int MaxZoomLevel { get; set; }
         public int MaxDistance { get; set; }
-        public Action<IContentQuery<ContentItem>> QueryModifier { get; set; }
+        public QueryModifer ModifyQuery { get; set; }
 
         public MindSettings()
         {
@@ -21,7 +21,7 @@ namespace Associativy.Models.Mind
             ZoomLevel = 0;
             MaxZoomLevel = 10;
             MaxDistance = 3;
-            QueryModifier = (query) => { };
+            ModifyQuery = (query) => { };
         }
     }
 }
