@@ -31,7 +31,7 @@ namespace Associativy.Services
         protected readonly IGraphEventHandler _graphEventHandler;
 
         // The inner dictionary should really be a concurrent HashSet
-        // Race conditionas could occure, revise if necessary.
+        // Race conditions could occur, revise if necessary.
         protected static readonly ConcurrentDictionary<int, ConcurrentDictionary<int, object>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, object>>();
 
 
