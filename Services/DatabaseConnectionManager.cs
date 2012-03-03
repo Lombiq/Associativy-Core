@@ -141,8 +141,20 @@ namespace Associativy.Services
 
         public virtual IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
+            var records = new List<TNodeToNodeConnectorRecord>();
+
+            foreach (var connections in _connections)
+            {
+                foreach (var connection in connections.Value)
+                {
+                    records.Add(new TNodeToNodeConnectorRecord { Node1Id = connections.Key, Node2Id = connection.Key });
+                }
+            }
+
+            return records.Cast<INodeToNodeConnector>();
+
             // Without .ToList(), "No persister for: Associativy.Models.INodeToNodeConnector" is thrown
-            return _nodeToNodeRecordRepository.Table.ToList().Select(r => (INodeToNodeConnector)r);
+            //return _nodeToNodeRecordRepository.Table.ToList().Select(r => (INodeToNodeConnector)r);
         }
 
 
@@ -162,8 +174,9 @@ namespace Associativy.Services
 
         public virtual int GetNeighbourCount(IGraphContext graphContext, int nodeId)
         {
-            return _nodeToNodeRecordRepository.
-                Count(connector => connector.Node1Id == nodeId || connector.Node2Id == nodeId);
+            return GetNeighbourIds(graphContext, nodeId).Count();
+            //return _nodeToNodeRecordRepository.
+            //    Count(connector => connector.Node1Id == nodeId || connector.Node2Id == nodeId);
         }
 
 
