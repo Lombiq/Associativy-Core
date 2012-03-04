@@ -6,35 +6,12 @@ using Orchard.Environment.Extensions;
 using System.Data;
 using Orchard.Localization;
 using Associativy.Services;
+using Piedone.HelpfulLibraries.Utilities;
 
 namespace Associativy.GraphDiscovery
 {
-    /// <summary>
-    /// This is a lightweight appraoch to the Freezable class from WPF
-    /// </summary>
-    public interface IFreezable
-    {
-        bool IsFrozen { get; }
-        void Freeze();
-    }
-
-    public class Freezable : IFreezable
-    {
-        public bool IsFrozen { get; private set; }
-
-        public void Freeze()
-        {
-            IsFrozen = true;
-        }
-
-        protected void ThrowIfFrozen()
-        {
-            if (IsFrozen) throw new ReadOnlyException("A frozen IFreezable object can't be modified");
-        }
-    }
-
     [OrchardFeature("Associativy")]
-    public abstract class GraphDescriptor : Freezable
+    public abstract class GraphDescriptor : FreezableBase
     {
         private string _graphName;
 
