@@ -14,10 +14,10 @@ namespace Associativy.Handlers
     [OrchardFeature("Associativy")]
     public class AssociativyNodeHandler : ContentHandler
     {
-        private readonly IGraphManager _graphManager;
-        private readonly IGraphEventHandler _graphEventHandler;
+        private readonly Lazy<IGraphManager> _graphManager;
+        private readonly Lazy<IGraphEventHandler> _graphEventHandler;
 
-        public AssociativyNodeHandler(IGraphManager graphManager, IGraphEventHandler graphEventHandler)
+        public AssociativyNodeHandler(Lazy<IGraphManager> graphManager, Lazy<IGraphEventHandler> graphEventHandler)
         {
             _graphManager = graphManager;
             _graphEventHandler = graphEventHandler;
@@ -25,12 +25,12 @@ namespace Associativy.Handlers
 
         protected override void Created(CreateContentContext context)
         {
-            TryInvokeEventHandler(context.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.NodeAdded(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.Value.NodeAdded(graphContext, context.ContentItem));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.NodeChanged(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.Value.NodeChanged(graphContext, context.ContentItem));
         }
 
         protected override void Removed(RemoveContentContext context)
@@ -38,16 +38,14 @@ namespace Associativy.Handlers
             TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) =>
                 {
                     graphDescriptor.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
-                    _graphEventHandler.NodeRemoved(graphContext, context.ContentItem);
+                    _graphEventHandler.Value.NodeRemoved(graphContext, context.ContentItem);
                 });
         }
 
         private void TryInvokeEventHandler(string contentType, Action<IGraphContext, GraphDescriptor> eventHandler)
         {
             var context = new GraphContext { ContentTypes = new string[] { contentType }};
-            var descriptors = _graphManager.FindGraphs(context);
-
-            if (descriptors.Count() == 0) return;
+            var descriptors = _graphManager.Value.FindGraphs(context);
 
             foreach (var descriptor in descriptors)
             {
