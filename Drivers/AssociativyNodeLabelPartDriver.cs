@@ -7,12 +7,29 @@ using Orchard.ContentManagement.Handlers;
 namespace Associativy.Drivers
 {
     [OrchardFeature("Associativy")]
-    // This driver's purpose is also to enable "casting" (.As<>()) of nodes to AssociativyNodeLabelPart
     public class AssociativyNodeLabelPartDriver : ContentPartDriver<AssociativyNodeLabelPart>
     {
         protected override string Prefix
         {
             get { return "Associativy.NodeLabelPart"; }
+        }
+
+        // GET
+        protected override DriverResult Editor(AssociativyNodeLabelPart part, dynamic shapeHelper)
+        {
+            return ContentShape("Parts_AssociativyNodeLabelPart_Edit",
+                () => shapeHelper.EditorTemplate(
+                        TemplateName: "Parts.AssociativyNodeLabelPart",
+                        Model: part,
+                        Prefix: Prefix));
+        }
+
+        // POST
+        protected override DriverResult Editor(AssociativyNodeLabelPart part, IUpdateModel updater, dynamic shapeHelper)
+        {
+            updater.TryUpdateModel(part, Prefix, null, null);
+
+            return Editor(part, shapeHelper);
         }
 
         protected override void Exporting(AssociativyNodeLabelPart part, ExportContentContext context)

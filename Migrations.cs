@@ -13,13 +13,6 @@ namespace Associativy.Migrations
     [OrchardFeature("Associativy")]
     public class Migrations : DataMigrationImpl
     {
-        private readonly IRepository<ContentPartDefinitionRecord> _partDefinitionRepository;
-
-        public Migrations(IRepository<ContentPartDefinitionRecord> partDefinitionRepository)
-        {
-            _partDefinitionRepository = partDefinitionRepository;
-        }
-
         public int Create()
         {
             SchemaBuilder.CreateTable(typeof(AssociativyNodeLabelPartRecord).Name,
@@ -34,8 +27,7 @@ namespace Associativy.Migrations
                     .CreateIndex("UpperInvariantLabel", new string[] { "UpperInvariantLabel" })
                 );
 
-            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, part => part.Attachable(false));
-            _partDefinitionRepository.Fetch(p => p.Name == typeof(AssociativyNodeLabelPart).Name).FirstOrDefault().Hidden = true;
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, part => part.Attachable());
 
 
             return 1;
