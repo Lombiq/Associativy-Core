@@ -10,6 +10,9 @@ using Piedone.HelpfulLibraries.Utilities;
 
 namespace Associativy.GraphDiscovery
 {
+    /// <summary>
+    /// Describes the capabilities of an associative graph
+    /// </summary>
     [OrchardFeature("Associativy")]
     public abstract class GraphDescriptor : FreezableBase
     {

@@ -12,27 +12,34 @@ namespace Associativy.GraphDiscovery
     [OrchardFeature("Associativy")]
     public class GraphManager : IGraphManager
     {
-        private readonly IEnumerable<IGraphProvider> _registeredProviders;
-        private readonly IDescriptorFilterer _providerFilterer;
+        private readonly IEnumerable<IGraphDescriptorProvider> _descriptorProviders;
+        private readonly IDescriptorFilterer _descriptorFilterer;
 
-        private readonly List<GraphDescriptor> _descriptors;
-        private List<GraphDescriptor> Descriptors
+        private IEnumerable<GraphDescriptor> _descriptors;
+        private IEnumerable<GraphDescriptor> Descriptors
         {
             get
             {
-                if (_descriptors.Count == 0) DescribeGraphs();
+                if (_descriptors == null)
+                {
+                    _descriptors = Enumerable.Empty<GraphDescriptor>();
+                    foreach (var provider in _descriptorProviders)
+                    {
+                        _descriptors = _descriptors.Union(provider.DecribeGraphs());
+                    }
+                }
+
                 return _descriptors;
             }
         }
         
 
         public GraphManager(
-            IEnumerable<IGraphProvider> registeredProviders,
+            IEnumerable<IGraphDescriptorProvider> descriptorProviders,
             IDescriptorFilterer providerFilterer)
         {
-            _registeredProviders = registeredProviders;
-            _providerFilterer = providerFilterer;
-            _descriptors = new List<GraphDescriptor>();
+            _descriptorProviders = descriptorProviders;
+            _descriptorFilterer = providerFilterer;
         }
 
 
@@ -43,7 +50,7 @@ namespace Associativy.GraphDiscovery
 
         public IEnumerable<GraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
-            return _providerFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
+            return _descriptorFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
         }
 
         public IEnumerable<GraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
@@ -56,21 +63,6 @@ namespace Associativy.GraphDiscovery
             }
 
             return descriptors.Values;
-        }
-
-        private void DescribeGraphs()
-        {
-            foreach (var provider in _registeredProviders)
-            {
-                var descriptor = new GraphDescriptorImpl();
-                provider.Describe(descriptor);
-                descriptor.Freeze();
-                _descriptors.Add(descriptor);
-            }
-        }
-
-        private class GraphDescriptorImpl : GraphDescriptor
-        {
         }
     }
 }
