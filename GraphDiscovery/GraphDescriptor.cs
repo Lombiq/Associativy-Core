@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 using System.Data;
 using Orchard.Localization;
 using Associativy.Services;
-using Piedone.HelpfulLibraries.Utilities;
 
 namespace Associativy.GraphDiscovery
 {
@@ -14,82 +13,31 @@ namespace Associativy.GraphDiscovery
     /// Describes the capabilities of an associative graph
     /// </summary>
     [OrchardFeature("Associativy")]
-    public abstract class GraphDescriptor : FreezableBase
+    public class GraphDescriptor
     {
-        private string _graphName;
+        public string GraphName { get; private set; }
+        public LocalizedString DisplayGraphName { get; private set; }
+        public IEnumerable<string> ContentTypes { get; private set; }
+        public IConnectionManager ConnectionManager { get; private set; }
 
-        /// <summary>
-        /// Name of the graph
-        /// </summary>
-        public string GraphName
+        public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
         {
-            get { return _graphName; }
-            set
-            {
-                ThrowIfFrozen();
-                _graphName = value;
-            }
-        }
-
-
-        private LocalizedString _displayGraphName;
-
-        /// <summary>
-        /// Human-readable name of the graph
-        /// </summary>
-        public LocalizedString DisplayGraphName
-        {
-            get { return _displayGraphName; }
-            set
-            {
-                ThrowIfFrozen();
-                _displayGraphName = value;
-            }
-        }
-
-
-        private IEnumerable<string> _contentTypes;
-
-        /// <summary>
-        /// The types of the content items stored by the graph
-        /// </summary>
-        public IEnumerable<string> ContentTypes
-        {
-            get { return _contentTypes; }
-            set
-            {
-                ThrowIfFrozen();
-                _contentTypes = value;
-            }
-        }
-
-
-        private IConnectionManager _connectionManager;
-
-        /// <summary>
-        /// The IConnectionManager instance used to discover connections in the graph
-        /// </summary>
-        // This should maybe be done lazily
-        public IConnectionManager ConnectionManager
-        {
-            get { return _connectionManager; }
-            set
-            {
-                ThrowIfFrozen();
-                _connectionManager = value;
-            }
+            GraphName = name;
+            DisplayGraphName = displayName;
+            ContentTypes = contentTypes;
+            ConnectionManager = connectionManager;
         }
     }
 
-    [OrchardFeature("Associativy")]
-    public static class GraphDescriptorExtensions
-    {
-        /// <summary>
-        /// Creates the maximal context the descriptor supports
-        /// </summary>
-        public static IGraphContext ProduceMaximalContext(this GraphDescriptor descriptor)
-        {
-            return new GraphContext { GraphName = descriptor.GraphName, ContentTypes = descriptor.ContentTypes };
-        }
-    }
+    //[OrchardFeature("Associativy")]
+    //public static class GraphDescriptorExtensions
+    //{
+    //    /// <summary>
+    //    /// Creates the maximal context the descriptor supports
+    //    /// </summary>
+    //    public static IGraphContext ProduceMaximalContext(this GraphDescriptor descriptor)
+    //    {
+    //        return new GraphContext { GraphName = descriptor.GraphName, ContentTypes = descriptor.ContentTypes };
+    //    }
+    //}
 }

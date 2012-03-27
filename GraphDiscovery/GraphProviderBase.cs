@@ -31,6 +31,6 @@ namespace Associativy.GraphDiscovery
             T = NullLocalizer.Instance;
         }
 
-        public abstract void Describe(GraphDescriptor graphDescriptor);
+        public abstract void Describe(DescribeContext describeContext);
     }
 }

@@ -10,4 +10,4 @@ Features:
 		Name: Associativy Core
         Description: Associativy Core
 		Category: Associativy
-		Dependencies: Orchard.jQuery, Piedone.HelpfulLibraries.DependencyInjection, Piedone.HelpfulLibraries.Utilities, Orchard.Tokens
+		Dependencies: Orchard.jQuery, Piedone.HelpfulLibraries.DependencyInjection, Orchard.Tokens

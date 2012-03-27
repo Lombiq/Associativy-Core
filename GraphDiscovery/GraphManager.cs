@@ -12,7 +12,7 @@ namespace Associativy.GraphDiscovery
     [OrchardFeature("Associativy")]
     public class GraphManager : IGraphManager
     {
-        private readonly IEnumerable<IGraphDescriptorProvider> _descriptorProviders;
+        private readonly IEnumerable<IGraphProvider> _graphProviders;
         private readonly IDescriptorFilterer _descriptorFilterer;
 
         private IEnumerable<GraphDescriptor> _descriptors;
@@ -23,10 +23,12 @@ namespace Associativy.GraphDiscovery
                 if (_descriptors == null)
                 {
                     _descriptors = Enumerable.Empty<GraphDescriptor>();
-                    foreach (var provider in _descriptorProviders)
+                    var describeContext = new DescribeContextImpl();
+                    foreach (var provider in _graphProviders)
                     {
-                        _descriptors = _descriptors.Union(provider.DecribeGraphs());
+                        provider.Describe(describeContext);
                     }
+                    _descriptors = describeContext.Descriptors;
                 }
 
                 return _descriptors;
@@ -35,10 +37,10 @@ namespace Associativy.GraphDiscovery
         
 
         public GraphManager(
-            IEnumerable<IGraphDescriptorProvider> descriptorProviders,
+            IEnumerable<IGraphProvider> graphProviders,
             IDescriptorFilterer providerFilterer)
         {
-            _descriptorProviders = descriptorProviders;
+            _graphProviders = graphProviders;
             _descriptorFilterer = providerFilterer;
         }
 
@@ -63,6 +65,10 @@ namespace Associativy.GraphDiscovery
             }
 
             return descriptors.Values;
+        }
+
+        private class DescribeContextImpl : DescribeContext
+        {
         }
     }
 }
