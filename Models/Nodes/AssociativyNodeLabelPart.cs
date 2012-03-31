@@ -8,7 +8,7 @@ using Orchard.ContentManagement;
 namespace Associativy.Models
 {
     [OrchardFeature("Associativy")]
-    public class AssociativyNodeLabelPart : ContentPart<AssociativyNodeLabelPartRecord>
+    public class AssociativyNodeLabelPart : ContentPart<AssociativyNodeLabelPartRecord>, IAssociativyNodeLabelAspect
     {
         public string Label
         {
