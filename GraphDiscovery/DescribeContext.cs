@@ -28,7 +28,7 @@ namespace Associativy.GraphDiscovery
 
         public void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
         {
-            new GraphDescriptor(name, displayName, contentTypes, connectionManager);
+            _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, connectionManager));
         }
     }
 }
