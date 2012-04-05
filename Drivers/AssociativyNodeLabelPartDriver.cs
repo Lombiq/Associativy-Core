@@ -17,9 +17,9 @@ namespace Associativy.Drivers
         // GET
         protected override DriverResult Editor(AssociativyNodeLabelPart part, dynamic shapeHelper)
         {
-            return ContentShape("Parts_AssociativyNodeLabelPart_Edit",
+            return ContentShape("Parts_AssociativyNodeLabel_Edit",
                 () => shapeHelper.EditorTemplate(
-                        TemplateName: "Parts.AssociativyNodeLabelPart",
+                        TemplateName: "Parts.AssociativyNodeLabel",
                         Model: part,
                         Prefix: Prefix));
         }

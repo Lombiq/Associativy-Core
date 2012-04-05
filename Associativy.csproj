@@ -155,7 +155,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\EditorTemplates\Parts.AssociativyNodeLabelPart.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.AssociativyNodeLabel.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Placement.info">
