@@ -19,7 +19,7 @@ namespace Associativy.GraphDiscovery
 
             if (!String.IsNullOrEmpty(graphContext.GraphName))
             {
-                filteredDescriptors = filteredDescriptors.Where((descriptor) => graphNameSelector(descriptor) == graphContext.GraphName);
+                filteredDescriptors = filteredDescriptors.Where((descriptor) => graphNameSelector(descriptor) == graphContext.GraphName || String.IsNullOrEmpty(graphNameSelector(descriptor)));
             }
 
 
@@ -44,11 +44,11 @@ namespace Associativy.GraphDiscovery
 
                     return true;
                 });
-
-                // Catch-alls will be at the top, so the more specific descriptors at the bottom.
-                // Also, because OrderBy is a stable sort, registration (dependency) order is kept.
-                filteredDescriptors = filteredDescriptors.OrderBy(descriptor => contentTypesSelector(descriptor) != null && contentTypesSelector(descriptor).Count() != 0);
             }
+
+            // Catch-alls will be at the top, so the more specific descriptors at the bottom.
+            // Also, because OrderBy is a stable sort, registration (dependency) order is kept.
+            filteredDescriptors = filteredDescriptors.OrderBy(descriptor => contentTypesSelector(descriptor) != null && contentTypesSelector(descriptor).Count() != 0);
 
 
             return filteredDescriptors;
