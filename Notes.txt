@@ -14,6 +14,7 @@
 -	Since frontend engine page parts are added dynamically (not with migrations) they don't require a Driver.
 -	All frontend engine page types should include EngineCommonPart.
 -	Further good visualization libraries: http://jsplumb.org, http://code.google.com/p/canviz/
+-	For frontend engines to be properly contexted routes to them should include either a GraphName token or a GraphContext data token.
 
 Search().Parse(searchFields, query, false); kell a partial match-hez, wildcarddal (kere*), a false tiltja az escape-elést
  * Példa: Modules\Orchard.Search\Services\SearchService.cs
