@@ -19,6 +19,7 @@ namespace Associativy.GraphDiscovery
 
             if (!String.IsNullOrEmpty(graphContext.GraphName))
             {
+                // Catch-alls with empty name property are kept
                 filteredDescriptors = filteredDescriptors.Where((descriptor) => graphNameSelector(descriptor) == graphContext.GraphName || String.IsNullOrEmpty(graphNameSelector(descriptor)));
             }
 
