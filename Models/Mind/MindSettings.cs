@@ -10,7 +10,7 @@ namespace Associativy.Models.Mind
         public MindAlgorithm Algorithm { get; set; }
         public bool UseCache { get; set; }
         public int ZoomLevel { get; set; }
-        public int MaxZoomLevel { get; set; }
+        public int ZoomLevelCount { get; set; }
         public int MaxDistance { get; set; }
         public QueryModifer ModifyQuery { get; set; }
 
@@ -19,7 +19,7 @@ namespace Associativy.Models.Mind
             Algorithm = MindAlgorithm.Sophisticated;
             UseCache = false;
             ZoomLevel = 0;
-            MaxZoomLevel = 10;
+            ZoomLevelCount = 10;
             MaxDistance = 3;
             ModifyQuery = (query) => { };
         }

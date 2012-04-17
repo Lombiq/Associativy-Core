@@ -89,10 +89,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
+                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }
-            else return _graphService.CreateZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.MaxZoomLevel);
+            else return _graphService.CreateZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
@@ -142,10 +142,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.MaxZoomLevel);
+                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }
-            else return _graphService.CreateZoomedGraph(makeGraph(), settings.ZoomLevel, settings.MaxZoomLevel);
+            else return _graphService.CreateZoomedGraph(makeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(

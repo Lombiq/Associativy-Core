@@ -19,9 +19,9 @@ namespace Associativy.Models.Mind
         int ZoomLevel { get; set; }
 
         /// <summary>
-        /// Upper bound of the graph zoom levels (lower bound is always zero).
+        /// Maximal number of zoom levels.
         /// </summary>
-        int MaxZoomLevel { get; set; }
+        int ZoomLevelCount { get; set; }
 
         int MaxDistance { get; set; }
 

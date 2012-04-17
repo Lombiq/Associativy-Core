@@ -17,7 +17,7 @@ namespace Associativy.Services
             return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>(false);
         }
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int maxZoomLevel)
+        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int zoomLevelCount)
         {
             /// Removing all nodes that are above the specified zoom level
             IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
@@ -25,7 +25,7 @@ namespace Associativy.Services
             zoomedGraph.AddVertexRange(graph.Vertices); // With AddVerticesAndEdgeRange() nodes without edges wouldn't be copied
             zoomedGraph.AddEdgeRange(graph.Edges);
 
-            var zoomPartitions = CalculateZoomPartitions(graph, maxZoomLevel);
+            var zoomPartitions = CalculateZoomPartitions(graph, zoomLevelCount);
             int i = zoomPartitions.Count - 1;
             while (i >= 0 && i > zoomLevel)
             {
@@ -50,12 +50,12 @@ namespace Associativy.Services
             return zoomedGraph;
         }
 
-        public virtual int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int maxZoomLevel)
+        public virtual int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevelCount)
         {
-            return CalculateZoomPartitions(graph, maxZoomLevel).Count;
+            return CalculateZoomPartitions(graph, zoomLevelCount).Count;
         }
 
-        protected virtual List<List<IContent>> CalculateZoomPartitions(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int maxZoomLevel)
+        protected virtual List<List<IContent>> CalculateZoomPartitions(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevelCount)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
@@ -75,14 +75,14 @@ namespace Associativy.Services
 
 
             /// Partitioning nodes into continuous zoom levels
-            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / maxZoomLevel), 0);
+            int approxVerticesInPartition = (int)Math.Round((double)(nodes.Count / zoomLevelCount), 0);
             if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevel = 0;
-            var zoomPartitions = new List<List<IContent>>(maxZoomLevel); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<IContent>>(zoomLevelCount); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
-            // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on MaxZoomLevel
+            // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on ZoomLevelCount
             // all the nodes.
             var reversedAdjacentDegreeGroups = adjacentDegreeGroups.Reverse();
             foreach (var nodeGroup in reversedAdjacentDegreeGroups)
