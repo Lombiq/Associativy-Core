@@ -1,9 +1,37 @@
 ﻿@model Associativy.Settings.AssociativyNodeLabelTypePartSettings
-
+@{
+    Script.Require("jQuery").AtFoot();
+    var z = Model;
+}
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        (function ($) {
+            $.extend({
+                associativy: {
+                    refreshLabels: function () {
+                        $("#button\\.RefreshLabels").attr("disabled", "disabled");
+                        var url = '@Url.Action("RefreshLabels", new { Controller = "AssociativyNodeLabelAdmin", Area = "Associativy", ContentType = Model.ContentType })';
+                        var postData = { __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()" };
+                        $.post(url, postData, function (response) {
+                            alert("@T("Labels were refreshed.")");
+                            $("#button\\.RefreshLabels").removeAttr("disabled");
+                        });
+                    }
+                }
+            });
+        })(jQuery);
+    </script>
+}
 <fieldset>
     @Html.LabelFor(m => m.DefaultLabelPattern, T("Pattern for generating labels"))
     @Html.TextBoxFor(m => m.DefaultLabelPattern, new { @class = "tokenized textMedium" })
     @Html.ValidationMessageFor(m => m.DefaultLabelPattern)
 </fieldset>
-
 @Display.TokenHint()
+
+<fieldset>
+    <button type="button" id="button.RefreshLabels" name="button.RefreshLabels" value="UpdateLabels"
+        onclick="$.associativy.refreshLabels(); return false;">@T("Refresh labels")</button>
+    <span class="hint">@T("This will regenerate labels stored with content items for this content type, based on the token configuration provided here.")</span>
+</fieldset>

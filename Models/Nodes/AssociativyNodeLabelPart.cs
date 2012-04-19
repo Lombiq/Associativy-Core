@@ -15,7 +15,7 @@ namespace Associativy.Models
             get { return Record.Label; }
             set
             {
-                if (String.IsNullOrEmpty(value)) return;
+                if (value == null) return;
                 Record.Label = value;
                 Record.UpperInvariantLabel = value.ToUpperInvariant();
             }
