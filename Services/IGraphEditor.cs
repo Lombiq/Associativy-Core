@@ -12,7 +12,7 @@ namespace Associativy.Services
     /// <summary>
     /// Performs work on graphs
     /// </summary>
-    public interface IGraphService : IDependency
+    public interface IGraphEditor : IDependency
     {
         /// <summary>
         /// Creates a new graph object

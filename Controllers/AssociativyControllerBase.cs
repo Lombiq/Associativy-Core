@@ -8,7 +8,7 @@ namespace Associativy.Controllers
     {
         protected readonly IAssociativyServices _associativyServices;
         protected readonly IGraphManager _graphManager;
-        protected readonly IGraphService _graphService;
+        protected readonly IGraphEditor _graphEditor;
         protected readonly IMind _mind;
         protected readonly INodeManager _nodeManager;
 
@@ -17,7 +17,7 @@ namespace Associativy.Controllers
         {
             _associativyServices = associativyServices;
             _graphManager = associativyServices.GraphManager;
-            _graphService = associativyServices.GraphService;
+            _graphEditor = associativyServices.GraphEditor;
             _mind = associativyServices.Mind;
             _nodeManager = associativyServices.NodeManager;
         }

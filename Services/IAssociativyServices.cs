@@ -17,7 +17,7 @@ namespace Associativy.Services
         /// <summary>
         /// Performs work on graphs
         /// </summary>
-        IGraphService GraphService { get; }
+        IGraphEditor GraphEditor { get; }
 
         /// <summary>
         /// Service for generating associations

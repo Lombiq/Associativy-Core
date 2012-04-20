@@ -114,7 +114,7 @@
     <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="GraphDiscovery\GraphManager.cs" />
     <Compile Include="Services\AssociativyServiceBase.cs" />
-    <Compile Include="Services\GraphService.cs" />
+    <Compile Include="Services\GraphEditor.cs" />
     <Compile Include="GraphDiscovery\IGraphManager.cs" />
     <Compile Include="GraphDiscovery\GraphProviderBase.cs" />
     <Compile Include="GraphDiscovery\IGraphProvider.cs" />
@@ -128,7 +128,7 @@
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
     <Compile Include="Services\IDatabaseConnectionManager.cs" />
-    <Compile Include="Services\IGraphService.cs" />
+    <Compile Include="Services\IGraphEditor.cs" />
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\IPathFinder.cs" />

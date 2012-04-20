@@ -10,7 +10,7 @@ using Orchard.ContentManagement;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphService : IGraphService
+    public class GraphEditor : IGraphEditor
     {
         public IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
         {

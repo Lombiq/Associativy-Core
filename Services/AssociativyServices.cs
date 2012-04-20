@@ -13,10 +13,10 @@ namespace Associativy.Services
             get { return _graphManager; }
         }
 
-        protected readonly IGraphService _graphService;
-        public IGraphService GraphService
+        protected readonly IGraphEditor _graphEditor;
+        public IGraphEditor GraphEditor
         {
-            get { return _graphService; }
+            get { return _graphEditor; }
         }
 
         protected readonly IMind _mind;
@@ -34,12 +34,12 @@ namespace Associativy.Services
 
         public AssociativyServices(
             IGraphManager graphManager,
-            IGraphService graphService,
+            IGraphEditor graphEditor,
             IMind mind,
             INodeManager nodeManager)
         {
             _graphManager = graphManager;
-            _graphService = graphService;
+            _graphEditor = graphEditor;
             _nodeManager = nodeManager;
             _mind = mind;
         }

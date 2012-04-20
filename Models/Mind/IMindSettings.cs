@@ -14,8 +14,19 @@ namespace Associativy.Models.Mind
 
     public interface IMindSettings
     {
+        /// <summary>
+        /// The algorithm to use to fing associations
+        /// </summary>
         MindAlgorithm Algorithm { get; set; }
+
+        /// <summary>
+        /// Use cache or regenerate the result
+        /// </summary>
         bool UseCache { get; set; }
+
+        /// <summary>
+        /// Current level of zoom
+        /// </summary>
         int ZoomLevel { get; set; }
 
         /// <summary>
@@ -23,6 +34,9 @@ namespace Associativy.Models.Mind
         /// </summary>
         int ZoomLevelCount { get; set; }
 
+        /// <summary>
+        /// Maximal distance between two nodes that can be considered as related
+        /// </summary>
         int MaxDistance { get; set; }
 
         /// <summary>

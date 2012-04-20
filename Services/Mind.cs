@@ -18,7 +18,7 @@ namespace Associativy.Services
     {
         protected readonly INodeManager _nodeManager;
         protected readonly IPathFinder _pathFinder;
-        protected readonly IGraphService _graphService;
+        protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
 
         #region Caching fields
@@ -30,14 +30,14 @@ namespace Associativy.Services
             IGraphManager graphManager,
             INodeManager nodeManager,
             IPathFinder pathFinder,
-            IGraphService graphService,
+            IGraphEditor graphEditor,
             IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(graphManager)
         {
             _nodeManager = nodeManager;
             _pathFinder = pathFinder;
-            _graphService = graphService;
+            _graphEditor = graphEditor;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
         }
@@ -53,7 +53,7 @@ namespace Associativy.Services
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeWholeGraph =
                 () =>
                 {
-                    var wholeGraph = _graphService.GraphFactory();
+                    var wholeGraph = _graphEditor.GraphFactory();
 
                     var query =_nodeManager.GetContentQuery(graphContext);
                     settings.ModifyQuery(query);
@@ -89,10 +89,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
+                    return _graphEditor.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }
-            else return _graphService.CreateZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            else return _graphEditor.CreateZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
@@ -142,10 +142,10 @@ namespace Associativy.Services
                 return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphService.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
+                    return _graphEditor.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }
-            else return _graphService.CreateZoomedGraph(makeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            else return _graphEditor.CreateZoomedGraph(makeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
@@ -154,7 +154,7 @@ namespace Associativy.Services
             IContent node,
             QueryModifer queryModifier)
         {
-            var graph = _graphService.GraphFactory();
+            var graph = _graphEditor.GraphFactory();
 
             graph.AddVertex(node);
 
@@ -178,7 +178,7 @@ namespace Associativy.Services
         {
             // Simply calculate the intersection of the neighbours of the nodes
 
-            var graph = _graphService.GraphFactory();
+            var graph = _graphEditor.GraphFactory();
 
             var commonNeighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
             var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
@@ -230,7 +230,7 @@ namespace Associativy.Services
                 };
 
 
-            var graph = _graphService.GraphFactory();
+            var graph = _graphEditor.GraphFactory();
             IList<IEnumerable<int>> succeededPaths;
 
             var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache);
