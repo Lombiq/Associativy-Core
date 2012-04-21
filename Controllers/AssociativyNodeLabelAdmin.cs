@@ -33,7 +33,7 @@ namespace Associativy.Controllers
 
             foreach (var item in contentItems)
             {
-                item.As<IAssociativyNodeLabelAspect>().Label = "";
+                item.As<AssociativyNodeLabelPart>().Label = "";
                 // This unpublish-publish fun is needed for the handler code to run. Otherwise, without the usage of an editor and calling UpdateEditor
                 // there seems to be no way to invoke a content event when a content part was modified directly like above.
                 _contentManager.Unpublish(item);
