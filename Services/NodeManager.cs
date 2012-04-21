@@ -33,7 +33,8 @@ namespace Associativy.Services
 
         public IContentQuery<ContentItem> GetManyContentQuery(IGraphContext graphContext, IEnumerable<int> ids)
         {
-            // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown Orchard.ContentManagement.DefaultContentQuery on line 90.
+            // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown from
+            // Orchard.ContentManagement.DefaultContentQuery on line 90.
             var idsCollection = ids.ToList();
             return GetContentQuery(graphContext).Where<CommonPartRecord>(r => idsCollection.Contains(r.Id));
         }
