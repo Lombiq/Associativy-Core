@@ -32,7 +32,7 @@ namespace Associativy.Services
 
         // The inner dictionary should really be a concurrent HashSet
         // Race conditions could occur, revise if necessary.
-        protected static readonly ConcurrentDictionary<int, ConcurrentDictionary<int, object>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, object>>();
+        protected static readonly ConcurrentDictionary<int, ConcurrentDictionary<int, int>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, int>>();
 
 
         public DatabaseConnectionManager(
@@ -64,14 +64,14 @@ namespace Associativy.Services
             // This apparently uses ~75KB memory with the test set of 80 connections.
             foreach (var connector in _nodeToNodeRecordRepository.Table)
             {
-                StoreMemoryConnection(connector.Node1Id, connector.Node2Id);
+                StoreMemoryConnection(connector.Id, connector.Node1Id, connector.Node2Id);
             }
         }
 
 
         public virtual bool AreNeighbours(IGraphContext graphContext, int nodeId1, int nodeId2)
         {
-            ConcurrentDictionary<int, object> subDictionary;
+            ConcurrentDictionary<int, int> subDictionary;
 
             if (_connections.TryGetValue(nodeId1, out subDictionary))
             {
@@ -90,8 +90,9 @@ namespace Associativy.Services
         {
             if (!AreNeighbours(graphContext, nodeId1, nodeId2))
             {
-                _nodeToNodeRecordRepository.Create(new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 });
-                StoreMemoryConnection(nodeId1, nodeId2);
+                var connector = new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 };
+                _nodeToNodeRecordRepository.Create(connector);
+                StoreMemoryConnection(connector.Id, nodeId1, nodeId2);
                 _graphEventHandler.ConnectionAdded(graphContext, nodeId1, nodeId2);
             }
         }
@@ -108,13 +109,13 @@ namespace Associativy.Services
                 _nodeToNodeRecordRepository.Delete(connector);
             }
 
-            ConcurrentDictionary<int, object> subDictionary;
+            ConcurrentDictionary<int, int> subDictionary;
             if (_connections.TryRemove(nodeId, out subDictionary))
             {
-                object currentObject;
+                int currentId;
                 foreach (var neighbourId in subDictionary.Keys)
                 {
-                    _connections[neighbourId].TryRemove(neighbourId, out currentObject);
+                    _connections[neighbourId].TryRemove(neighbourId, out currentId);
                 }
             }
 
@@ -131,9 +132,9 @@ namespace Associativy.Services
 
             _nodeToNodeRecordRepository.Delete(connectorRecord);
 
-            object currentObject;
-            _connections[nodeId1].TryRemove(nodeId2, out currentObject);
-            _connections[nodeId2].TryRemove(nodeId1, out currentObject);
+            int currentId;
+            _connections[nodeId1].TryRemove(nodeId2, out currentId);
+            _connections[nodeId2].TryRemove(nodeId1, out currentId);
 
             _graphEventHandler.ConnectionDeleted(graphContext, nodeId1, nodeId2);
         }
@@ -147,7 +148,7 @@ namespace Associativy.Services
             {
                 foreach (var connection in connections.Value)
                 {
-                    records.Add(new TNodeToNodeConnectorRecord { Node1Id = connections.Key, Node2Id = connection.Key });
+                    records.Add(new TNodeToNodeConnectorRecord { Id = connection.Value, Node1Id = connections.Key, Node2Id = connection.Key });
                 }
             }
 
@@ -160,7 +161,7 @@ namespace Associativy.Services
 
         public virtual IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
         {
-            ConcurrentDictionary<int, object> subDictionary;
+            ConcurrentDictionary<int, int> subDictionary;
 
             if (_connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
 
@@ -180,17 +181,17 @@ namespace Associativy.Services
         }
 
 
-        private static void StoreMemoryConnection(int node1Id, int node2Id)
+        private static void StoreMemoryConnection(int id, int node1Id, int node2Id)
         {
             Action<int, int> storeConnection =
                 (id1, id2) =>
                 {
                     if (!_connections.ContainsKey(id1))
                     {
-                        _connections[id1] = new ConcurrentDictionary<int, object>();
+                        _connections[id1] = new ConcurrentDictionary<int, int>();
                     }
 
-                    _connections[id1][id2] = null;
+                    _connections[id1][id2] = id;
                 };
 
             // Storing both ways for fast access.
