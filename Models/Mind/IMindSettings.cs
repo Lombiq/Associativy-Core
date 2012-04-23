@@ -44,4 +44,20 @@ namespace Associativy.Models.Mind
         /// </summary>
         QueryModifer ModifyQuery { get; set; }
     }
+
+    public static class MindSettingsExtensions
+    {
+        public static IMindSettings MakeShallowCopy(this IMindSettings settings)
+        {
+            return new MindSettings
+            {
+                Algorithm = settings.Algorithm,
+                UseCache = settings.UseCache,
+                ZoomLevel = settings.ZoomLevel,
+                ZoomLevelCount = settings.ZoomLevelCount,
+                MaxDistance = settings.MaxDistance,
+                ModifyQuery = settings.ModifyQuery
+            };
+        }
+    }
 }
