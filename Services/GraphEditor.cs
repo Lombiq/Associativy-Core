@@ -79,7 +79,7 @@ namespace Associativy.Services
             if (approxVerticesInPartition == 0) approxVerticesInPartition = nodes.Count; // Too little number of nodes
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
-            int nodeCountTillThisLevel = 0;
+            int nodeCountTillThisLevelInclusive = 0; // Including the current level
             var zoomPartitions = new List<List<IContent>>(zoomLevelCount); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on ZoomLevelCount
@@ -87,8 +87,11 @@ namespace Associativy.Services
             var reversedAdjacentDegreeGroups = adjacentDegreeGroups.Reverse();
             foreach (var nodeGroup in reversedAdjacentDegreeGroups)
             {
-                nodeCountTillThisLevel += nodeGroup.Value.Count;
-                currentRealZoomLevel = (int)Math.Floor((double)(nodeCountTillThisLevel / approxVerticesInPartition));
+                nodeCountTillThisLevelInclusive += nodeGroup.Value.Count;
+
+                // +1 so that filled up partitions don't invoke a start of a new one, e.g. if nodeCountTillThisLevelInclusive = approxVerticesInPartition = 5
+                // this ensures that there will still be only one partition.
+                currentRealZoomLevel = (int)Math.Floor((double)(nodeCountTillThisLevelInclusive / (approxVerticesInPartition + 1)));
 
                 if (previousRealZoomLevel != currentRealZoomLevel) zoomPartitions.Add(nodeGroup.Value); // We've reached a new zoom level
                 else zoomPartitions[zoomPartitions.Count - 1].AddRange(nodeGroup.Value);
