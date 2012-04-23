@@ -7,20 +7,16 @@ using Orchard.Environment.Extensions;
 namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
-    public class DescriptorFilterer : IDescriptorFilterer
+    public class GraphDescriptorFilterer : IGraphDescriptorFilterer
     {
-        public IEnumerable<TAssociativyDescriptor> FilterByMatchingGraphContext<TAssociativyDescriptor>(
-            IEnumerable<TAssociativyDescriptor> descriptors, 
-            IGraphContext graphContext, 
-            Func<TAssociativyDescriptor, string> graphNameSelector, 
-            Func<TAssociativyDescriptor, IEnumerable<string>> contentTypesSelector) 
+        public IEnumerable<GraphDescriptor> FilterByMatchingGraphContext(IEnumerable<GraphDescriptor> descriptors, IGraphContext graphContext) 
         {
             var filteredDescriptors = descriptors;
 
             if (!String.IsNullOrEmpty(graphContext.GraphName))
             {
                 // Catch-alls with empty name property are kept
-                filteredDescriptors = filteredDescriptors.Where((descriptor) => graphNameSelector(descriptor) == graphContext.GraphName || String.IsNullOrEmpty(graphNameSelector(descriptor)));
+                filteredDescriptors = filteredDescriptors.Where((descriptor) => descriptor.GraphName == graphContext.GraphName || String.IsNullOrEmpty(descriptor.GraphName));
             }
 
 
@@ -39,8 +35,8 @@ namespace Associativy.GraphDiscovery
                     {
                         // A descriptor is only suitable if it has no content types specified (catch-all) or contains all content 
                         // types listed in the context.
-                        if (contentTypesSelector(descriptor) == null || contentTypesSelector(descriptor).Count() == 0) return true;
-                        if (!contentTypesSelector(descriptor).Contains(contentType)) return false;
+                        if (descriptor.ContentTypes == null || descriptor.ContentTypes.Count() == 0) return true;
+                        if (!descriptor.ContentTypes.Contains(contentType)) return false;
                     }
 
                     return true;
@@ -49,7 +45,7 @@ namespace Associativy.GraphDiscovery
 
             // Catch-alls will be at the top, so the more specific descriptors at the bottom.
             // Also, because OrderBy is a stable sort, registration (dependency) order is kept.
-            filteredDescriptors = filteredDescriptors.OrderBy(descriptor => contentTypesSelector(descriptor) != null && contentTypesSelector(descriptor).Count() != 0);
+            filteredDescriptors = filteredDescriptors.OrderBy(descriptor => descriptor.ContentTypes != null && descriptor.ContentTypes.Count() != 0);
 
 
             return filteredDescriptors;

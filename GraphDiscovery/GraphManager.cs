@@ -13,7 +13,7 @@ namespace Associativy.GraphDiscovery
     public class GraphManager : IGraphManager
     {
         private readonly IEnumerable<IGraphProvider> _graphProviders;
-        private readonly IDescriptorFilterer _descriptorFilterer;
+        private readonly IGraphDescriptorFilterer _descriptorFilterer;
 
         private IEnumerable<GraphDescriptor> _descriptors;
         private IEnumerable<GraphDescriptor> Descriptors
@@ -38,10 +38,10 @@ namespace Associativy.GraphDiscovery
 
         public GraphManager(
             IEnumerable<IGraphProvider> graphProviders,
-            IDescriptorFilterer providerFilterer)
+            IGraphDescriptorFilterer descriptorFilterer)
         {
             _graphProviders = graphProviders;
-            _descriptorFilterer = providerFilterer;
+            _descriptorFilterer = descriptorFilterer;
         }
 
 

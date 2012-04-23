@@ -104,8 +104,8 @@
     <Compile Include="GraphDiscovery\GraphContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
-    <Compile Include="GraphDiscovery\IDescriptorFilterer.cs" />
-    <Compile Include="GraphDiscovery\DescriptorFilterer.cs" />
+    <Compile Include="GraphDiscovery\IGraphDescriptorFilterer.cs" />
+    <Compile Include="GraphDiscovery\GraphDescriptorFilterer.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />
