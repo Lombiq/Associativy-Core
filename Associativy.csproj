@@ -90,7 +90,7 @@
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
     <Compile Include="Controllers\AssociativyControllerBase.cs" />
-    <Compile Include="Controllers\AssociativyNodeLabelAdmin.cs" />
+    <Compile Include="Controllers\AssociativyNodeLabelAdminController.cs" />
     <Compile Include="Drivers\AssociativyNodeLabelPartDriver.cs" />
     <Compile Include="EventHandlers\GraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\GraphEventHandlerBase.cs" />
