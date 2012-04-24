@@ -15,6 +15,12 @@
 -	All frontend engine page types should include EngineCommonPart.
 -	Further good visualization libraries: http://jsplumb.org, http://code.google.com/p/canviz/
 -	For frontend engines to be properly contexted routes to them should include either a GraphName token or a GraphContext data token.
+-	Templates can be overridden like this: /Themes/MyTheme/Views/MyModule/MyController/Path/To/MyTemplate.cshtml
+
+Page content type conventions:
+- Page parts should be prefixed when necessary to avoid name clashing with other content parts
+- Shapes are to be named Page_PagePartName
+- Model, drivers, templates, etc. should be placed into a subdirectory: Pages/ControllerName/PagePartName.cshtml Here part name prefixes can be ommited.
 
 Search().Parse(searchFields, query, false); kell a partial match-hez, wildcarddal (kere*), a false tiltja az escape-elést
  * Példa: Modules\Orchard.Search\Services\SearchService.cs
