@@ -8,16 +8,18 @@ using Orchard.ContentManagement;
 using Associativy.Models;
 using Orchard;
 using Orchard.Core.Contents;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Controllers
 {
     [Admin]
-    public class AssociativyNodeLabelAdmin : Controller
+    [OrchardFeature("Associativy")]
+    public class AssociativyNodeLabelAdminController : Controller
     {
         private readonly IOrchardServices _orchardServices;
         private readonly IContentManager _contentManager;
 
-        public AssociativyNodeLabelAdmin(IOrchardServices orchardServices)
+        public AssociativyNodeLabelAdminController(IOrchardServices orchardServices)
         {
             _orchardServices = orchardServices;
             _contentManager = orchardServices.ContentManager;
