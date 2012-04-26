@@ -9,7 +9,7 @@ using Associativy.Services;
 namespace Associativy.GraphDiscovery
 {
     [OrchardFeature("Associativy")]
-    public abstract class DescribeContext
+    public class DescribeContext
     {
         private readonly List<GraphDescriptor> _descriptors;
 

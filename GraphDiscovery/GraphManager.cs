@@ -23,7 +23,7 @@ namespace Associativy.GraphDiscovery
                 if (_descriptors == null)
                 {
                     _descriptors = Enumerable.Empty<GraphDescriptor>();
-                    var describeContext = new DescribeContextImpl();
+                    var describeContext = new DescribeContext();
                     foreach (var provider in _graphProviders)
                     {
                         provider.Describe(describeContext);
@@ -65,10 +65,6 @@ namespace Associativy.GraphDiscovery
             }
 
             return descriptors.Values;
-        }
-
-        private class DescribeContextImpl : DescribeContext
-        {
         }
     }
 }
