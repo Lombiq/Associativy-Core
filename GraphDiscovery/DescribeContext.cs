@@ -30,7 +30,7 @@ namespace Associativy.GraphDiscovery
         {
             if (String.IsNullOrEmpty(name) || displayName == null || String.IsNullOrEmpty(displayName.Text))
             {
-                throw new ArgumentException("Associativy graphs should have their Name and DisplayName set properly");
+                throw new ArgumentException("Associativy graphs should have their Name and DisplayName set properly.");
             }
 
             _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, connectionManager));
