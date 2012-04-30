@@ -16,6 +16,7 @@
 -	Further good visualization libraries: http://jsplumb.org, http://code.google.com/p/canviz/
 -	For frontend engines to be properly contexted routes to them should include either a GraphName token or a GraphContext data token.
 -	Templates can be overridden like this: /Themes/MyTheme/Views/MyModule/MyController/Path/To/MyTemplate.cshtml
+-	The default admin user has no roles, take this so to use frontend engine authorization administration, add a role to it. By default graphs aren't shown to anyone.
 
 Page content type conventions:
 - Page parts should be prefixed when necessary to avoid name clashing with other content parts
