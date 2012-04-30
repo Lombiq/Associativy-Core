@@ -12,8 +12,7 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Controllers
 {
-    [Admin]
-    [OrchardFeature("Associativy")]
+    [Admin, OrchardFeature("Associativy")]
     public class AssociativyNodeLabelAdminController : Controller
     {
         private readonly IOrchardServices _orchardServices;
