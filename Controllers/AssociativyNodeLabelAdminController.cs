@@ -9,6 +9,8 @@ using Associativy.Models;
 using Orchard;
 using Orchard.Core.Contents;
 using Orchard.Environment.Extensions;
+using Orchard.Localization;
+using Orchard.UI.Notify;
 
 namespace Associativy.Controllers
 {
@@ -18,10 +20,14 @@ namespace Associativy.Controllers
         private readonly IOrchardServices _orchardServices;
         private readonly IContentManager _contentManager;
 
+        public Localizer T { get; set; }
+
         public AssociativyNodeLabelAdminController(IOrchardServices orchardServices)
         {
             _orchardServices = orchardServices;
             _contentManager = orchardServices.ContentManager;
+
+            T = NullLocalizer.Instance;
         }
 
         [HttpPost]
@@ -42,6 +48,8 @@ namespace Associativy.Controllers
             }
 
             _contentManager.Flush();
+
+            _orchardServices.Notifier.Information(T("Labels were refreshed."));
         }
     }
 }

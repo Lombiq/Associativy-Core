@@ -13,8 +13,7 @@
                         var url = '@Url.Action("RefreshLabels", new { Controller = "AssociativyNodeLabelAdmin", Area = "Associativy", ContentType = Model.ContentType })';
                         var postData = { __RequestVerificationToken: "@Html.AntiForgeryTokenValueOrchard()" };
                         $.post(url, postData, function (response) {
-                            alert("@T("Labels were refreshed.")");
-                            $("#button\\.RefreshLabels").removeAttr("disabled");
+                            window.location.reload();
                         });
                     }
                 }
