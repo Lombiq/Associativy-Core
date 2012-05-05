@@ -23,7 +23,7 @@ namespace Associativy.Services
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
-        protected string _cachePrefix;
+        protected const string _cachePrefix = "Associativy.";
         #endregion
 
         public Mind(
@@ -77,22 +77,7 @@ namespace Associativy.Services
                     return wholeGraph;
                 };
 
-
-            if (settings.UseCache)
-            {
-                var graph = _cacheManager.Get(MakeCacheKey("WholeGraph"), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return makeWholeGraph();
-                });
-
-                return _cacheManager.Get(MakeCacheKey("WholeGraphZoomed.Zoom:" + settings.ZoomLevel, settings), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphEditor.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
-                });
-            }
-            else return _graphEditor.CreateZoomedGraph(makeWholeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            return MakeGraph(graphContext, makeWholeGraph, settings, "WholeGraph");
         }
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
@@ -100,7 +85,7 @@ namespace Associativy.Services
             IEnumerable<IContent> nodes,
             IMindSettings settings = null)
         {
-            if (nodes == null) throw new ArgumentNullException("The list of searched nodes can't be empty");
+            if (nodes == null) throw new ArgumentNullException("nodes");
 
             var nodeCount = nodes.Count();
             if (nodeCount == 0) throw new ArgumentException("The list of searched nodes can't be empty");
@@ -128,24 +113,30 @@ namespace Associativy.Services
                     }
                 };
 
+            return MakeGraph(graphContext, makeGraph, settings, "AssociativeGraph." + String.Join(",", nodes.Select(node => node.Id)));
+        }
+
+        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeGraph(
+            IGraphContext graphContext,
+            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> createGraph,
+            IMindSettings settings,
+            string cacheKey)
+        {
             if (settings.UseCache)
             {
-                string cacheKey = "AssociativeGraph.";
-                nodes.ToList().ForEach(node => cacheKey += node.Id.ToString() + ", ");
-
-                var graph = _cacheManager.Get(MakeCacheKey(cacheKey, settings), ctx =>
+                var graph = _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return makeGraph();
+                    return createGraph();
                 });
 
-                return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom" + settings.ZoomLevel, settings), ctx =>
+                return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom:" + settings.ZoomLevel, settings), ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
                     return _graphEditor.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }
-            else return _graphEditor.CreateZoomedGraph(makeGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            else return _graphEditor.CreateZoomedGraph(createGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
