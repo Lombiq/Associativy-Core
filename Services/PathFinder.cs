@@ -58,9 +58,9 @@ namespace Associativy.Services
         public virtual IEnumerable<IEnumerable<int>> FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
         {
             // It could be that this is the only caching that's really needed and can work:
-            // - With this tens of database queries can be saved.
+            // - With this tens of database queries can be saved (when the connection manager uses DB storage without caching).
             // - Caching the whole graph is nice, but caching parts and their records could cause problems. None is yet known,
-            //   but it can happen.
+            //   but it can happen because of NHibernate.
             if (useCache)
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
