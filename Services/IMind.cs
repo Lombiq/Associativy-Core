@@ -28,5 +28,13 @@ namespace Associativy.Services
         /// <param name="nodes">The nodes to search associations between</param>
         /// <param name="settings">Mind settings</param>
         IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(IGraphContext graphContext, IEnumerable<IContent> nodes, IMindSettings settings = null);
+
+        /// <summary>
+        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range
+        /// </summary>
+        /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
+        /// <param name="centerNode">The node paths willl be calculated from</param>
+        /// <param name="settings">Mind settings</param>
+        IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(IGraphContext graphContext, IContent centerNode, IMindSettings settings = null);
     }
 }

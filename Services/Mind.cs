@@ -55,7 +55,7 @@ namespace Associativy.Services
                 {
                     var wholeGraph = _graphEditor.GraphFactory();
 
-                    var query =_nodeManager.GetContentQuery(graphContext);
+                    var query = _nodeManager.GetContentQuery(graphContext);
                     settings.ModifyQuery(query);
                     var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
 
@@ -116,6 +116,26 @@ namespace Associativy.Services
             return MakeGraph(graphContext, makeGraph, settings, "AssociativeGraph." + String.Join(",", nodes.Select(node => node.Id)));
         }
 
+        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(
+            IGraphContext graphContext,
+            IContent centerNode,
+            IMindSettings settings = null)
+        {
+            if (centerNode == null) throw new ArgumentNullException("centerNode");
+
+            var descriptor = _graphManager.FindGraph(graphContext);
+            MakeSettings(ref settings);
+
+            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
+                () =>
+                {
+                    // TODO: better
+                    return GetNeighboursGraph(graphContext, descriptor, centerNode, settings.ModifyQuery);
+                };
+
+            return MakeGraph(graphContext, makeGraph, settings, "PartialGraph." + centerNode.Id.ToString());
+        }
+
         protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeGraph(
             IGraphContext graphContext,
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> createGraph,
@@ -152,7 +172,7 @@ namespace Associativy.Services
             var query = _nodeManager.GetManyContentQuery(graphContext, descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id));
             queryModifier(query);
             var neighbours = query.List();
-            
+
             foreach (var neighbour in neighbours)
             {
                 graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
