@@ -70,7 +70,9 @@ namespace Associativy.Services
                 });
             }
 
-            var descriptor = _graphManager.FindGraph(graphContext);
+            // This below is a depth-first search that only searches till the maximum depth (maxDistance) is reached and keeps track of the paths
+            // found to the nodes.
+            var connectionManager = _graphManager.FindGraph(graphContext).ConnectionManager;
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<IList<int>>();
@@ -95,7 +97,7 @@ namespace Associativy.Services
                 if (currentDistance == maxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (descriptor.ConnectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
+                    if (connectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -114,7 +116,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, currentNode.Id);
+                        var neighbourIds = connectionManager.GetNeighbourIds(graphContext, currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {
