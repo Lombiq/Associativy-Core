@@ -6,6 +6,7 @@ using Associativy.Models.Mind;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
 using Associativy.GraphDiscovery;
+using QuickGraph;
 
 namespace Associativy.Services
 {
@@ -55,7 +56,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual IEnumerable<IEnumerable<int>> FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
+        public virtual PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
         {
             // It could be that this is the only caching that's really needed and can work:
             // - With this tens of database queries can be saved (when the connection manager uses DB storage without caching).
@@ -76,10 +77,12 @@ namespace Associativy.Services
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
+            var traversedGraph = new UndirectedGraph<int, IUndirectedEdge<int>>(false);
             var frontier = new Stack<FrontierNode>();
 
             explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
             frontier.Push(new FrontierNode { Node = explored[startNodeId] });
+            traversedGraph.AddVertex(startNodeId);
 
             FrontierNode frontierNode;
             PathNode currentNode;
@@ -99,7 +102,12 @@ namespace Associativy.Services
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
                     {
-                        if (!explored.ContainsKey(targetNodeId)) explored[targetNodeId] = new PathNode(targetNodeId);
+                        if (!explored.ContainsKey(targetNodeId))
+                        {
+                            explored[targetNodeId] = new PathNode(targetNodeId);
+                            traversedGraph.AddVertex(targetNodeId);
+                        }
+
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
                         {
                             explored[targetNodeId].MinDistance = currentDistance + 1;
@@ -108,6 +116,7 @@ namespace Associativy.Services
                         currentNode.Neighbours.Add(explored[targetNodeId]);
                         currentPath.Add(targetNodeId);
                         succeededPaths.Add(currentPath);
+                        traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, targetNodeId));
                     }
                 }
                 // We can traverse the graph further
@@ -120,11 +129,7 @@ namespace Associativy.Services
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {
-                            if (!explored.ContainsKey(neighbourId))
-                            {
-                                explored[neighbourId] = new PathNode(neighbourId);
-                            }
-                            currentNode.Neighbours.Add(explored[neighbourId]);
+                            currentNode.Neighbours.Add(new PathNode(neighbourId));
                         }
                     }
 
@@ -140,7 +145,12 @@ namespace Associativy.Services
                         else if (neighbour.Id != startNodeId)
                         {
                             neighbour.MinDistance = currentDistance + 1;
-                            frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
+                            if (!explored.ContainsKey(neighbour.Id) || neighbour.MinDistance >= currentDistance + 1)
+                            {
+                                frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
+                                traversedGraph.AddVertex(neighbour.Id);
+                                traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id));
+                            }
                         }
 
                         // If this is the shortest path to the node, overwrite its minDepth
@@ -148,12 +158,14 @@ namespace Associativy.Services
                         {
                             neighbour.MinDistance = currentDistance + 1;
                         }
+
+                        explored[neighbour.Id] = neighbour;
                     }
                 }
             }
 
 
-            return succeededPaths;
+            return new PathResult(succeededPaths, traversedGraph);
         }
     }
 }

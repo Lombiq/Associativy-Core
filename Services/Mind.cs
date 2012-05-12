@@ -129,8 +129,16 @@ namespace Associativy.Services
             Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
                 () =>
                 {
-                    // TODO: better
-                    return GetNeighboursGraph(graphContext, descriptor, centerNode, settings.ModifyQuery);
+                    var traversedGraph = _pathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
+                    var query = _nodeManager.GetManyContentQuery(graphContext, traversedGraph.Vertices);
+                    settings.ModifyQuery(query);
+                    var nodes = query.List().ToDictionary(node => node.Id);
+
+                    var graph = _graphEditor.GraphFactory();
+                    graph.AddVertexRange(nodes.Values);
+                    graph.AddEdgeRange(traversedGraph.Edges.Select(edge => new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target])));
+
+                    return graph;
                 };
 
             return MakeGraph(graphContext, makeGraph, settings, "PartialGraph." + centerNode.Id.ToString());
@@ -244,7 +252,7 @@ namespace Associativy.Services
             var graph = _graphEditor.GraphFactory();
             IList<IEnumerable<int>> succeededPaths;
 
-            var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache);
+            var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
 
             if (allPairSucceededPaths.Count() == 0) return graph;
 
@@ -271,7 +279,7 @@ namespace Associativy.Services
                     while (n < nodeList.Count)
                     {
                         // Here could be multithreading
-                        var pairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache);
+                        var pairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
                         commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                         allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
