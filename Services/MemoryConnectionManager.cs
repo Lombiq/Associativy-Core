@@ -23,10 +23,15 @@ namespace Associativy.Services
     {
         protected readonly IGraphEventHandler _graphEventHandler;
 
-        // The inner dictionary should really be a concurrent HashSet
-        // Race conditions could occur, revise if necessary.
-        // This apparently uses ~75KB memory with the test set of 80 connections.
-        protected static readonly ConcurrentDictionary<int, ConcurrentDictionary<int, int>> _connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, int>>();
+        /// <summary>
+        /// Stores the connections.
+        /// Schema: [graphName][node1Id][node2Id] = connectionId. This aims fast lookup of connections between two nodes.
+        /// </summary>
+        /// <remarks>
+        /// Race conditions could occur, revise if necessary.
+        /// This apparently uses ~75KB memory with the test set of 80 connections.
+        /// </remarks>
+        protected static readonly ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> _connections = new ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>>();
 
         public MemoryConnectionManager(
             IGraphManager graphManager,
@@ -40,7 +45,7 @@ namespace Associativy.Services
         {
             ConcurrentDictionary<int, int> subDictionary;
 
-            if (_connections.TryGetValue(node1Id, out subDictionary))
+            if (GetGraphConnections(graphContext).TryGetValue(node1Id, out subDictionary))
             {
                 return subDictionary.ContainsKey(node2Id);
             }
@@ -50,7 +55,7 @@ namespace Associativy.Services
 
         public void Connect(IGraphContext graphContext, int node1Id, int node2Id)
         {
-            Connect(graphContext, node1Id, node2Id, _connections.Count);
+            Connect(graphContext, _connections.Count, node1Id, node2Id);
         }
 
         public void Connect(IGraphContext graphContext, int connectionId, int node1Id, int node2Id)
@@ -60,12 +65,8 @@ namespace Associativy.Services
             Action<int, int> storeConnection =
                 (id1, id2) =>
                 {
-                    if (!_connections.ContainsKey(id1))
-                    {
-                        _connections[id1] = new ConcurrentDictionary<int, int>();
-                    }
-
-                    _connections[id1][id2] = connectionId;
+                    var subDictionary = GetGraphConnections(graphContext).GetOrAdd(id1, new ConcurrentDictionary<int, int>());
+                    subDictionary[id2] = connectionId;
                 };
 
             // Storing both ways for fast access.
@@ -77,13 +78,14 @@ namespace Associativy.Services
 
         public void DeleteFromNode(IGraphContext graphContext, int nodeId)
         {
+            var graphConnections = GetGraphConnections(graphContext);
             ConcurrentDictionary<int, int> subDictionary;
-            if (_connections.TryRemove(nodeId, out subDictionary))
+            if (graphConnections.TryRemove(nodeId, out subDictionary))
             {
                 int currentId;
                 foreach (var neighbourId in subDictionary.Keys)
                 {
-                    _connections[neighbourId].TryRemove(neighbourId, out currentId);
+                    graphConnections[neighbourId].TryRemove(neighbourId, out currentId);
                 }
             }
 
@@ -94,9 +96,10 @@ namespace Associativy.Services
         {
             if (!AreNeighbours(graphContext, node1Id, node2Id)) return;
 
+            var graphConnections = GetGraphConnections(graphContext);
             int currentId;
-            _connections[node1Id].TryRemove(node2Id, out currentId);
-            _connections[node2Id].TryRemove(node1Id, out currentId);
+            graphConnections[node1Id].TryRemove(node2Id, out currentId);
+            graphConnections[node2Id].TryRemove(node1Id, out currentId);
 
             _graphEventHandler.ConnectionDeleted(graphContext, node1Id, node2Id);
         }
@@ -105,7 +108,7 @@ namespace Associativy.Services
         {
             var records = new List<INodeToNodeConnector>();
 
-            foreach (var connections in _connections)
+            foreach (var connections in GetGraphConnections(graphContext))
             {
                 foreach (var connection in connections.Value)
                 {
@@ -120,7 +123,7 @@ namespace Associativy.Services
         {
             ConcurrentDictionary<int, int> subDictionary;
 
-            if (_connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
+            if (GetGraphConnections(graphContext).TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
 
             return Enumerable.Empty<int>();
         }
@@ -133,6 +136,11 @@ namespace Associativy.Services
         private string GetGraphName(IGraphContext graphContext)
         {
             return _graphManager.FindGraph(graphContext).GraphName;
+        }
+
+        private ConcurrentDictionary<int, ConcurrentDictionary<int, int>> GetGraphConnections(IGraphContext graphContext)
+        {
+            return _connections.GetOrAdd(_graphManager.FindGraph(graphContext).GraphName, new ConcurrentDictionary<int, ConcurrentDictionary<int, int>>());
         }
 
         private class NodeConnector : INodeToNodeConnector

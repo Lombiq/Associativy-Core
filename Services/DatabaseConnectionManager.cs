@@ -120,7 +120,7 @@ namespace Associativy.Services
 
         public virtual int GetNeighbourCount(IGraphContext graphContext, int nodeId)
         {
-            return GetNeighbourIds(graphContext, nodeId).Count();
+            return _memoryConnectionManager.GetNeighbourCount(graphContext, nodeId);
         }
     }
 }
