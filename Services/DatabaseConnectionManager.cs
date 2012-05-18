@@ -27,7 +27,6 @@ namespace Associativy.Services
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        protected readonly IContentManager _contentManager;
         protected readonly IGraphEventHandler _graphEventHandler;
 
         // The inner dictionary should really be a concurrent HashSet
@@ -37,11 +36,9 @@ namespace Associativy.Services
 
         public DatabaseConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            IContentManager contentManager,
             IGraphEventHandler graphEventHandler)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            _contentManager = contentManager;
             _graphEventHandler = graphEventHandler;
 
             // Although this happens once in the shell life time, should be called lazily or hooked into events, e.g. IOrchardShellEvents
