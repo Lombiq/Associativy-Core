@@ -69,31 +69,31 @@ namespace Associativy.Services
         }
 
 
-        public virtual bool AreNeighbours(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id)
         {
             ConcurrentDictionary<int, int> subDictionary;
 
-            if (_connections.TryGetValue(nodeId1, out subDictionary))
+            if (_connections.TryGetValue(node1Id, out subDictionary))
             {
-                return subDictionary.ContainsKey(nodeId2);
+                return subDictionary.ContainsKey(node2Id);
             }
 
             return false;
 
             //return _nodeToNodeRecordRepository.Count(connector =>
-            //    connector.Node1Id == nodeId1 && connector.Node2Id == nodeId2 ||
-            //    connector.Node1Id == nodeId2 && connector.Node2Id == nodeId1) != 0;
+            //    connector.Node1Id == node1Id && connector.Node2Id == node2Id ||
+            //    connector.Node1Id == node2Id && connector.Node2Id == node1Id) != 0;
         }
 
 
-        public virtual void Connect(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual void Connect(IGraphContext graphContext, int node1Id, int node2Id)
         {
-            if (!AreNeighbours(graphContext, nodeId1, nodeId2))
+            if (!AreNeighbours(graphContext, node1Id, node2Id))
             {
-                var connector = new TNodeToNodeConnectorRecord() { Node1Id = nodeId1, Node2Id = nodeId2 };
+                var connector = new TNodeToNodeConnectorRecord() { Node1Id = node1Id, Node2Id = node2Id };
                 _nodeToNodeRecordRepository.Create(connector);
-                StoreMemoryConnection(connector.Id, nodeId1, nodeId2);
-                _graphEventHandler.ConnectionAdded(graphContext, nodeId1, nodeId2);
+                StoreMemoryConnection(connector.Id, node1Id, node2Id);
+                _graphEventHandler.ConnectionAdded(graphContext, node1Id, node2Id);
             }
         }
 
@@ -122,21 +122,21 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionsDeletedFromNode(graphContext, nodeId);
         }
 
-        public virtual void Disconnect(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual void Disconnect(IGraphContext graphContext, int node1Id, int node2Id)
         {
             var connectorRecord = _nodeToNodeRecordRepository.Fetch(connector =>
-                connector.Node1Id == nodeId1 && connector.Node2Id == nodeId2 ||
-                connector.Node1Id == nodeId2 && connector.Node2Id == nodeId1).FirstOrDefault();
+                connector.Node1Id == node1Id && connector.Node2Id == node2Id ||
+                connector.Node1Id == node2Id && connector.Node2Id == node1Id).FirstOrDefault();
 
             if (connectorRecord == null) return;
 
             _nodeToNodeRecordRepository.Delete(connectorRecord);
 
             int currentId;
-            _connections[nodeId1].TryRemove(nodeId2, out currentId);
-            _connections[nodeId2].TryRemove(nodeId1, out currentId);
+            _connections[node1Id].TryRemove(node2Id, out currentId);
+            _connections[node2Id].TryRemove(node1Id, out currentId);
 
-            _graphEventHandler.ConnectionDeleted(graphContext, nodeId1, nodeId2);
+            _graphEventHandler.ConnectionDeleted(graphContext, node1Id, node2Id);
         }
 
 

@@ -14,19 +14,19 @@ namespace Associativy.Services
         /// Checks if the nodes are neighbours (= directly connected to each other)
         /// </summary>
         /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
-        /// <param name="nodeId1">Id of the first node</param>
-        /// <param name="nodeId2">Id of the second node</param>
+        /// <param name="node1Id">Id of the first node</param>
+        /// <param name="node2Id">Id of the second node</param>
         /// <returns>True if the nodes are neighbours; False if they aren't</returns>
-        bool AreNeighbours(IGraphContext graphContext, int nodeId1, int nodeId2);
+        bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id);
 
 
         /// <summary>
         /// Creates a new connection between two nodes
         /// </summary>
         /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
-        /// <param name="nodeId1">Id of the first node</param>
-        /// <param name="nodeId2">Id of the second node</param>
-        void Connect(IGraphContext graphContext, int nodeId1, int nodeId2);
+        /// <param name="node1Id">Id of the first node</param>
+        /// <param name="node2Id">Id of the second node</param>
+        void Connect(IGraphContext graphContext, int node1Id, int node2Id);
 
 
         /// <summary>
@@ -40,9 +40,9 @@ namespace Associativy.Services
         /// Removes the connection between two nodes
         /// </summary>
         /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
-        /// <param name="nodeId1">Id of the first node</param>
-        /// <param name="nodeId2">Id of the second node</param>
-        void Disconnect(IGraphContext graphContext, int nodeId1, int nodeId2);
+        /// <param name="node1Id">Id of the first node</param>
+        /// <param name="node2Id">Id of the second node</param>
+        void Disconnect(IGraphContext graphContext, int node1Id, int node2Id);
 
 
         /// <summary>
