@@ -17,7 +17,7 @@ namespace Associativy.Services
         /// <summary>
         /// Creates a new graph object
         /// </summary>
-        IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory();
+        IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> GraphFactory<TNode>();
 
         /// <summary>
         /// Creates a graph zoomed to the specified level from the given graph
@@ -25,13 +25,13 @@ namespace Associativy.Services
         /// <param name="graph">The original graph</param>
         /// <param name="zoomLevel">Level to zoom into</param>
         /// <param name="zoomLevelCount">Number of zoom levels</param>
-        IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int zoomLevelCount);
+        IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> CreateZoomedGraph<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevel, int zoomLevelCount);
 
         /// <summary>
         /// Computes the amount of real zoom levels for a graph for a given maximal zoom level
         /// </summary>
         /// <param name="graph">The graph to check</param>
         /// <param name="zoomLevelCount">Number of zoom levels</param>
-        int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevelCount);
+        int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount);
     }
 }

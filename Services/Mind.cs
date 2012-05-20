@@ -50,34 +50,21 @@ namespace Associativy.Services
             var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
-            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeWholeGraph =
+            return MakeGraph(
+                graphContext,
                 () =>
                 {
-                    var wholeGraph = _graphEditor.GraphFactory();
+                    var graph = _graphEditor.GraphFactory<int>();
 
-                    var query = _nodeManager.GetContentQuery(graphContext);
-                    settings.ModifyQuery(query);
-                    var nodes = query.List().ToDictionary<IContent, int>(node => node.Id);
+                    // This won't include nodes that are not connected to anything
+                    graph.AddVerticesAndEdgeRange(
+                        descriptor.ConnectionManager.GetAll(graphContext)
+                            .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
-                    foreach (var node in nodes)
-                    {
-                        wholeGraph.AddVertex(node.Value);
-                    }
-
-                    var connections = descriptor.ConnectionManager.GetAll(graphContext);
-                    foreach (var connection in connections)
-                    {
-                        // Since the QueryModifier could have removed items, this check is necessary
-                        if (nodes.ContainsKey(connection.Node1Id) && nodes.ContainsKey(connection.Node2Id))
-                        {
-                            wholeGraph.AddEdge(new UndirectedEdge<IContent>(nodes[connection.Node1Id], nodes[connection.Node2Id]));
-                        }
-                    }
-
-                    return wholeGraph;
-                };
-
-            return MakeGraph(graphContext, makeWholeGraph, settings, "WholeGraph");
+                    return graph;
+                },
+                settings,
+                "WholeGraph");
         }
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
@@ -93,27 +80,21 @@ namespace Associativy.Services
             var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
-            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
-                () =>
-                {
-                    // If there's only one node, return its neighbours
-                    if (nodeCount == 1)
-                    {
-                        return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings.ModifyQuery);
-                    }
-                    // Simply calculate the intersection of the neighbours of the nodes
-                    else if (settings.Algorithm == MindAlgorithm.Simple)
-                    {
-                        return MakeSimpleAssociations(graphContext, descriptor, nodes, settings.ModifyQuery);
-                    }
-                    // Calculate the routes between two nodes
-                    else
-                    {
-                        return MakeSophisticatedAssociations(graphContext, descriptor, nodes, settings);
-                    }
-                };
-
-            return MakeGraph(graphContext, makeGraph, settings, "AssociativeGraph." + String.Join(",", nodes.Select(node => node.Id)));
+            // If there's only one node, return its neighbours
+            if (nodeCount == 1)
+            {
+                return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings);
+            }
+            // Simply calculate the intersection of the neighbours of the nodes
+            else if (settings.Algorithm == MindAlgorithm.Simple)
+            {
+                return MakeSimpleAssociations(graphContext, descriptor, nodes, settings);
+            }
+            // Calculate the routes between two nodes
+            else
+            {
+                return MakeSophisticatedAssociations(graphContext, descriptor, nodes, settings);
+            }
         }
 
         public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(
@@ -126,104 +107,75 @@ namespace Associativy.Services
             var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
-            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> makeGraph =
+            return MakeGraph(
+                graphContext,
                 () =>
                 {
-                    var traversedGraph = _pathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
-                    var query = _nodeManager.GetManyContentQuery(graphContext, traversedGraph.Vertices);
-                    settings.ModifyQuery(query);
-                    var nodes = query.List().ToDictionary(node => node.Id);
-
-                    var graph = _graphEditor.GraphFactory();
-                    graph.AddVertexRange(nodes.Values);
-                    graph.AddEdgeRange(traversedGraph.Edges.Select(edge => new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target])));
-
-                    return graph;
-                };
-
-            return MakeGraph(graphContext, makeGraph, settings, "PartialGraph." + centerNode.Id.ToString());
+                    return _pathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
+                },
+                settings,
+                "PartialGraph." + centerNode.Id.ToString());
         }
 
-        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeGraph(
-            IGraphContext graphContext,
-            Func<IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>>> createGraph,
-            IMindSettings settings,
-            string cacheKey)
-        {
-            if (settings.UseCache)
-            {
-                var graph = _cacheManager.Get(MakeCacheKey(cacheKey), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return createGraph();
-                });
-
-                return _cacheManager.Get(MakeCacheKey(cacheKey + ".Zoom:" + settings.ZoomLevel, settings), ctx =>
-                {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return _graphEditor.CreateZoomedGraph(graph, settings.ZoomLevel, settings.ZoomLevelCount);
-                });
-            }
-            else return _graphEditor.CreateZoomedGraph(createGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
-        }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IContent node,
-            QueryModifer queryModifier)
+            IMindSettings settings)
         {
-            var graph = _graphEditor.GraphFactory();
+            return MakeGraph(
+                graphContext,
+                () =>
+                {
+                    var graph = _graphEditor.GraphFactory<int>();
 
-            graph.AddVertex(node);
+                    graph.AddVertex(node.Id);
+                    graph.AddVerticesAndEdgeRange(
+                        descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)
+                            .Select(neighbourId => new UndirectedEdge<int>(node.Id, neighbourId)));
 
-            var query = _nodeManager.GetManyContentQuery(graphContext, descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id));
-            queryModifier(query);
-            var neighbours = query.List();
-
-            foreach (var neighbour in neighbours)
-            {
-                graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
-            }
-
-            return graph;
+                    return graph;
+                },
+                settings,
+                "NeighboursGraph." + node.Id.ToString());
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssociations(
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
-            QueryModifer queryModifier)
+            IMindSettings settings)
         {
-            // Simply calculate the intersection of the neighbours of the nodes
-
-            var graph = _graphEditor.GraphFactory();
-
-            var commonNeighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
-            var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
-            remainingNodes.RemoveAt(0);
-            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
-            // Same as
-            //foreach (var node in remainingNodes)
-            //{
-            //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
-            //}
-
-            if (commonNeighbourIds.Count() == 0) return graph;
-
-            var query = _nodeManager.GetManyContentQuery(graphContext, commonNeighbourIds);
-            queryModifier(query);
-            var commonNeighbours = query.List();
-
-            foreach (var node in nodes)
-            {
-                foreach (var neighbour in commonNeighbours)
+            return MakeGraph(
+                graphContext,
+                () =>
                 {
-                    graph.AddVerticesAndEdge(new UndirectedEdge<IContent>(node, neighbour));
-                }
-            }
+                    // Simply calculate the intersection of the neighbours of the nodes
+                    var graph = _graphEditor.GraphFactory<int>();
 
-            return graph;
+                    var commonNeighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
+                    var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
+                    remainingNodes.RemoveAt(0);
+                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
+                    // Same as
+                    //foreach (var node in remainingNodes)
+                    //{
+                    //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.Id)).ToList();
+                    //}
+
+                    foreach (var node in nodes)
+                    {
+                        foreach (var neighbourId in commonNeighbourIds)
+                        {
+                            graph.AddVerticesAndEdge(new UndirectedEdge<int>(node.Id, neighbourId));
+                        }
+                    }
+
+                    return graph;
+                },
+                settings,
+                "SimpleAssociations." + String.Join(", ", nodes.Select(node => node.Id.ToString())));
         }
 
         protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSophisticatedAssociations(
@@ -248,100 +200,134 @@ namespace Associativy.Services
                     return succeededNodeIds;
                 };
 
-
-            var graph = _graphEditor.GraphFactory();
-            IList<IEnumerable<int>> succeededPaths;
-
-            var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
-
-            if (allPairSucceededPaths.Count() == 0) return graph;
-
-            if (nodeList.Count == 2)
-            {
-                succeededPaths = allPairSucceededPaths.ToList();
-            }
-            // Calculate the routes between every nodes pair, then calculate the intersection of the routes
-            else
-            {
-                // We have to preserve the searched node ids in the succeeded paths despite the intersections
-                var searchedNodeIds = new List<int>(nodeList.Count);
-                nodes.ToList().ForEach(
-                        node => searchedNodeIds.Add(node.Id)
-                    );
-
-                var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
-
-                for (int i = 0; i < nodeList.Count - 1; i++)
+            return MakeGraph(
+                graphContext,
+                () =>
                 {
-                    int n = i + 1;
-                    if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
+                    var graph = _graphEditor.GraphFactory<int>();
+                    IList<IEnumerable<int>> succeededPaths;
 
-                    while (n < nodeList.Count)
+                    var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+
+                    if (allPairSucceededPaths.Count() == 0) return graph;
+
+                    if (nodeList.Count == 2)
                     {
-                        // Here could be multithreading
-                        var pairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
-                        commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
-                        allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
-
-                        n++;
+                        succeededPaths = allPairSucceededPaths.ToList();
                     }
-                }
-
-                if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
-
-                succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
-
-                foreach (var path in allPairSucceededPaths)
-                {
-                    var succeededPath = path.Intersect(commonSucceededNodeIds);
-                    if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
-                }
-
-                if (succeededPaths.Count() == 0) return graph;
-            }
-
-            var query = _nodeManager.GetManyContentQuery(graphContext, getSucceededNodeIds((succeededPaths)));
-            settings.ModifyQuery(query);
-            var succeededNodes = query.List().ToDictionary(node => node.Id);
-
-            graph.AddVertexRange(succeededNodes.Values);
-
-            foreach (var path in succeededPaths)
-            {
-                var pathList = path.ToList();
-                for (int i = 1; i < pathList.Count; i++)
-                {
-                    var node1Id = pathList[i - 1];
-                    var node2Id = pathList[i];
-
-                    // Since the QueryModifier could have removed items, this check is necessary
-                    if (succeededNodes.ContainsKey(node1Id) && succeededNodes.ContainsKey(node2Id))
+                    // Calculate the routes between every nodes pair, then calculate the intersection of the routes
+                    else
                     {
-                        // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
-                        // different order of source and dest are recognized as different edges.
-                        // See issue: http://quickgraph.codeplex.com/workitem/21805
-                        var newEdge = new UndirectedEdge<IContent>(succeededNodes[node1Id], succeededNodes[node2Id]);
-                        IUndirectedEdge<IContent> reversedNewEdge;
+                        // We have to preserve the searched node ids in the succeeded paths despite the intersections
+                        var searchedNodeIds = new List<int>(nodeList.Count);
+                        nodes.ToList().ForEach(
+                                node => searchedNodeIds.Add(node.Id)
+                            );
 
-                        // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
-                        if (!graph.TryGetEdge(succeededNodes[node2Id], succeededNodes[node1Id], out reversedNewEdge))
+                        var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
+
+                        for (int i = 0; i < nodeList.Count - 1; i++)
                         {
-                            graph.AddEdge(newEdge);
+                            int n = i + 1;
+                            if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
+
+                            while (n < nodeList.Count)
+                            {
+                                // Here could be multithreading
+                                var pairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                                commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
+                                allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
+
+                                n++;
+                            }
+                        }
+
+                        if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
+
+                        succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
+
+                        foreach (var path in allPairSucceededPaths)
+                        {
+                            var succeededPath = path.Intersect(commonSucceededNodeIds);
+                            if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
+                        }
+
+                        if (succeededPaths.Count() == 0) return graph;
+                    }
+
+                    graph.AddVertexRange(getSucceededNodeIds(succeededPaths));
+
+                    foreach (var path in succeededPaths)
+                    {
+                        var pathList = path.ToList();
+                        for (int i = 1; i < pathList.Count; i++)
+                        {
+                            var node1Id = pathList[i - 1];
+                            var node2Id = pathList[i];
+
+                            // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
+                            // different order of source and dest are recognized as different edges.
+                            // See issue: http://quickgraph.codeplex.com/workitem/21805
+                            var newEdge = new UndirectedEdge<int>(node1Id, node2Id);
+                            IUndirectedEdge<int> reversedNewEdge;
+
+                            // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
+                            if (!graph.TryGetEdge(node2Id, node1Id, out reversedNewEdge))
+                            {
+                                graph.AddEdge(newEdge);
+                            }
                         }
                     }
+
+                    return graph;
+                },
+                settings,
+                "SophisticatedAssociations." + String.Join(", ", nodes.Select(node => node.Id.ToString())));
+        }
+
+        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeGraph(
+            IGraphContext graphContext,
+            Func<IUndirectedGraph<int, IUndirectedEdge<int>>> createIdGraph,
+            IMindSettings settings,
+            string cacheKey)
+        {
+            if (settings.UseCache)
+            {
+                cacheKey = MakeCacheKey(graphContext.GraphName + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
+                var zoomedGraph = _cacheManager.Get(cacheKey, ctx =>
+                {
+                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
+                    return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+                });
+
+                return MakeContentGraph(graphContext, zoomedGraph, settings);
+            }
+            else return MakeContentGraph(graphContext, _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount), settings);
+        }
+
+
+        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph, IMindSettings settings)
+        {
+            var query = _nodeManager.GetManyContentQuery(graphContext, idGraph.Vertices);
+            settings.ModifyQuery(query);
+            var nodes = query.List().ToDictionary(node => node.Id);
+
+            var graph = _graphEditor.GraphFactory<IContent>();
+            graph.AddVertexRange(nodes.Values);
+
+            foreach (var edge in idGraph.Edges)
+            {
+                // Since the QueryModifier could have removed items, this check is necessary
+                if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
+                {
+                    graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
                 }
             }
 
             return graph;
         }
 
-        protected string MakeCacheKey(string name, IMindSettings settings)
-        {
-            return MakeCacheKey(name)
-                + "MindSettings:" + settings.Algorithm + settings.MaxDistance;
-        }
-
-        protected string MakeCacheKey(string name)
+        protected static string MakeCacheKey(string name)
         {
             return _cachePrefix + name;
         }

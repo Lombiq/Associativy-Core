@@ -12,15 +12,15 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class GraphEditor : IGraphEditor
     {
-        public IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GraphFactory()
+        public IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> GraphFactory<TNode>()
         {
-            return new UndirectedGraph<IContent, IUndirectedEdge<IContent>>(false);
+            return new UndirectedGraph<TNode, IUndirectedEdge<TNode>>(false);
         }
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> CreateZoomedGraph(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevel, int zoomLevelCount)
+        public virtual IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> CreateZoomedGraph<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevel, int zoomLevelCount)
         {
             /// Removing all nodes that are above the specified zoom level
-            IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> zoomedGraph = GraphFactory();
+            var zoomedGraph = GraphFactory<TNode>();
             // Copying the original graph
             zoomedGraph.AddVertexRange(graph.Vertices); // With AddVerticesAndEdgeRange() nodes without edges wouldn't be copied
             zoomedGraph.AddEdgeRange(graph.Edges);
@@ -31,15 +31,6 @@ namespace Associativy.Services
             {
                 foreach (var node in zoomPartitions[i])
                 {
-                    // Rewiring all edges so that nodes previously connected through this nodes now get directly connected
-                    // Looks unneeded and wrong
-                    //if (zoomedGraph.AdjacentDegree(node) > 1)
-                    //{
-                    //    foreach (var edge in zoomedGraph.AdjacentEdges(node))
-                    //    {
-
-                    //    }
-                    //}
                     zoomedGraph.RemoveVertex(node);
                 }
 
@@ -50,12 +41,12 @@ namespace Associativy.Services
             return zoomedGraph;
         }
 
-        public virtual int CalculateZoomLevelCount(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevelCount)
+        public virtual int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount)
         {
             return CalculateZoomPartitions(graph, zoomLevelCount).Count;
         }
 
-        protected virtual List<List<IContent>> CalculateZoomPartitions(IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> graph, int zoomLevelCount)
+        protected virtual List<List<TNode>> CalculateZoomPartitions<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount)
         {
             // Caching doesn't work, fails at graph.AdjacentEdges(node), the graph can't find the object. Caused most likely
             // because the objects are not the same. But it seems that although the calculation to the last block is repeated
@@ -65,11 +56,11 @@ namespace Associativy.Services
 
             /// Grouping vertices by the number of their neighbours (= adjacentDegree)
             var nodes = graph.Vertices.ToList();
-            var adjacentDegreeGroups = new SortedList<int, List<IContent>>();
+            var adjacentDegreeGroups = new SortedList<int, List<TNode>>();
             foreach (var node in nodes)
             {
                 var adjacentDegree = graph.AdjacentDegree(node);
-                if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<IContent>();
+                if (!adjacentDegreeGroups.ContainsKey(adjacentDegree)) adjacentDegreeGroups[adjacentDegree] = new List<TNode>();
                 adjacentDegreeGroups[adjacentDegree].Add(node);
             }
 
@@ -80,7 +71,7 @@ namespace Associativy.Services
             int currentRealZoomLevel = 0;
             int previousRealZoomLevel = -1;
             int nodeCountTillThisLevelInclusive = 0; // Including the current level
-            var zoomPartitions = new List<List<IContent>>(zoomLevelCount); // Nodes partitioned by zoom level, filled up continuously
+            var zoomPartitions = new List<List<TNode>>(zoomLevelCount); // Nodes partitioned by zoom level, filled up continuously
             // Iterating backwards as nodes with higher neighbourCount are on the top
             // I.e.: with zoomlevel 0 only the nodes with the highest neighbourCount will be returned, on ZoomLevelCount
             // all the nodes.

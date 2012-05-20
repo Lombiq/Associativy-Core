@@ -13,15 +13,18 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class PathFinder : AssociativyServiceBase, IPathFinder
     {
+        protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public PathFinder(
             IGraphManager graphManager,
+            IGraphEditor graphEditor,
             IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(graphManager)
         {
+            _graphEditor = graphEditor;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
         }
@@ -63,7 +66,7 @@ namespace Associativy.Services
             // - Caching the whole graph would be nice, but caching parts and their records cause problems.
             if (useCache)
             {
-                return _cacheManager.Get("Associativy." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
+                return _cacheManager.Get("Associativy.Paths." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
                     return FindPaths(graphContext, startNodeId, targetNodeId, maxDistance, false);
@@ -76,7 +79,7 @@ namespace Associativy.Services
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();
-            var traversedGraph = new UndirectedGraph<int, IUndirectedEdge<int>>(false);
+            var traversedGraph = _graphEditor.GraphFactory<int>();
             var frontier = new Stack<FrontierNode>();
 
             explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
