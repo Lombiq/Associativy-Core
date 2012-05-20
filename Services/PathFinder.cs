@@ -59,9 +59,8 @@ namespace Associativy.Services
         public virtual PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
         {
             // It could be that this is the only caching that's really needed and can work:
-            // - With this tens of database queries can be saved (when the connection manager uses DB storage without caching).
-            // - Caching the whole graph is nice, but caching parts and their records could cause problems. None is yet known,
-            //   but it can happen because of NHibernate.
+            // - With this tens of database queries can be saved (when the connection manager uses DB storage without in-memory caching).
+            // - Caching the whole graph would be nice, but caching parts and their records cause problems.
             if (useCache)
             {
                 return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
@@ -148,18 +147,21 @@ namespace Associativy.Services
                             if (!explored.ContainsKey(neighbour.Id) || neighbour.MinDistance >= currentDistance + 1)
                             {
                                 frontier.Push(new FrontierNode { Distance = currentDistance + 1, Path = new List<int>(currentPath), Node = neighbour });
-                                traversedGraph.AddVertex(neighbour.Id);
-                                traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id));
                             }
                         }
 
-                        // If this is the shortest path to the node, overwrite its minDepth
-                        if (neighbour.Id != startNodeId && neighbour.MinDistance > currentDistance + 1)
+                        if (neighbour.Id != startNodeId)
                         {
-                            neighbour.MinDistance = currentDistance + 1;
-                        }
+                            // If this is the shortest path to the node, overwrite its minDepth
+                            if (neighbour.MinDistance > currentDistance + 1)
+                            {
+                                neighbour.MinDistance = currentDistance + 1;
+                            }
 
-                        explored[neighbour.Id] = neighbour;
+                            explored[neighbour.Id] = neighbour;
+                            traversedGraph.AddVertex(neighbour.Id);
+                            traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id)); 
+                        }
                     }
                 }
             }
