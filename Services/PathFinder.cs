@@ -63,7 +63,7 @@ namespace Associativy.Services
             // - Caching the whole graph would be nice, but caching parts and their records cause problems.
             if (useCache)
             {
-                return _cacheManager.Get("Associativy." + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
+                return _cacheManager.Get("Associativy." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
                 {
                     _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
                     return FindPaths(graphContext, startNodeId, targetNodeId, maxDistance, false);
