@@ -17,7 +17,7 @@ namespace Associativy.Services
             return new UndirectedGraph<TNode, IUndirectedEdge<TNode>>(false);
         }
 
-        public virtual IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> CreateZoomedGraph<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevel, int zoomLevelCount)
+        public virtual IUndirectedGraph<TNode, IUndirectedEdge<TNode>> CreateZoomedGraph<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevel, int zoomLevelCount)
         {
             /// Removing all nodes that are above the specified zoom level
             var zoomedGraph = GraphFactory<TNode>();

@@ -43,7 +43,7 @@ namespace Associativy.Services
         }
 
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
             IGraphContext graphContext,
             IMindSettings settings = null)
         {
@@ -67,7 +67,7 @@ namespace Associativy.Services
                 "WholeGraph");
         }
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
             IGraphContext graphContext,
             IEnumerable<IContent> nodes,
             IMindSettings settings = null)
@@ -97,7 +97,7 @@ namespace Associativy.Services
             }
         }
 
-        public virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(
             IGraphContext graphContext,
             IContent centerNode,
             IMindSettings settings = null)
