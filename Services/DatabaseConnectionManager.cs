@@ -22,7 +22,6 @@ namespace Associativy.Services
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IMemoryConnectionManager _memoryConnectionManager;
         protected readonly IGraphEventHandler _graphEventHandler;
-        protected static bool _connectionsLoaded = false;
 
         public DatabaseConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
@@ -37,7 +36,7 @@ namespace Associativy.Services
 
         public void TryLoadConnections(IGraphContext graphContext)
         {
-            if (!_connectionsLoaded)
+            if (_memoryConnectionManager.GetConnectionCount(graphContext) == 0)
             {
                 foreach (var connector in _nodeToNodeRecordRepository.Table)
                 {

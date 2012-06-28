@@ -7,8 +7,9 @@ using Orchard;
 
 namespace Associativy.Services
 {
-    public interface IMemoryConnectionManager : IConnectionManager, IDependency
+    public interface IMemoryConnectionManager : IConnectionManager, ISingletonDependency
     {
+        int GetConnectionCount(IGraphContext graphContext);
         void Connect(IGraphContext graphContext, int connectionId, int node1Id, int node2Id);
     }
 }

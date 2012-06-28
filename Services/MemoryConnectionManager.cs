@@ -13,9 +13,9 @@ namespace Associativy.Services
     /// Connections manager storing the graph in memory (i.e. not persisting it)
     /// </summary>
     /// <remarks>
-    /// The memcaching is done with a static dictionary. Now this is fine if the site is run on a single server but will 
+    /// The memcaching is done with a dictionary. Now this is fine if the site is run on a single server but will 
     /// eventually cause users to observe inconsistencies (as the memcache won't be updated if the DB is updated from a different
-    /// isntance); DB will remain consistent though.
+    /// isntance) on multi-server installations; DB will remain consistent though.
     /// Currently there is no real way to support a web farm scenario, see: http://orchard.codeplex.com/workitem/17361
     /// However, this will work just as in a single-server environment with proper cloud hosting like Gearhost.
     /// </remarks>
@@ -29,9 +29,9 @@ namespace Associativy.Services
         /// </summary>
         /// <remarks>
         /// Race conditions could occur, revise if necessary.
-        /// This apparently uses ~75KB memory with the test set of 80 connections.
+        /// This apparently uses ~75KB memory with a test set of 80 connections.
         /// </remarks>
-        protected static readonly ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> _connections = new ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>>();
+        protected readonly ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> _connections = new ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>>();
 
         public MemoryConnectionManager(
             IGraphManager graphManager,
@@ -39,6 +39,13 @@ namespace Associativy.Services
             : base(graphManager)
         {
             _graphEventHandler = graphEventHandler;
+        }
+
+        public int GetConnectionCount(IGraphContext graphContext)
+        {
+            if (!_connections.ContainsKey(graphContext.GraphName)) return 0;
+            // Dividing by 2 since connections are stored both ways
+            return _connections[graphContext.GraphName].Count / 2;
         }
 
         public bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id)
