@@ -6,46 +6,33 @@ using System.Collections.Concurrent;
 using Associativy.GraphDiscovery;
 using Associativy.EventHandlers;
 using Associativy.Models;
+using Orchard;
 
 namespace Associativy.Services
 {
     /// <summary>
     /// Connections manager storing the graph in memory (i.e. not persisting it)
     /// </summary>
-    /// <remarks>
-    /// The memcaching is done with a dictionary. Now this is fine if the site is run on a single server but will 
-    /// eventually cause users to observe inconsistencies (as the memcache won't be updated if the DB is updated from a different
-    /// isntance) on multi-server installations; DB will remain consistent though.
-    /// Currently there is no real way to support a web farm scenario, see: http://orchard.codeplex.com/workitem/17361
-    /// However, this will work just as in a single-server environment with proper cloud hosting like Gearhost.
-    /// </remarks>
     public class MemoryConnectionManager : AssociativyServiceBase, IMemoryConnectionManager
     {
+        protected readonly IMemoryConnectionStorage _connectionStorage;
         protected readonly IGraphEventHandler _graphEventHandler;
-
-        /// <summary>
-        /// Stores the connections.
-        /// Schema: [graphName][node1Id][node2Id] = connectionId. This aims fast lookup of connections between two nodes.
-        /// </summary>
-        /// <remarks>
-        /// Race conditions could occur, revise if necessary.
-        /// This apparently uses ~75KB memory with a test set of 80 connections.
-        /// </remarks>
-        protected readonly ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> _connections = new ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>>();
 
         public MemoryConnectionManager(
             IGraphManager graphManager,
+            IMemoryConnectionStorage connectionStorage,
             IGraphEventHandler graphEventHandler)
             : base(graphManager)
         {
+            _connectionStorage = connectionStorage;
             _graphEventHandler = graphEventHandler;
         }
 
         public int GetConnectionCount(IGraphContext graphContext)
         {
-            if (!_connections.ContainsKey(graphContext.GraphName)) return 0;
+            if (!_connectionStorage.Connections.ContainsKey(graphContext.GraphName)) return 0;
             // Dividing by 2 since connections are stored both ways
-            return _connections[graphContext.GraphName].Count / 2;
+            return _connectionStorage.Connections[graphContext.GraphName].Count / 2;
         }
 
         public bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id)
@@ -62,7 +49,7 @@ namespace Associativy.Services
 
         public void Connect(IGraphContext graphContext, int node1Id, int node2Id)
         {
-            Connect(graphContext, _connections.Count, node1Id, node2Id);
+            Connect(graphContext, _connectionStorage.Connections.Count, node1Id, node2Id);
         }
 
         public void Connect(IGraphContext graphContext, int connectionId, int node1Id, int node2Id)
@@ -147,7 +134,7 @@ namespace Associativy.Services
 
         private ConcurrentDictionary<int, ConcurrentDictionary<int, int>> GetGraphConnections(IGraphContext graphContext)
         {
-            return _connections.GetOrAdd(_graphManager.FindGraph(graphContext).GraphName, new ConcurrentDictionary<int, ConcurrentDictionary<int, int>>());
+            return _connectionStorage.Connections.GetOrAdd(_graphManager.FindGraph(graphContext).GraphName, new ConcurrentDictionary<int, ConcurrentDictionary<int, int>>());
         }
 
         private class NodeConnector : INodeToNodeConnector
@@ -155,6 +142,42 @@ namespace Associativy.Services
             public int Id { get; set; }
             public int Node1Id { get; set; }
             public int Node2Id { get; set; }
+        }
+    }
+
+
+    public interface IMemoryConnectionStorage : ISingletonDependency
+    {
+        ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> Connections { get; }
+    }
+
+    /// <summary>
+    /// Singleton storage for MemoryConnectionManager
+    /// </summary>
+    /// <remarks>
+    /// This is separated from the connection manager so dependency injection can't be mixed up (a singleton MemoryConnectionManager could use Work<>,
+    /// but this is easier).
+    /// 
+    /// In-memory storage is done with a dictionary. Now this is fine if the site is run on a single server but will 
+    /// eventually cause users to observe inconsistencies (as the storage won't be updated if the DB is updated from a different
+    /// isntance) on multi-server installations (DB will remain consistent though, if this is used in conjunction with DatabaseConnectionManager).
+    /// Currently there is no real way to support a web farm scenario, see: http://orchard.codeplex.com/workitem/17361
+    /// However, this will work just as in a single-server environment with proper cloud hosting like Gearhost.
+    /// </remarks>
+    public class MemoryConnectionStorage : IMemoryConnectionStorage
+    {
+        /// <summary>
+        /// Stores the connections.
+        /// Schema: [graphName][node1Id][node2Id] = connectionId. This aims fast lookup of connections between two nodes.
+        /// </summary>
+        /// <remarks>
+        /// Race conditions could occur, revise if necessary.
+        /// This apparently uses ~75KB memory with a test set of 80 connections.
+        /// </remarks>
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> _connections = new ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>>();
+        public ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, int>>> Connections
+        {
+            get { return _connections; }
         }
     }
 }
