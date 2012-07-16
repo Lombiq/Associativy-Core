@@ -9,32 +9,32 @@ namespace Associativy.EventHandlers
     public class GraphEventMonitor : GraphEventHandlerBase, IGraphEventMonitor
     {
         private readonly ISignals _signals;
-        private readonly ISignalStore _signalStore;
+        private readonly ISignalStorage _signalStorage;
 
-        public GraphEventMonitor(ISignals signals, ISignalStore signalStore)
+        public GraphEventMonitor(ISignals signals, ISignalStorage signalStorage)
         {
             _signals = signals;
-            _signalStore = signalStore;
+            _signalStorage = signalStorage;
         }
 
         public void MonitorChanged(IGraphContext graphContext, IAcquireContext acquireContext)
         {
             var signal = graphContext.GraphName + "ChangedSignal";
-            _signalStore.Signals[graphContext.GraphName] = signal;
+            _signalStorage.Signals[graphContext.GraphName] = signal;
             acquireContext.Monitor(_signals.When(signal));
         }
 
         public override void Changed(IGraphContext graphContext)
         {
             string signal;
-            if (_signalStore.Signals.TryGetValue(graphContext.GraphName, out signal))
+            if (_signalStorage.Signals.TryGetValue(graphContext.GraphName, out signal))
             {
                 _signals.Trigger(signal);
             }
         }
     }
 
-    public interface ISignalStore : ISingletonDependency
+    public interface ISignalStorage : ISingletonDependency
     {
         ConcurrentDictionary<string, string> Signals { get; }
     }
@@ -46,13 +46,13 @@ namespace Associativy.EventHandlers
     /// It's crucial that this dictionary stays alive at least as long as the ISignals instance. ISignals is an 
     /// ISingletonDependency too.
     /// </remarks>
-    public class SignalStore : ISignalStore
+    public class SignalStorage : ISignalStorage
     {
-        public ConcurrentDictionary<string, string> Signals { get; private set; }
+        private readonly ConcurrentDictionary<string, string> _signals = new ConcurrentDictionary<string, string>();
 
-        public SignalStore()
+        public ConcurrentDictionary<string, string> Signals
         {
-            Signals = new ConcurrentDictionary<string, string>();
+            get { return _signals; }
         }
     }
 }
