@@ -39,7 +39,7 @@ namespace Associativy.Drivers
 
         protected override void Importing(AssociativyNodeLabelPart part, ImportContentContext context)
         {
-            part.Label = context.Attribute(part.PartDefinition.Name, "Label");
+            context.ImportAttribute(part.PartDefinition.Name, "Label", value => part.Label = value);
         }
     }
 }
