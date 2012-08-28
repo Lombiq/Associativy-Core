@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
-using Associativy.Models;
-using Associativy.Models.Mind;
+using Associativy.GraphDiscovery;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
-using Associativy.GraphDiscovery;
 using QuickGraph;
 
 namespace Associativy.Services

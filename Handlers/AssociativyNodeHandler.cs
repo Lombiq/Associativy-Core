@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Associativy.EventHandlers;
-using Associativy.Models;
+using Associativy.GraphDiscovery;
 using Associativy.Services;
 using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
-using System.Diagnostics;
-using Associativy.GraphDiscovery;
-using System.Linq;
 
 namespace Associativy.Handlers
 {

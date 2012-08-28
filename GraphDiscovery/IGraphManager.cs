@@ -1,6 +1,5 @@
-﻿using Associativy.Models;
+﻿using System.Collections.Generic;
 using Orchard;
-using System.Collections.Generic;
 
 namespace Associativy.GraphDiscovery
 {

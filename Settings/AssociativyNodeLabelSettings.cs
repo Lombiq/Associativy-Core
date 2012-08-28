@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Orchard.Environment.Extensions;
-using Orchard.ContentManagement.MetaData;
-using Orchard.ContentManagement.ViewModels;
-using Orchard.ContentManagement.MetaData.Models;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.MetaData;
 using Orchard.ContentManagement.MetaData.Builders;
+using Orchard.ContentManagement.MetaData.Models;
+using Orchard.ContentManagement.ViewModels;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Settings
 {

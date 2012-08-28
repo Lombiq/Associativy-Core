@@ -1,8 +1,8 @@
-﻿using Orchard.ContentManagement;
+﻿using Associativy.Models;
+using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
-using Orchard.Environment.Extensions;
-using Associativy.Models;
 using Orchard.ContentManagement.Handlers;
+using Orchard.Environment.Extensions;
 
 namespace Associativy.Drivers
 {

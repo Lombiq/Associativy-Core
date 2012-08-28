@@ -2,10 +2,6 @@
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 using Piedone.HelpfulLibraries.DependencyInjection;
-using Associativy.GraphDiscovery;
-using System.Collections.Generic;
-using Associativy.Models;
-using System.Diagnostics;
 
 namespace Associativy.GraphDiscovery
 {

@@ -1,7 +1,6 @@
-﻿using Associativy.Models;
+﻿using Associativy.GraphDiscovery;
 using Orchard.ContentManagement;
 using Orchard.Events;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.EventHandlers
 {

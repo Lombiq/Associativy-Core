@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Associativy.Services;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
-using Associativy.Services;
 
 namespace Associativy.GraphDiscovery
 {

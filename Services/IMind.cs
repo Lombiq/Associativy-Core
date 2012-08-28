@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Associativy.Models;
+﻿using System.Collections.Generic;
+using Associativy.GraphDiscovery;
 using Associativy.Models.Mind;
 using Orchard;
 using Orchard.ContentManagement;
 using QuickGraph;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {

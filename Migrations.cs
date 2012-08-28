@@ -1,12 +1,8 @@
-using Associativy.Extensions;
 using Associativy.Models;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 using Orchard.Environment.Extensions;
-using Orchard.Core.Settings.Metadata.Records;
-using Orchard.Data;
-using System.Linq;
 
 namespace Associativy.Migrations
 {

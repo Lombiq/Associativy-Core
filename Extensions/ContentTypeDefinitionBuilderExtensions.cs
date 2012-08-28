@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Associativy.Models;
 using Orchard.ContentManagement.MetaData.Builders;
-using Associativy.Models;
 
 namespace Associativy.Extensions
 {

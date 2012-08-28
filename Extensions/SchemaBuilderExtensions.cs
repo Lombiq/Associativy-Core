@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Associativy.Models;
 using Orchard.Data.Migration.Schema;
-using Associativy.Models;
 
 namespace Associativy.Extensions
 {

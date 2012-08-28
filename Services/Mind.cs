@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
-using Associativy.Models;
+using Associativy.GraphDiscovery;
 using Associativy.Models.Mind;
-using Orchard;
 using Orchard.Caching;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {

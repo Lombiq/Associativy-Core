@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
+using Associativy.GraphDiscovery;
 using Associativy.Models;
-using Orchard.ContentManagement;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
-using Associativy.GraphDiscovery;
-using System.Collections.Concurrent;
-using System;
 
 namespace Associativy.Services
 {

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Orchard;
-using Orchard.ContentManagement;
+﻿using Orchard;
 using QuickGraph;
-using Associativy.Models;
 
 namespace Associativy.Services
 {

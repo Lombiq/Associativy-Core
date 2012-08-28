@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Associativy.GraphDiscovery;
 using Associativy.Models;
 using Orchard.ContentManagement;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {

@@ -1,17 +1,13 @@
-﻿using Orchard.ContentManagement.Handlers;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Associativy.Models;
+using Associativy.Settings;
+using Orchard.ContentManagement.Handlers;
+using Orchard.ContentManagement.MetaData;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
-using Associativy.Models;
-using Orchard.ContentManagement;
-using Orchard.ContentManagement.Aspects;
-using Orchard.Core.Title.Models;
-using Orchard.Core.Common.Models;
-using Orchard.ContentManagement.MetaData;
 using Orchard.Tokens;
-using System;
-using System.Linq;
-using Associativy.Settings;
-using System.Collections.Generic;
 
 namespace Associativy.Handlers
 {

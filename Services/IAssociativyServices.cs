@@ -1,6 +1,5 @@
-﻿using Associativy.Models;
+﻿using Associativy.GraphDiscovery;
 using Orchard;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {

@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
-using Associativy.Services;
 using Associativy.GraphDiscovery;
+using Associativy.Services;
 
 namespace Associativy.Controllers
 {

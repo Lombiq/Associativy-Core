@@ -1,6 +1,4 @@
 ﻿using Orchard.Environment.Extensions;
-using System;
-using Orchard.ContentManagement;
 
 namespace Associativy.Models.Mind
 {

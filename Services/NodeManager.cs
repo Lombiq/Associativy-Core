@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
+using Associativy.GraphDiscovery;
 using Associativy.Models;
 using Orchard.ContentManagement;
 using Orchard.Core.Common.Models;
 using Orchard.Environment.Extensions;
-using Associativy.GraphDiscovery;
 
 namespace Associativy.Services
 {

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using Associativy.Models;
-using Orchard.Caching;
 using Associativy.GraphDiscovery;
 using Orchard;
+using Orchard.Caching;
 
 namespace Associativy.EventHandlers
 {

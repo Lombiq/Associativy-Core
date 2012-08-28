@@ -1,9 +1,4 @@
-﻿using Associativy.Services;
-using Orchard;
-using Orchard.Localization;
-using Associativy.GraphDiscovery;
-using System.Collections.Generic;
-using Orchard.Events;
+﻿using Orchard;
 
 namespace Associativy.GraphDiscovery
 {
