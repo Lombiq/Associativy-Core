@@ -37,7 +37,7 @@ namespace Associativy.Services
             {
                 foreach (var connector in _nodeToNodeRecordRepository.Table)
                 {
-                    _memoryConnectionManager.Connect(graphContext, connector.Id, connector.Node1Id, connector.Node2Id);
+                    _memoryConnectionManager.Connect(graphContext, connector.Node1Id, connector.Node2Id);
                 }
             }
         }
@@ -58,7 +58,7 @@ namespace Associativy.Services
 
             var connector = new TNodeToNodeConnectorRecord() { Node1Id = node1Id, Node2Id = node2Id };
             _nodeToNodeRecordRepository.Create(connector);
-            _memoryConnectionManager.Connect(graphContext, connector.Id, node1Id, node2Id);
+            _memoryConnectionManager.Connect(graphContext, node1Id, node2Id);
             _graphEventHandler.ConnectionAdded(graphContext, node1Id, node2Id);
         }
 
