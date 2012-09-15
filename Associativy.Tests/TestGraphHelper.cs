@@ -15,7 +15,7 @@ namespace Associativy.Tests
         public static NotionGraphBuilder BuildTestGraph(IContainer container)
         {
             var graphContext = TestGraphContext();
-            var connectionManager = container.Resolve<IGraphManager>().FindGraph(graphContext).ConnectionManager;
+            var connectionManager = container.Resolve<IGraphManager>().FindGraph(graphContext).PathServices.ConnectionManager;
 
             var graphBuilder = new NotionGraphBuilder(container.Resolve<IContentManager>(), graphContext, connectionManager);
             graphBuilder.Build(false);

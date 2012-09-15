@@ -15,7 +15,6 @@ namespace Associativy.Services
     public class Mind : AssociativyServiceBase, IMind
     {
         protected readonly INodeManager _nodeManager;
-        protected readonly IPathFinder _pathFinder;
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
 
@@ -27,14 +26,12 @@ namespace Associativy.Services
         public Mind(
             IGraphManager graphManager,
             INodeManager nodeManager,
-            IPathFinder pathFinder,
             IGraphEditor graphEditor,
             IGraphEventMonitor associativeGraphEventMonitor,
             ICacheManager cacheManager)
             : base(graphManager)
         {
             _nodeManager = nodeManager;
-            _pathFinder = pathFinder;
             _graphEditor = graphEditor;
             _associativeGraphEventMonitor = associativeGraphEventMonitor;
             _cacheManager = cacheManager;
@@ -56,7 +53,7 @@ namespace Associativy.Services
 
                     // This won't include nodes that are not connected to anything
                     graph.AddVerticesAndEdgeRange(
-                        descriptor.ConnectionManager.GetAll(graphContext)
+                        descriptor.PathServices.ConnectionManager.GetAll(graphContext)
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
                     return graph;
@@ -109,7 +106,7 @@ namespace Associativy.Services
                 graphContext,
                 () =>
                 {
-                    return _pathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
+                    return descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
                 },
                 settings,
                 "PartialGraph." + centerNode.Id.ToString());
@@ -130,7 +127,7 @@ namespace Associativy.Services
 
                     graph.AddVertex(node.Id);
                     graph.AddVerticesAndEdgeRange(
-                        descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)
+                        descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.Id)
                             .Select(neighbourId => new UndirectedEdge<int>(node.Id, neighbourId)));
 
                     return graph;
@@ -152,10 +149,10 @@ namespace Associativy.Services
                     // Simply calculate the intersection of the neighbours of the nodes
                     var graph = _graphEditor.GraphFactory<int>();
 
-                    var commonNeighbourIds = descriptor.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
+                    var commonNeighbourIds = descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().Id);
                     var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
                     remainingNodes.RemoveAt(0);
-                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
+                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.Id)).ToList());
                     // Same as
                     //foreach (var node in remainingNodes)
                     //{
@@ -205,7 +202,7 @@ namespace Associativy.Services
                     var graph = _graphEditor.GraphFactory<int>();
                     IList<IEnumerable<int>> succeededPaths;
 
-                    var allPairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                    var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
 
                     if (allPairSucceededPaths.Count() == 0) return graph;
 
@@ -232,7 +229,7 @@ namespace Associativy.Services
                             while (n < nodeList.Count)
                             {
                                 // Here could be multithreading
-                                var pairSucceededPaths = _pathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                                var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
                                 commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                                 allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 

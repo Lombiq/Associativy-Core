@@ -115,7 +115,6 @@
     <Compile Include="Services\AssociativyServiceBase.cs" />
     <Compile Include="Services\GraphEditor.cs" />
     <Compile Include="GraphDiscovery\IGraphManager.cs" />
-    <Compile Include="GraphDiscovery\GraphProviderBase.cs" />
     <Compile Include="GraphDiscovery\IGraphProvider.cs" />
     <Compile Include="Models\Mind\IMindSettings.cs" />
     <Compile Include="Models\Nodes\INodeToNodeConnector.cs" />
@@ -123,10 +122,13 @@
     <Compile Include="Models\Nodes\NodeToNodeConnectorRecord.cs" />
     <Compile Include="EventHandlers\GraphEventMonitor.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
-    <Compile Include="Services\DatabaseConnectionManager.cs" />
+    <Compile Include="Services\IPathServices.cs" />
+    <Compile Include="Services\IStandardPathFinder.cs" />
+    <Compile Include="Services\PathServices.cs" />
+    <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
-    <Compile Include="Services\IDatabaseConnectionManager.cs" />
+    <Compile Include="Services\ISqlConnectionManager.cs" />
     <Compile Include="Services\IGraphEditor.cs" />
     <Compile Include="Services\IMemoryConnectionManager.cs" />
     <Compile Include="Services\MemoryConnectionManager.cs" />
@@ -135,7 +137,7 @@
     <Compile Include="Services\IPathFinder.cs" />
     <Compile Include="Services\Mind.cs" />
     <Compile Include="Services\NodeManager.cs" />
-    <Compile Include="Services\PathFinder.cs" />
+    <Compile Include="Services\StandardPathFinder.cs" />
     <Compile Include="Settings\AssociativyNodeLabelSettings.cs" />
   </ItemGroup>
   <ItemGroup>

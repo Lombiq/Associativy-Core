@@ -26,7 +26,7 @@ using Orchard.Tests.Utility;
 namespace Associativy.Tests.Services
 {
     [TestFixture]
-    public class PathFinderTests
+    public class StandardPathFinderTests
     {
         private IContainer _container;
         private IPathFinder _pathFinder;
@@ -59,7 +59,7 @@ namespace Associativy.Tests.Services
             builder.RegisterInstance(new StubGraphManager()).As<IGraphManager>();
             builder.RegisterInstance(new StubGraphEditor()).As<IGraphEditor>();
             builder.RegisterType<StubCacheManager>().As<ICacheManager>();
-            builder.RegisterType<PathFinder>().As<IPathFinder>();
+            builder.RegisterType<StandardPathFinder>().As<IPathFinder>();
 
             #region ContentManager setup
             builder.RegisterType<DefaultContentManager>().As<IContentManager>();

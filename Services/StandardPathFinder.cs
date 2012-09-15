@@ -9,13 +9,13 @@ using QuickGraph;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class PathFinder : AssociativyServiceBase, IPathFinder
+    public class StandardPathFinder : AssociativyServiceBase, IStandardPathFinder
     {
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
-        public PathFinder(
+        public StandardPathFinder(
             IGraphManager graphManager,
             IGraphEditor graphEditor,
             IGraphEventMonitor associativeGraphEventMonitor,
@@ -73,7 +73,7 @@ namespace Associativy.Services
 
             // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
             // keeps track of the paths found.
-            var connectionManager = _graphManager.FindGraph(graphContext).ConnectionManager;
+            var connectionManager = _graphManager.FindGraph(graphContext).PathServices.ConnectionManager;
 
             var explored = new Dictionary<int, PathNode>();
             var succeededPaths = new List<List<int>>();

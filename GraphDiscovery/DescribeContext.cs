@@ -25,14 +25,14 @@ namespace Associativy.GraphDiscovery
             _descriptors = new List<GraphDescriptor>();
         }
 
-        public void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
+        public void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
         {
             if (String.IsNullOrEmpty(name) || displayName == null || String.IsNullOrEmpty(displayName.Text))
             {
                 throw new ArgumentException("Associativy graphs should have their Name and DisplayName set properly.");
             }
 
-            _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, connectionManager));
+            _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, pathServicesFactory));
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Associativy
             // by Orchard.
             var builder = new ContainerBuilder();
 
-            builder.RegisterGeneric(typeof(DatabaseConnectionManager<>)).As(typeof(IDatabaseConnectionManager<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(SqlConnectionManager<>)).As(typeof(ISqlConnectionManager<>)).InstancePerLifetimeScope();
 
             builder.Update(componentRegistry);
         }

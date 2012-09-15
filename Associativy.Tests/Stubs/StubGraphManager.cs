@@ -9,11 +9,13 @@ namespace Associativy.Tests.Stubs
 {
     public class StubGraphManager : IGraphManager
     {
-        private static MemoryConnectionManager _connectionManager;
+        private static PathServices _pathServices;
 
         public StubGraphManager()
         {
-            if (_connectionManager == null) _connectionManager = new MemoryConnectionManager(this, new StubCacheManager(), new Mock<IGraphEventHandler>().Object);
+            if (_pathServices == null) _pathServices = new PathServices(
+                new MemoryConnectionManager(this, new StubCacheManager(), new Mock<IGraphEventHandler>().Object),
+                new StandardPathFinder(this, new StubGraphEditor(), new Mock<IGraphEventMonitor>().Object, new StubCacheManager()));
         }
 
         public GraphDescriptor FindGraph(IGraphContext graphContext)
@@ -37,7 +39,7 @@ namespace Associativy.Tests.Stubs
                 "TestGraph",
                 new Orchard.Localization.LocalizedString("Test Graph"),
                 new string[] { "Page" },
-                _connectionManager);
+                () => _pathServices);
         }
     }
 }

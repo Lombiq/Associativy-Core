@@ -2,6 +2,7 @@
 using Associativy.Services;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
+using System;
 
 namespace Associativy.GraphDiscovery
 {
@@ -14,14 +15,22 @@ namespace Associativy.GraphDiscovery
         public string GraphName { get; private set; }
         public LocalizedString DisplayGraphName { get; private set; }
         public IEnumerable<string> ContentTypes { get; private set; }
-        public IConnectionManager ConnectionManager { get; private set; }
 
-        public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, IConnectionManager connectionManager)
+        private readonly Lazy<IPathServices> _pathServicesField;
+        public IPathServices PathServices
+        {
+            get
+            {
+                return _pathServicesField.Value;
+            }
+        }
+
+        public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
         {
             GraphName = name;
             DisplayGraphName = displayName;
             ContentTypes = contentTypes;
-            ConnectionManager = connectionManager;
+            _pathServicesField = new Lazy<IPathServices>(pathServicesFactory);
         }
     }
 

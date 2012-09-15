@@ -33,7 +33,7 @@ namespace Associativy.Handlers
         {
             TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) =>
                 {
-                    graphDescriptor.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
+                    graphDescriptor.PathServices.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
                     _graphEventHandler.Value.NodeRemoved(graphContext, context.ContentItem);
                 });
         }
