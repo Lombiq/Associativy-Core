@@ -5,7 +5,6 @@ using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models;
-using Orchard;
 using Orchard.Caching;
 
 namespace Associativy.Services

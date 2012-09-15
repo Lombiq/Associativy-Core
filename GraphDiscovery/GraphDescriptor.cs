@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Associativy.Services;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
-using System;
 
 namespace Associativy.GraphDiscovery
 {

@@ -153,10 +153,6 @@
       <Project>{6F759635-13D7-4E94-BCC9-80445D63F117}</Project>
       <Name>Orchard.Tokens</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Piedone.HelpfulLibraries\Piedone.HelpfulLibraries.csproj">
-      <Project>{EA61AD10-39D6-41A9-B12B-227F50C54158}</Project>
-      <Name>Piedone.HelpfulLibraries</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\EditorTemplates\Parts.AssociativyNodeLabel.cshtml" />
