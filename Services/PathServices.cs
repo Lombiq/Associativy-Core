@@ -17,18 +17,6 @@ namespace Associativy.Services
             get { return _pathFinder; }
         }
 
-        protected readonly IMind _mind;
-        public IMind Mind
-        {
-            get { return _mind; }
-        }
-
-        protected readonly INodeManager _nodeManager;
-        public INodeManager NodeManager
-        {
-            get { return _nodeManager; }
-        }
-
 
         public PathServices(
             IConnectionManager connectionManager,
