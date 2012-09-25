@@ -4,10 +4,10 @@ Author: Piedone
 Website: http://associativy.com
 Version: 1.0
 OrchardVersion: 1.5.1
-Description: Associativy module.
+Description: Associativy aims to give a platform for building knowledge bases organized through associative connections
 Features:
     Associativy:
 		Name: Associativy Core
-        Description: Associativy Core
+        Description: Core functionality of the Associativy platform
 		Category: Associativy
 		Dependencies: Orchard.jQuery, Orchard.Tokens
