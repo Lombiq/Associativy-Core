@@ -12,18 +12,18 @@ namespace Associativy.Services
     public class StandardPathFinder : AssociativyServiceBase, IStandardPathFinder
     {
         protected readonly IGraphEditor _graphEditor;
-        protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
+        protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
         public StandardPathFinder(
             IGraphManager graphManager,
             IGraphEditor graphEditor,
-            IGraphEventMonitor associativeGraphEventMonitor,
+            IGraphEventMonitor graphEventMonitor,
             ICacheManager cacheManager)
             : base(graphManager)
         {
             _graphEditor = graphEditor;
-            _associativeGraphEventMonitor = associativeGraphEventMonitor;
+            _graphEventMonitor = graphEventMonitor;
             _cacheManager = cacheManager;
         }
 
@@ -66,7 +66,7 @@ namespace Associativy.Services
             {
                 return _cacheManager.Get("Associativy.Paths." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
+                    _graphEventMonitor.MonitorChanged(graphContext, ctx);
                     return FindPaths(graphContext, startNodeId, targetNodeId, maxDistance, false);
                 });
             }
