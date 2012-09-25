@@ -200,79 +200,79 @@ namespace Associativy.Services
                 () =>
                 {
                     var graph = _graphEditor.GraphFactory<int>();
-                    IList<IEnumerable<int>> succeededPaths;
+                    //IList<IEnumerable<int>> succeededPaths;
 
-                    var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                    //var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededGraph;
 
-                    if (allPairSucceededPaths.Count() == 0) return graph;
+                    //if (allPairSucceededPaths.Count() == 0) return graph;
 
-                    if (nodeList.Count == 2)
-                    {
-                        succeededPaths = allPairSucceededPaths.ToList();
-                    }
-                    // Calculate the routes between every nodes pair, then calculate the intersection of the routes
-                    else
-                    {
-                        // We have to preserve the searched node ids in the succeeded paths despite the intersections
-                        var searchedNodeIds = new List<int>(nodeList.Count);
-                        nodes.ToList().ForEach(
-                                node => searchedNodeIds.Add(node.Id)
-                            );
+                    //if (nodeList.Count == 2)
+                    //{
+                    //    succeededPaths = allPairSucceededPaths.ToList();
+                    //}
+                    //// Calculate the routes between every nodes pair, then calculate the intersection of the routes
+                    //else
+                    //{
+                    //    // We have to preserve the searched node ids in the succeeded paths despite the intersections
+                    //    var searchedNodeIds = new List<int>(nodeList.Count);
+                    //    nodes.ToList().ForEach(
+                    //            node => searchedNodeIds.Add(node.Id)
+                    //        );
 
-                        var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
+                    //    var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
 
-                        for (int i = 0; i < nodeList.Count - 1; i++)
-                        {
-                            int n = i + 1;
-                            if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
+                    //    for (int i = 0; i < nodeList.Count - 1; i++)
+                    //    {
+                    //        int n = i + 1;
+                    //        if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
 
-                            while (n < nodeList.Count)
-                            {
-                                // Here could be multithreading
-                                var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
-                                commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
-                                allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
+                    //        while (n < nodeList.Count)
+                    //        {
+                    //            // Here could be multithreading
+                    //            var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                    //            commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
+                    //            allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
-                                n++;
-                            }
-                        }
+                    //            n++;
+                    //        }
+                    //    }
 
-                        if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
+                    //    if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
 
-                        succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
+                    //    succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
 
-                        foreach (var path in allPairSucceededPaths)
-                        {
-                            var succeededPath = path.Intersect(commonSucceededNodeIds);
-                            if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
-                        }
+                    //    foreach (var path in allPairSucceededPaths)
+                    //    {
+                    //        var succeededPath = path.Intersect(commonSucceededNodeIds);
+                    //        if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
+                    //    }
 
-                        if (succeededPaths.Count() == 0) return graph;
-                    }
+                    //    if (succeededPaths.Count() == 0) return graph;
+                    //}
 
-                    graph.AddVertexRange(getSucceededNodeIds(succeededPaths));
+                    //graph.AddVertexRange(getSucceededNodeIds(succeededPaths));
 
-                    foreach (var path in succeededPaths)
-                    {
-                        var pathList = path.ToList();
-                        for (int i = 1; i < pathList.Count; i++)
-                        {
-                            var node1Id = pathList[i - 1];
-                            var node2Id = pathList[i];
+                    //foreach (var path in succeededPaths)
+                    //{
+                    //    var pathList = path.ToList();
+                    //    for (int i = 1; i < pathList.Count; i++)
+                    //    {
+                    //        var node1Id = pathList[i - 1];
+                    //        var node2Id = pathList[i];
 
-                            // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
-                            // different order of source and dest are recognized as different edges.
-                            // See issue: http://quickgraph.codeplex.com/workitem/21805
-                            var newEdge = new UndirectedEdge<int>(node1Id, node2Id);
-                            IUndirectedEdge<int> reversedNewEdge;
+                    //        // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
+                    //        // different order of source and dest are recognized as different edges.
+                    //        // See issue: http://quickgraph.codeplex.com/workitem/21805
+                    //        var newEdge = new UndirectedEdge<int>(node1Id, node2Id);
+                    //        IUndirectedEdge<int> reversedNewEdge;
 
-                            // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
-                            if (!graph.TryGetEdge(node2Id, node1Id, out reversedNewEdge))
-                            {
-                                graph.AddEdge(newEdge);
-                            }
-                        }
-                    }
+                    //        // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
+                    //        if (!graph.TryGetEdge(node2Id, node1Id, out reversedNewEdge))
+                    //        {
+                    //            graph.AddEdge(newEdge);
+                    //        }
+                    //    }
+                    //}
 
                     return graph;
                 },
