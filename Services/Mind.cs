@@ -16,7 +16,7 @@ namespace Associativy.Services
     {
         protected readonly INodeManager _nodeManager;
         protected readonly IGraphEditor _graphEditor;
-        protected readonly IGraphEventMonitor _associativeGraphEventMonitor;
+        protected readonly IGraphEventMonitor _graphEventMonitor;
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
@@ -27,13 +27,13 @@ namespace Associativy.Services
             IGraphManager graphManager,
             INodeManager nodeManager,
             IGraphEditor graphEditor,
-            IGraphEventMonitor associativeGraphEventMonitor,
+            IGraphEventMonitor graphEventMonitor,
             ICacheManager cacheManager)
             : base(graphManager)
         {
             _nodeManager = nodeManager;
             _graphEditor = graphEditor;
-            _associativeGraphEventMonitor = associativeGraphEventMonitor;
+            _graphEventMonitor = graphEventMonitor;
             _cacheManager = cacheManager;
         }
 
@@ -291,7 +291,7 @@ namespace Associativy.Services
                 cacheKey = MakeCacheKey(graphContext.GraphName + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
                 var zoomedGraph = _cacheManager.Get(cacheKey, ctx =>
                 {
-                    _associativeGraphEventMonitor.MonitorChanged(graphContext, ctx);
+                    _graphEventMonitor.MonitorChanged(graphContext, ctx);
                     return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
                 });
 
