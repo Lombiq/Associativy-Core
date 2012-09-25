@@ -6,6 +6,7 @@ using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models;
 using Orchard.Caching;
+using Associativy.Models.Nodes;
 
 namespace Associativy.Services
 {
@@ -113,17 +114,17 @@ namespace Associativy.Services
 
         public IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
-            var records = new List<INodeToNodeConnector>();
+            var connectors = new List<INodeToNodeConnector>();
 
             foreach (var connections in GetGraphConnections(graphContext))
             {
                 foreach (var connection in connections.Value)
                 {
-                    records.Add(new NodeConnector { Node1Id = connections.Key, Node2Id = connection.Key });
+                    connectors.Add(new NodeConnector { Node1Id = connections.Key, Node2Id = connection.Key });
                 }
             }
 
-            return records.Cast<INodeToNodeConnector>();
+            return connectors.Cast<INodeToNodeConnector>();
         }
 
         public IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
@@ -148,13 +149,6 @@ namespace Associativy.Services
         private ConcurrentDictionary<int, ConcurrentDictionary<int, bool>> GetGraphConnections(IGraphContext graphContext)
         {
             return Connections.GetOrAdd(_graphManager.FindGraph(graphContext).GraphName, new ConcurrentDictionary<int, ConcurrentDictionary<int, bool>>());
-        }
-
-        private class NodeConnector : INodeToNodeConnector
-        {
-            public int Id { get; set; }
-            public int Node1Id { get; set; }
-            public int Node2Id { get; set; }
         }
     }
 }
