@@ -76,7 +76,7 @@ namespace Associativy.Services
             var connectionManager = _graphManager.FindGraph(graphContext).PathServices.ConnectionManager;
 
             var explored = new Dictionary<int, PathNode>();
-            var succeededPaths = new List<List<int>>();
+            var succeededGraph = _graphEditor.GraphFactory<int>();
             var traversedGraph = _graphEditor.GraphFactory<int>();
             var frontier = new Stack<FrontierNode>();
 
@@ -115,7 +115,7 @@ namespace Associativy.Services
 
                         currentNode.Neighbours.Add(explored[targetNodeId]);
                         currentPath.Add(targetNodeId);
-                        succeededPaths.Add(currentPath);
+                        AddPathToGraph(succeededGraph, currentPath);
                         traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, targetNodeId));
                     }
                 }
@@ -139,7 +139,7 @@ namespace Associativy.Services
                         if (neighbour.Id == targetNodeId)
                         {
                             var succeededPath = new List<int>(currentPath) { targetNodeId }; // Since we will use currentPath in further iterations too
-                            succeededPaths.Add(succeededPath);
+                            AddPathToGraph(succeededGraph, currentPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startNodeId)
@@ -161,14 +161,21 @@ namespace Associativy.Services
 
                             explored[neighbour.Id] = neighbour;
                             traversedGraph.AddVertex(neighbour.Id);
-                            traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id)); 
+                            traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id));
                         }
                     }
                 }
             }
 
+            return new PathResult(succeededGraph, traversedGraph);
+        }
 
-            return new PathResult(succeededPaths, traversedGraph);
+        private static void AddPathToGraph(IMutableUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IList<int> path)
+        {
+            for (int i = 1; i < path.Count; i++)
+            {
+                succeededGraph.AddVerticesAndEdge(new UndirectedEdge<int>(path[i-1], path[i]));
+            }
         }
     }
 }

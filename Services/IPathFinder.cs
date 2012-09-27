@@ -22,18 +22,12 @@ namespace Associativy.Services
 
     public class PathResult
     {
-        public IEnumerable<IEnumerable<int>> SucceededPaths { get; protected set; }
+        public IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; protected set; }
         public IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; protected set; }
 
-        public PathResult()
+        public PathResult(IUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
         {
-            SucceededPaths = new List<IEnumerable<int>>();
-            TraversedGraph = new UndirectedGraph<int, IUndirectedEdge<int>>(false);
-        }
-
-        public PathResult(IEnumerable<IEnumerable<int>> succeededPaths, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
-        {
-            SucceededPaths = succeededPaths;
+            SucceededGraph = succeededGraph;
             TraversedGraph = traversedGraph;
         }
     }
