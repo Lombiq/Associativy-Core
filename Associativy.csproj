@@ -96,6 +96,7 @@
     <Compile Include="EventHandlers\IGraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\IGraphEventHandler.cs" />
     <Compile Include="EventHandlers\IGraphEventMonitor.cs" />
+    <Compile Include="EventHandlers\IMindEventHandler.cs" />
     <Compile Include="Extensions\ContentTypeDefinitionBuilderExtensions.cs" />
     <Compile Include="Extensions\CreateTableCommandExtensions.cs" />
     <Compile Include="Extensions\SchemaBuilderExtensions.cs" />

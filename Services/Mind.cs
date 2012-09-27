@@ -17,6 +17,7 @@ namespace Associativy.Services
         protected readonly INodeManager _nodeManager;
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _graphEventMonitor;
+        protected readonly IMindEventHandler _eventHandler;
 
         #region Caching fields
         protected readonly ICacheManager _cacheManager;
@@ -28,12 +29,14 @@ namespace Associativy.Services
             INodeManager nodeManager,
             IGraphEditor graphEditor,
             IGraphEventMonitor graphEventMonitor,
+            IMindEventHandler eventHandler,
             ICacheManager cacheManager)
             : base(graphManager)
         {
             _nodeManager = nodeManager;
             _graphEditor = graphEditor;
             _graphEventMonitor = graphEventMonitor;
+            _eventHandler = eventHandler;
             _cacheManager = cacheManager;
         }
 
@@ -55,6 +58,8 @@ namespace Associativy.Services
                     graph.AddVerticesAndEdgeRange(
                         descriptor.PathServices.ConnectionManager.GetAll(graphContext)
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
+
+                    _eventHandler.BeforeWholeContentGraphBuilding(graphContext, graph);
 
                     return graph;
                 },
@@ -106,7 +111,9 @@ namespace Associativy.Services
                 graphContext,
                 () =>
                 {
-                    return descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
+                    var graph = descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.Id, -1, settings.MaxDistance).TraversedGraph;
+                    _eventHandler.BeforePartialContentGraphBuilding(graphContext, centerNode, graph);
+                    return graph;
                 },
                 settings,
                 "PartialGraph." + centerNode.Id.ToString());
@@ -129,6 +136,8 @@ namespace Associativy.Services
                     graph.AddVerticesAndEdgeRange(
                         descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.Id)
                             .Select(neighbourId => new UndirectedEdge<int>(node.Id, neighbourId)));
+
+                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, new IContent[] { node }, graph);
 
                     return graph;
                 },
@@ -167,6 +176,8 @@ namespace Associativy.Services
                         }
                     }
 
+                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+
                     return graph;
                 },
                 settings,
@@ -204,6 +215,8 @@ namespace Associativy.Services
 
                     var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
 
+                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+
                     if (allPairSucceededPaths.Count() == 0) return graph;
 
                     if (nodeList.Count == 2)
@@ -237,6 +250,8 @@ namespace Associativy.Services
                             }
                         }
 
+                        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+
                         if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
 
                         succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
@@ -246,6 +261,8 @@ namespace Associativy.Services
                             var succeededPath = path.Intersect(commonSucceededNodeIds);
                             if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
                         }
+
+                        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
 
                         if (succeededPaths.Count() == 0) return graph;
                     }
@@ -273,6 +290,8 @@ namespace Associativy.Services
                             }
                         }
                     }
+
+                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
 
                     return graph;
                 },

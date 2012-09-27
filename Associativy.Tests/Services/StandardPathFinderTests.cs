@@ -26,55 +26,25 @@ using Orchard.Tests.Utility;
 namespace Associativy.Tests.Services
 {
     [TestFixture]
-    public class StandardPathFinderTests
+    public class StandardPathFinderTests : ContentManagerEnabledTestBase
     {
-        private IContainer _container;
         private IPathFinder _pathFinder;
 
-        #region ContentManager setup
-        private ISessionFactory _sessionFactory;
-        private ISession _session;
-
-        [TestFixtureSetUp]
-        public void InitFixture()
-        {
-            var databaseFileName = System.IO.Path.GetTempFileName();
-            _sessionFactory = DataUtility.CreateSessionFactory(
-                databaseFileName,
-                typeof(ContentTypeRecord),
-                typeof(ContentItemRecord),
-                typeof(ContentItemVersionRecord));
-        }
-        #endregion
-
         [SetUp]
-        public virtual void Init()
+        public override void Init()
         {
-            var builder = new ContainerBuilder();
+            base.Init();
 
-            builder.RegisterAutoMocking(MockBehavior.Loose);
+            var builder = new ContainerBuilder();
 
 
             builder.RegisterInstance(new GraphEventMonitor(new Signals(), new SignalStorage())).As<IGraphEventMonitor>();
             builder.RegisterInstance(new StubGraphManager()).As<IGraphManager>();
             builder.RegisterInstance(new StubGraphEditor()).As<IGraphEditor>();
-            builder.RegisterType<StubCacheManager>().As<ICacheManager>();
             builder.RegisterType<StandardPathFinder>().As<IPathFinder>();
 
-            #region ContentManager setup
-            builder.RegisterType<DefaultContentManager>().As<IContentManager>();
-            builder.RegisterType<ContentDefinitionManager>().As<IContentDefinitionManager>();
-            builder.RegisterType<ContentDefinitionWriter>().As<IContentDefinitionWriter>();
-            builder.RegisterType<StubOrchardServices>().As<IOrchardServices>();
-            builder.RegisterType<StubAppDataFolder>().As<IAppDataFolder>();
-            builder.RegisterType<Signals>().As<ISignals>();
-            builder.RegisterGeneric(typeof(Repository<>)).As(typeof(IRepository<>));
-            builder.RegisterInstance(new Mock<ISettingsFormatter>().Object);
-            _session = _sessionFactory.OpenSession();
-            builder.RegisterInstance(new DefaultContentManagerTests.TestSessionLocator(_session)).As<ISessionLocator>();
-            #endregion
 
-            _container = builder.Build();
+            builder.Update(_container);
 
             _pathFinder = _container.Resolve<IPathFinder>();
         }

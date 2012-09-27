@@ -24,7 +24,7 @@ namespace Associativy.EventHandlers
         void ConnectionDeleted(IGraphContext graphContext, int nodeId1, int nodeId2);
 
         /// <summary>
-        /// Gets called when the associative graph has changed.
+        /// Gets called when the associative graph has changed (meaning any change listed here).
         /// </summary>
         void Changed(IGraphContext graphContext);
     }
