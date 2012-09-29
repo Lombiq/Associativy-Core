@@ -19,7 +19,7 @@ namespace Associativy.Tests.Helpers
             while (node != pathList.Last().Id)
             {
                 var nextNode = pathList[nextIndex].Id;
-                if (!graph.AdjacentEdges(node).Any(edge => edge.Target == nextNode)) return false;
+                if (!graph.AdjacentEdges(node).Any(edge => edge.Target == nextNode || edge.Source == nextNode)) return false;
                 node = nextNode;
                 nextIndex++;
             }

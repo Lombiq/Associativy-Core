@@ -61,7 +61,7 @@ namespace Associativy.Tests.Services
         }
 
         [Test]
-        public void SinglePathsAreFound()
+        public void TwoNotionSearchFindsSinglePath()
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
@@ -73,7 +73,7 @@ namespace Associativy.Tests.Services
         }
 
         [Test]
-        public void DualPathsAreFound()
+        public void TwoNotionSearchFindsDualPath()
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
@@ -84,6 +84,33 @@ namespace Associativy.Tests.Services
 
             Assert.That(PathVerifier.PathExistsInGraph(_currentIdGraph, new IContent[] { nodes["yellow"], nodes["sun"], nodes["light"], nodes["light year"] }), Is.True);
             Assert.That(PathVerifier.PathExistsInGraph(_currentIdGraph, new IContent[] { nodes["yellow"], nodes["colour"], nodes["light"], nodes["light year"] }), Is.True);
+        }
+
+        [Test]
+        public void ThreeNotionSearchFindsDualPath()
+        {
+            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+
+            Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(3));
+            Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(4));
+
+            Assert.That(PathVerifier.PathExistsInGraph(_currentIdGraph, new IContent[] { nodes["power plant"], nodes["hydroelectric power plant"], nodes["blue"] }), Is.True);
+            Assert.That(PathVerifier.PathExistsInGraph(_currentIdGraph, new IContent[] { nodes["power plant"], nodes["hydroelectric power plant"], nodes["electricity"] }), Is.True);
+        }
+
+        [Test]
+        public void FourNotionSearchFindsSinglePath()
+        {
+            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"], nodes["hydroelectric power plant"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+
+            Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(4));
+            Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(4));
+
+            Assert.That(PathVerifier.PathExistsInGraph(_currentIdGraph, new IContent[] { nodes["blue"], nodes["hydroelectric power plant"], nodes["power plant"], nodes["electricity"] }), Is.True);
         }
 
         [Test]
