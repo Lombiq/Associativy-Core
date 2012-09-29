@@ -22,6 +22,8 @@ using Orchard.Tests.ContentManagement;
 using Orchard.Tests.Stubs;
 using Orchard.Tests.UI.Navigation;
 using Orchard.Tests.Utility;
+using QuickGraph;
+using Associativy.Tests.Helpers;
 
 namespace Associativy.Tests.Services
 {
@@ -59,10 +61,12 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            var succeededPaths = CalcSucceededPaths(nodes["medicine"], nodes["colour"]);
+            var succeededGraph = CalcSucceededGraph(nodes["medicine"], nodes["colour"]);
 
-            Assert.That(succeededPaths.Count(), Is.EqualTo(1));
-            Assert.That(VerifyPath(succeededPaths.First(), new IContent[] { nodes["medicine"], nodes["cyanide"], nodes["cyan"], nodes["colour"] }), Is.True);
+            Assert.That(succeededGraph.VertexCount, Is.EqualTo(4));
+            Assert.That(succeededGraph.EdgeCount, Is.EqualTo(3));
+
+            Assert.That(PathVerifier.PathExistsInGraph(succeededGraph, new IContent[] { nodes["medicine"], nodes["cyanide"], nodes["cyan"], nodes["colour"] }), Is.True);
         }
 
         [Test]
@@ -70,12 +74,13 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            var succeededPaths = CalcSucceededPaths(nodes["yellow"], nodes["light year"]).ToList();
+            var succeededGraph = CalcSucceededGraph(nodes["yellow"], nodes["light year"]);
 
-            Assert.That(succeededPaths.Count, Is.EqualTo(2));
+            Assert.That(succeededGraph.VertexCount, Is.EqualTo(5));
+            Assert.That(succeededGraph.EdgeCount, Is.EqualTo(5));
 
-            Assert.That(VerifyPath(succeededPaths[0], new IContent[] { nodes["yellow"], nodes["sun"], nodes["light"], nodes["light year"] }), Is.True);
-            Assert.That(VerifyPath(succeededPaths[1], new IContent[] { nodes["yellow"], nodes["colour"], nodes["light"], nodes["light year"] }), Is.True);
+            Assert.That(PathVerifier.PathExistsInGraph(succeededGraph, new IContent[] { nodes["yellow"], nodes["sun"], nodes["light"], nodes["light year"] }), Is.True);
+            Assert.That(PathVerifier.PathExistsInGraph(succeededGraph, new IContent[] { nodes["yellow"], nodes["colour"], nodes["light"], nodes["light year"] }), Is.True);
         }
 
         [Test]
@@ -83,7 +88,10 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            Assert.That(CalcSucceededPaths(nodes["blue"], nodes["medicine"]).Count(), Is.EqualTo(0));
+            var succeededGraph = CalcSucceededGraph(nodes["blue"], nodes["medicine"]);
+
+            Assert.That(succeededGraph.VertexCount, Is.EqualTo(0));
+            Assert.That(succeededGraph.EdgeCount, Is.EqualTo(0));
         }
 
         [Test]
@@ -91,26 +99,15 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            Assert.That(CalcSucceededPaths(nodes["writer"], nodes["plant"]).Count(), Is.EqualTo(0));
+            var succeededGraph = CalcSucceededGraph(nodes["writer"], nodes["plant"]);
+
+            Assert.That(succeededGraph.VertexCount, Is.EqualTo(0));
+            Assert.That(succeededGraph.EdgeCount, Is.EqualTo(0));
         }
 
-        public IEnumerable<IEnumerable<int>> CalcSucceededPaths(IContent node1, IContent node2)
+        public IUndirectedGraph<int, IUndirectedEdge<int>> CalcSucceededGraph(IContent node1, IContent node2)
         {
-            return _pathFinder.FindPaths(TestGraphHelper.TestGraphContext(), node1.Id, node2.Id).SucceededPaths;
-        }
-
-        public static bool VerifyPath(IEnumerable<int> path, IEnumerable<IContent> verification)
-        {
-            var pathList = path.ToList();
-            var verificationList = verification.ToList();
-
-            var i = 0;
-            while (i < pathList.Count && verificationList[i].Id == pathList[i])
-            {
-                i++;   
-            }
-
-            return i == pathList.Count;
+            return _pathFinder.FindPaths(TestGraphHelper.TestGraphContext(), node1.Id, node2.Id).SucceededGraph;
         }
     }
 }
