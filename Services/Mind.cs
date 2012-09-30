@@ -215,9 +215,11 @@ namespace Associativy.Services
 
                     var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
-
-                    if (allPairSucceededPaths.Count() == 0) return graph;
+                    if (allPairSucceededPaths.Count() == 0)
+                    {
+                        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                        return graph;
+                    }
 
                     if (nodeList.Count == 2)
                     {
@@ -250,9 +252,12 @@ namespace Associativy.Services
                             }
                         }
 
-                        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
-
-                        if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return graph;
+                        
+                        if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0)
+                        {
+                            _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                            return graph;
+                        }
 
                         succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
 
@@ -262,9 +267,12 @@ namespace Associativy.Services
                             if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
                         }
 
-                        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
-
-                        if (succeededPaths.Count() == 0) return graph;
+                        
+                        if (succeededPaths.Count() == 0)
+                        {
+                            _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                            return graph;
+                        }
                     }
 
                     graph.AddVertexRange(getSucceededNodeIds(succeededPaths));
