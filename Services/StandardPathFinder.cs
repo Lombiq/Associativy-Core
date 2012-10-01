@@ -77,6 +77,7 @@ namespace Associativy.Services
 
             var explored = new Dictionary<int, PathNode>();
             var succeededGraph = _graphEditor.GraphFactory<int>();
+            var succeededPaths = new List<List<int>>();
             var traversedGraph = _graphEditor.GraphFactory<int>();
             var frontier = new Stack<FrontierNode>();
 
@@ -115,7 +116,7 @@ namespace Associativy.Services
 
                         currentNode.Neighbours.Add(explored[targetNodeId]);
                         currentPath.Add(targetNodeId);
-                        AddPathToGraph(succeededGraph, currentPath);
+                        SavePathToGraph(succeededGraph, succeededPaths, currentPath);
                         traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, targetNodeId));
                     }
                 }
@@ -139,7 +140,7 @@ namespace Associativy.Services
                         if (neighbour.Id == targetNodeId)
                         {
                             var succeededPath = new List<int>(currentPath) { targetNodeId }; // Since we will use currentPath in further iterations too
-                            AddPathToGraph(succeededGraph, currentPath);
+                            SavePathToGraph(succeededGraph, succeededPaths, currentPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startNodeId)
@@ -167,15 +168,17 @@ namespace Associativy.Services
                 }
             }
 
-            return new PathResult(succeededGraph, traversedGraph);
+            return new PathResult(succeededGraph, succeededPaths, traversedGraph);
         }
 
-        private static void AddPathToGraph(IMutableUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IList<int> path)
+        private static void SavePathToGraph(IMutableUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, List<List<int>> succeededPaths, List<int> path)
         {
             for (int i = 1; i < path.Count; i++)
             {
                 succeededGraph.AddVerticesAndEdge(new UndirectedEdge<int>(path[i-1], path[i]));
             }
+
+            succeededPaths.Add(path);
         }
     }
 }

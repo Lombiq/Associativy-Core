@@ -20,14 +20,23 @@ namespace Associativy.Services
         PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
     }
 
-    public class PathResult
+    public interface IPathResult
+    {
+        IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; }
+        IEnumerable<IEnumerable<int>> SucceededPaths { get; }
+        IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; }
+    }
+
+    public class PathResult : IPathResult
     {
         public IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; protected set; }
+        public IEnumerable<IEnumerable<int>> SucceededPaths { get; protected set; }
         public IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; protected set; }
 
-        public PathResult(IUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
+        public PathResult(IUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IEnumerable<IEnumerable<int>> succeededPaths, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
         {
             SucceededGraph = succeededGraph;
+            SucceededPaths = succeededPaths;
             TraversedGraph = traversedGraph;
         }
     }

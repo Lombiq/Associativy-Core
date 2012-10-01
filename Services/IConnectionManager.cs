@@ -74,31 +74,31 @@ namespace Associativy.Services
         public static void Connect<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node1, IContent node2)
             where TConnectionManager : IConnectionManager
         {
-            connectionManager.Connect(graphContext, node1.Id, node2.Id);
+            connectionManager.Connect(graphContext, node1.ContentItem.Id, node2.ContentItem.Id);
         }
 
         public static void DeleteFromNode<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
             where TConnectionManager : IConnectionManager
         {
-            connectionManager.DeleteFromNode(graphContext, node.Id);
+            connectionManager.DeleteFromNode(graphContext, node.ContentItem.Id);
         }
 
         public static void Disconnect<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node1, IContent node2)
             where TConnectionManager : IConnectionManager
         {
-            connectionManager.Disconnect(graphContext, node1.Id, node2.Id);
+            connectionManager.Disconnect(graphContext, node1.ContentItem.Id, node2.ContentItem.Id);
         }
 
         public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
             where TConnectionManager : IConnectionManager
         {
-            return connectionManager.GetNeighbourIds(graphContext, node.Id);
+            return connectionManager.GetNeighbourIds(graphContext, node.ContentItem.Id);
         }
 
         public static int GetNeighbourCount<TConnectionManager>(this TConnectionManager connectionManager, IGraphContext graphContext, IContent node)
             where TConnectionManager : IConnectionManager
         {
-            return connectionManager.GetNeighbourCount(graphContext, node.Id);
+            return connectionManager.GetNeighbourCount(graphContext, node.ContentItem.Id);
         }
     }
 }
