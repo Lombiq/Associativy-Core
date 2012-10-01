@@ -86,7 +86,7 @@ namespace Associativy.Services
                 return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings);
             }
             // Simply calculate the intersection of the neighbours of the nodes
-            else if (settings.Algorithm == MindAlgorithm.Simple)
+            else if (settings.Algorithm == "simple")
             {
                 return MakeSimpleAssociations(graphContext, descriptor, nodes, settings);
             }

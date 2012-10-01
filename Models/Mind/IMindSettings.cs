@@ -2,12 +2,6 @@
 
 namespace Associativy.Models.Mind
 {
-    public enum MindAlgorithm
-    {
-        Simple,
-        Sophisticated
-    }
-
     public delegate void QueryModifer(IContentQuery<ContentItem> query);
 
     public interface IMindSettings
@@ -15,7 +9,7 @@ namespace Associativy.Models.Mind
         /// <summary>
         /// The algorithm to use to fing associations
         /// </summary>
-        MindAlgorithm Algorithm { get; set; }
+        string Algorithm { get; set; }
 
         /// <summary>
         /// Use cache or regenerate the result

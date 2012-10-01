@@ -65,7 +65,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["medicine"], nodes["colour"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["medicine"], nodes["colour"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(3));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(4));
@@ -77,7 +77,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["yellow"], nodes["light year"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["yellow"], nodes["light year"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(5));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(5));
@@ -91,7 +91,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(3));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(4));
@@ -105,7 +105,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"], nodes["hydroelectric power plant"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["power plant"], nodes["electricity"], nodes["blue"], nodes["hydroelectric power plant"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(4));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(4));
@@ -118,7 +118,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["blue"], nodes["medicine"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["blue"], nodes["medicine"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(0));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(0));
@@ -129,7 +129,7 @@ namespace Associativy.Tests.Services
         {
             var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
 
-            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["writer"], nodes["plant"] }, new MindSettings { Algorithm = MindAlgorithm.Sophisticated });
+            _mind.MakeAssociations(TestGraphHelper.TestGraphContext(), new IContent[] { nodes["writer"], nodes["plant"] }, new MindSettings { Algorithm = "sophisticated" });
 
             Assert.That(_currentIdGraph.EdgeCount, Is.EqualTo(0));
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(0));

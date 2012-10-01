@@ -5,7 +5,7 @@ namespace Associativy.Models.Mind
     [OrchardFeature("Associativy")]
     public class MindSettings : IMindSettings
     {
-        public MindAlgorithm Algorithm { get; set; }
+        public string Algorithm { get; set; }
         public bool UseCache { get; set; }
         public int ZoomLevel { get; set; }
         public int ZoomLevelCount { get; set; }
@@ -14,7 +14,7 @@ namespace Associativy.Models.Mind
 
         public MindSettings()
         {
-            Algorithm = MindAlgorithm.Sophisticated;
+            Algorithm = "sophisticated";
             UseCache = false;
             ZoomLevel = 0;
             ZoomLevelCount = 10;
