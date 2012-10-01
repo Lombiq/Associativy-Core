@@ -26,5 +26,19 @@ namespace Associativy.Tests.Helpers
 
             return true;
         }
+
+        public static bool VerifyPath(IEnumerable<int> path, IEnumerable<IContent> verification)
+        {
+            var pathList = path.ToList();
+            var verificationList = verification.ToList();
+
+            var i = 0;
+            while (i < pathList.Count && verificationList[i].Id == pathList[i])
+            {
+                i++;
+            }
+
+            return i == pathList.Count;
+        }
     }
 }
