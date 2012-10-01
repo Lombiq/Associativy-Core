@@ -61,7 +61,7 @@ namespace Associativy.Services
             if (GetGraphConnections(graphContext).TryGetValue(node1Id, out subDictionary))
             {
                 return subDictionary.ContainsKey(node2Id);
-            }
+            } 
 
             return false;
         }
@@ -114,13 +114,18 @@ namespace Associativy.Services
 
         public IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
+            var addedConnections = new HashSet<string>();
             var connectors = new List<INodeToNodeConnector>();
 
             foreach (var connections in GetGraphConnections(graphContext))
             {
                 foreach (var connection in connections.Value)
                 {
-                    connectors.Add(new NodeConnector { Node1Id = connections.Key, Node2Id = connection.Key });
+                    if (!addedConnections.Contains(connections.Key + "-" + connection.Key) && !addedConnections.Contains(connection.Key + "-" + connections.Key))
+                    {
+                        connectors.Add(new NodeConnector { Node1Id = connections.Key, Node2Id = connection.Key });
+                        addedConnections.Add(connections.Key + "-" + connection.Key);
+                    }
                 }
             }
 
