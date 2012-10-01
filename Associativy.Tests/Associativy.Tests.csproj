@@ -159,7 +159,7 @@
     <Compile Include="Stubs\StubGraphEditor.cs" />
     <Compile Include="Stubs\StubGraphManager.cs" />
     <Compile Include="Stubs\StubNodeManager.cs" />
-    <Compile Include="TestGraphHelper.cs" />
+    <Compile Include="Helpers\TestGraphHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Associativy.Instances.Notions\Associativy.Instances.Notions.csproj">

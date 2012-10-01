@@ -140,7 +140,7 @@ namespace Associativy.Services
                         if (neighbour.Id == targetNodeId)
                         {
                             var succeededPath = new List<int>(currentPath) { targetNodeId }; // Since we will use currentPath in further iterations too
-                            SavePathToGraph(succeededGraph, succeededPaths, currentPath);
+                            SavePathToGraph(succeededGraph, succeededPaths, succeededPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startNodeId)

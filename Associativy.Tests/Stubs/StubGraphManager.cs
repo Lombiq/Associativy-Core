@@ -4,6 +4,7 @@ using Associativy.GraphDiscovery;
 using Associativy.Services;
 using Moq;
 using Orchard.Tests.Stubs;
+using Associativy.Tests.Helpers;
 
 namespace Associativy.Tests.Stubs
 {
@@ -36,9 +37,9 @@ namespace Associativy.Tests.Stubs
         private GraphDescriptor TestGraphDescriptor()
         {
             return new GraphDescriptor(
-                "TestGraph",
+                TestGraphHelper.TestGraphContext().GraphName,
                 new Orchard.Localization.LocalizedString("Test Graph"),
-                new string[] { "Page" },
+                TestGraphHelper.TestGraphContext().ContentTypes,
                 () => _pathServices);
         }
     }

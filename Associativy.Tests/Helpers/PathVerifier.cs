@@ -7,7 +7,7 @@ using QuickGraph;
 
 namespace Associativy.Tests.Helpers
 {
-    static class PathVerifier
+    public static class PathVerifier
     {
         public static bool PathExistsInGraph(IUndirectedGraph<int, IUndirectedEdge<int>> graph, IEnumerable<IContent> path)
         {
