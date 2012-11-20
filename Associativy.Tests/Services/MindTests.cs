@@ -6,7 +6,6 @@ using Associativy.Services;
 using Associativy.Tests.Stubs;
 using Autofac;
 using Moq;
-using NHibernate;
 using NUnit.Framework;
 using Orchard;
 using Orchard.Caching;

@@ -91,6 +91,16 @@ namespace Associativy.Tests.Stubs
             {
                 throw new NotImplementedException();
             }
+
+            public IContentQuery<ContentItem, TRecord> OrderBy<TRecord>(System.Linq.Expressions.Expression<Func<TRecord, object>> keySelector) where TRecord : Orchard.ContentManagement.Records.ContentPartRecord
+            {
+                throw new NotImplementedException();
+            }
+
+            public IContentQuery<ContentItem, TRecord> OrderByDescending<TRecord>(System.Linq.Expressions.Expression<Func<TRecord, object>> keySelector) where TRecord : Orchard.ContentManagement.Records.ContentPartRecord
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

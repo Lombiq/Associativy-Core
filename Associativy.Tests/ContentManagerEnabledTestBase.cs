@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NHibernate;
 using NUnit.Framework;
 using Orchard.Tests;
 using Orchard.ContentManagement.Records;
@@ -20,6 +19,7 @@ using Orchard.Data;
 using Moq;
 using Orchard.Tests.ContentManagement;
 using Orchard.Tests.Utility;
+using NHibernate;
 
 namespace Associativy.Tests
 {
