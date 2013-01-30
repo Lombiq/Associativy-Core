@@ -10,5 +10,8 @@ namespace Associativy.GraphDiscovery
     {
         public string GraphName { get; set; }
         public IEnumerable<string> ContentTypes { get; set; }
+
+        private static readonly GraphContext _empty = new GraphContext();
+        public static GraphContext Empty { get { return _empty; } }
     }
 }
