@@ -49,7 +49,6 @@ namespace Associativy.Services
             return _memoryConnectionManager.AreNeighbours(graphContext, node1Id, node2Id);
         }
 
-
         public virtual void Connect(IGraphContext graphContext, int node1Id, int node2Id)
         {
             TryLoadConnections(graphContext);
@@ -61,7 +60,6 @@ namespace Associativy.Services
             _memoryConnectionManager.Connect(graphContext, node1Id, node2Id);
             _graphEventHandler.ConnectionAdded(graphContext, node1Id, node2Id);
         }
-
 
         public virtual void DeleteFromNode(IGraphContext graphContext, int nodeId)
         {
@@ -98,14 +96,12 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionDeleted(graphContext, node1Id, node2Id);
         }
 
-
         public virtual IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
         {
             TryLoadConnections(graphContext);
 
             return _memoryConnectionManager.GetAll(graphContext);
         }
-
 
         public virtual IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
         {

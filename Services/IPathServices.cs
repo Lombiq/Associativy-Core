@@ -2,7 +2,7 @@
 namespace Associativy.Services
 {
     /// <summary>
-    /// Containes services that deal with node to node connections and paths
+    /// Contains services that deal with node to node connections and paths
     /// </summary>
     public interface IPathServices
     {
