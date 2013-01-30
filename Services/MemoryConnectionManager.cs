@@ -24,7 +24,7 @@ namespace Associativy.Services
         /// </summary>
         /// <remarks>
         /// Race conditions could occur, revise if necessary.
-        /// This apparently uses ~75KB memory with a test set of 80 connections.
+        /// This apparently uses ~75KB of memory with a test set of 80 connections.
         /// </remarks>
         protected ConcurrentDictionary<string, ConcurrentDictionary<int, ConcurrentDictionary<int, bool>>> Connections
         {
@@ -37,6 +37,7 @@ namespace Associativy.Services
             }
         }
 
+
         public MemoryConnectionManager(
             IGraphManager graphManager,
             ICacheManager cacheManager,
@@ -46,6 +47,7 @@ namespace Associativy.Services
             _cacheManager = cacheManager;
             _graphEventHandler = graphEventHandler;
         }
+
 
         public int GetConnectionCount(IGraphContext graphContext)
         {

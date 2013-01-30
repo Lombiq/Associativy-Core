@@ -15,6 +15,7 @@ namespace Associativy.Services
         protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly ICacheManager _cacheManager;
 
+
         public StandardPathFinder(
             IGraphManager graphManager,
             IGraphEditor graphEditor,

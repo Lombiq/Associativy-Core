@@ -9,7 +9,7 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     /// <summary>
-    /// Service for dealing with connections between nodes, persisting connections in the database
+    /// Service for dealing with connections between nodes, persisting connections in the SQL database
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     [OrchardFeature("Associativy")]
@@ -19,6 +19,7 @@ namespace Associativy.Services
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
         protected readonly IMemoryConnectionManager _memoryConnectionManager;
         protected readonly IGraphEventHandler _graphEventHandler;
+
 
         public SqlConnectionManager(
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
@@ -33,12 +34,11 @@ namespace Associativy.Services
 
         public void TryLoadConnections(IGraphContext graphContext)
         {
-            if (_memoryConnectionManager.GetConnectionCount(graphContext) == 0)
+            if (_memoryConnectionManager.GetConnectionCount(graphContext) != 0) return;
+
+            foreach (var connector in _nodeToNodeRecordRepository.Table)
             {
-                foreach (var connector in _nodeToNodeRecordRepository.Table)
-                {
-                    _memoryConnectionManager.Connect(graphContext, connector.Node1Id, connector.Node2Id);
-                }
+                _memoryConnectionManager.Connect(graphContext, connector.Node1Id, connector.Node2Id);
             }
         }
 
@@ -68,8 +68,8 @@ namespace Associativy.Services
             TryLoadConnections(graphContext);
 
             // Since there is no cummulative delete...
-            var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(connector =>
-                connector.Node1Id == nodeId || connector.Node2Id == nodeId).ToList();
+            var connectionsToBeDeleted = _nodeToNodeRecordRepository.Fetch(
+                    connector => connector.Node1Id == nodeId || connector.Node2Id == nodeId);
 
             foreach (var connector in connectionsToBeDeleted)
             {

@@ -16,6 +16,7 @@ namespace Associativy.Services
         protected readonly IContentManager _contentManager;
         protected readonly IGraphEventHandler _graphEventHandler;
 
+
         public NodeManager(
             IGraphManager graphManager,
             IContentManager contentManager,
@@ -25,6 +26,7 @@ namespace Associativy.Services
             _contentManager = contentManager;
             _graphEventHandler = graphEventHandler;
         }
+
 
         public IContentQuery<ContentItem> GetContentQuery(IGraphContext graphContext)
         {

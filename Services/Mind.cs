@@ -24,6 +24,7 @@ namespace Associativy.Services
         protected const string _cachePrefix = "Associativy.";
         #endregion
 
+
         public Mind(
             IGraphManager graphManager,
             INodeManager nodeManager,
