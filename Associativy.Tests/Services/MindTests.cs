@@ -134,19 +134,19 @@ namespace Associativy.Tests.Services
             Assert.That(_currentIdGraph.VertexCount, Is.EqualTo(0));
         }
 
-        public void BeforeWholeContentGraphBuilding(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public void BeforeWholeContentGraphBuilding(BeforeWholeContentGraphBuildingContext context)
         {
-            _currentIdGraph = idGraph;
+            _currentIdGraph = context.IdGraph;
         }
 
-        public void BeforePartialContentGraphBuilding(IGraphContext graphContext, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public void BeforePartialContentGraphBuilding(BeforePartialContentGraphBuildingContext context)
         {
-            _currentIdGraph = idGraph;
+            _currentIdGraph = context.IdGraph;
         }
 
-        public void BeforeSearchedContentGraphBuilding(IGraphContext graphContext, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public void BeforeSearchedContentGraphBuilding(BeforeSearchedContentGraphBuildingContext context)
         {
-            _currentIdGraph = idGraph;
+            _currentIdGraph = context.IdGraph;
         }
     }
 }

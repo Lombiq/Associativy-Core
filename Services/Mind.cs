@@ -60,7 +60,7 @@ namespace Associativy.Services
                         descriptor.PathServices.ConnectionManager.GetAll(graphContext)
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
-                    _eventHandler.BeforeWholeContentGraphBuilding(graphContext, graph);
+                    _eventHandler.BeforeWholeContentGraphBuilding(new BeforeWholeContentGraphBuildingContext(graphContext, settings, graph));
 
                     return graph;
                 },
@@ -113,7 +113,7 @@ namespace Associativy.Services
                 () =>
                 {
                     var graph = descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.ContentItem.Id, -1, settings.MaxDistance).TraversedGraph;
-                    _eventHandler.BeforePartialContentGraphBuilding(graphContext, centerNode, graph);
+                    _eventHandler.BeforePartialContentGraphBuilding(new BeforePartialContentGraphBuildingContext(graphContext, settings, centerNode, graph));
                     return graph;
                 },
                 settings,
@@ -138,7 +138,7 @@ namespace Associativy.Services
                         descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.ContentItem.Id)
                             .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, new IContent[] { node }, graph);
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, new IContent[] { node }, graph));
 
                     return graph;
                 },
@@ -177,7 +177,7 @@ namespace Associativy.Services
                         }
                     }
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
 
                     return graph;
                 },
@@ -305,7 +305,7 @@ namespace Associativy.Services
                     Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
                         () =>
                         {
-                            _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                            _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
                             return graph;
                         };
 
@@ -383,7 +383,7 @@ namespace Associativy.Services
                         }
                     }
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
 
                     return graph;
                 },
