@@ -2,8 +2,6 @@
 
 namespace Associativy.Models.Mind
 {
-    public delegate void QueryModifer(IContentQuery<ContentItem> query);
-
     public interface IMindSettings
     {
         /// <summary>
@@ -30,11 +28,6 @@ namespace Associativy.Models.Mind
         /// Maximal distance between two nodes that can be considered as related
         /// </summary>
         int MaxDistance { get; set; }
-
-        /// <summary>
-        /// Use this to customize the query which is run against content items, e. g. to specify the version to use or to eager-load records to enhance performance
-        /// </summary>
-        QueryModifer ModifyQuery { get; set; }
     }
 
     public static class MindSettingsExtensions
@@ -48,7 +41,6 @@ namespace Associativy.Models.Mind
                 ZoomLevel = settings.ZoomLevel,
                 ZoomLevelCount = settings.ZoomLevelCount,
                 MaxDistance = settings.MaxDistance,
-                ModifyQuery = settings.ModifyQuery
             };
         }
     }

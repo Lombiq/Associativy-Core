@@ -10,27 +10,27 @@ namespace Associativy.Tests.Stubs
 {
     public class StubNodeManager : INodeManager
     {
-        public IContentQuery<ContentItem> GetContentQuery(IGraphContext graphContext)
+        public IContentQuery<ContentItem> GetQuery(IGraphContext graphContext)
         {
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManyContentQuery(IGraphContext graphContext, IEnumerable<int> ids)
+        public IContentQuery<ContentItem> GetManyQuery(IGraphContext graphContext, IEnumerable<int> ids)
         {
             return new StubContentQuery();
         }
 
-        public IEnumerable<IContent> GetSimilarNodes(IGraphContext graphContext, string labelSnippet, int maxCount = 10, QueryHints queryHints = null)
+        public IContentQuery<ContentItem> GetSimilarNodesQuery(IGraphContext graphContext, string labelSnippet)
         {
             throw new NotImplementedException();
         }
 
-        public IContent Get(IGraphContext graphContext, string label, QueryHints queryHints = null)
+        public IContentQuery<ContentItem> GetManySimilarNodesQuery(IGraphContext graphContext, IEnumerable<string> labels)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IContent> GetMany(IGraphContext graphContext, IEnumerable<string> labels, QueryHints queryHints = null)
+        public IContentQuery<ContentItem> GetByLabelQuery(IGraphContext graphContext, string label)
         {
             throw new NotImplementedException();
         }

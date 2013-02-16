@@ -14,59 +14,57 @@ namespace Associativy.Services
     public class NodeManager : AssociativyServiceBase, INodeManager
     {
         protected readonly IContentManager _contentManager;
-        protected readonly IGraphEventHandler _graphEventHandler;
+        protected readonly INodeManagerEventHander _eventHandler;
 
 
         public NodeManager(
             IGraphManager graphManager,
             IContentManager contentManager,
-            IGraphEventHandler graphEventHandler)
+            INodeManagerEventHander eventHandler)
             : base(graphManager)
         {
             _contentManager = contentManager;
-            _graphEventHandler = graphEventHandler;
+            _eventHandler = eventHandler;
         }
 
 
-        public IContentQuery<ContentItem> GetContentQuery(IGraphContext graphContext)
+        public IContentQuery<ContentItem> GetQuery(IGraphContext graphContext)
         {
-            return _contentManager.Query(_graphManager.FindGraph(graphContext).ContentTypes.ToArray());
+            var query = _contentManager.Query(_graphManager.FindGraph(graphContext).ContentTypes.ToArray());
+            _eventHandler.QueryBuilt(new QueryBuiltContext(graphContext, query));
+            return query;
         }
 
-        public IContentQuery<ContentItem> GetManyContentQuery(IGraphContext graphContext, IEnumerable<int> ids)
+        public IContentQuery<ContentItem> GetManyQuery(IGraphContext graphContext, IEnumerable<int> ids)
         {
             // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown from
             // Orchard.ContentManagement.DefaultContentQuery on line 90.
-            var idsCollection = ids.ToList();
-            return GetContentQuery(graphContext).Where<CommonPartRecord>(r => idsCollection.Contains(r.Id));
+            var idsList = ids.ToList();
+            return GetQuery(graphContext).Where<CommonPartRecord>(r => idsList.Contains(r.Id));
         }
 
-        public virtual IEnumerable<IContent> GetSimilarNodes(IGraphContext graphContext, string labelSnippet, int maxCount = 10, QueryHints queryHints = null)
+        public virtual IContentQuery<ContentItem> GetSimilarNodesQuery(IGraphContext graphContext, string labelSnippet)
         {
-            if (String.IsNullOrEmpty(labelSnippet)) return null; // Otherwise would return the whole dataset
-            if (queryHints == null) queryHints = new QueryHints();
             labelSnippet = labelSnippet.ToUpperInvariant();
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel.StartsWith(labelSnippet)).WithQueryHints(queryHints).Slice(maxCount).ToList();
+            return GetQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel.StartsWith(labelSnippet));
         }
 
-        public virtual IContent Get(IGraphContext graphContext, string label, QueryHints queryHints = null)
-        {
-            if (queryHints == null) queryHints = new QueryHints();
-            label = label.ToUpperInvariant();
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel == label).WithQueryHints(queryHints).List().FirstOrDefault();
-        }
 
-        public virtual IEnumerable<IContent> GetMany(IGraphContext graphContext, IEnumerable<string> labels, QueryHints queryHints = null)
+        public virtual IContentQuery<ContentItem> GetManySimilarNodesQuery(IGraphContext graphContext, IEnumerable<string> labels)
         {
-            if (queryHints == null) queryHints = new QueryHints();
-
             var labelsArray = labels.ToArray();
             for (int i = 0; i < labelsArray.Length; i++)
             {
                 labelsArray[i] = labelsArray[i].ToUpperInvariant();
             }
 
-            return GetContentQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.UpperInvariantLabel)).WithQueryHints(queryHints).List();
+            return GetQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.UpperInvariantLabel));
+        }
+
+        public virtual IContentQuery<ContentItem> GetByLabelQuery(IGraphContext graphContext, string label)
+        {
+            label = label.ToUpperInvariant();
+            return GetQuery(graphContext).Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel == label);
         }
     }
 }

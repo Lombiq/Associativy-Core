@@ -414,8 +414,7 @@ namespace Associativy.Services
 
         protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph, IMindSettings settings)
         {
-            var query = _nodeManager.GetManyContentQuery(graphContext, idGraph.Vertices);
-            settings.ModifyQuery(query);
+            var query = _nodeManager.GetManyQuery(graphContext, idGraph.Vertices);
             var nodes = query.List().ToDictionary(node => node.Id);
 
             var graph = _graphEditor.GraphFactory<IContent>();
@@ -423,7 +422,7 @@ namespace Associativy.Services
 
             foreach (var edge in idGraph.Edges)
             {
-                // Since the QueryModifier could have removed items, this check is necessary
+                // Since the query can be modified in an event handler and it could have removed items, this check is necessary
                 if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
                 {
                     graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
