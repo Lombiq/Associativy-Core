@@ -12,6 +12,7 @@ namespace Associativy.Controllers
         protected readonly IMind _mind;
         protected readonly INodeManager _nodeManager;
 
+
         protected AssociativyControllerBase(
             IAssociativyServices associativyServices)
         {

@@ -14,6 +14,7 @@ namespace Associativy.Models.Mind
         private static MindSettings _empty = new MindSettings();
         public static MindSettings Empty { get { return _empty; } }
 
+
         public MindSettings()
         {
             Algorithm = "sophisticated";

@@ -25,6 +25,7 @@ namespace Associativy.GraphDiscovery
             }
         }
 
+
         public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
         {
             GraphName = name;

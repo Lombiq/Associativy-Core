@@ -19,6 +19,7 @@ namespace Associativy.Controllers
 
         public Localizer T { get; set; }
 
+
         public AssociativyNodeLabelAdminController(IOrchardServices orchardServices)
         {
             _orchardServices = orchardServices;
@@ -26,6 +27,7 @@ namespace Associativy.Controllers
 
             T = NullLocalizer.Instance;
         }
+
 
         [HttpPost]
         public void RefreshLabels(string contentType)

@@ -20,10 +20,12 @@ namespace Associativy.GraphDiscovery
             }
         }
 
+
         public DescribeContext()
         {
             _descriptors = new List<GraphDescriptor>();
         }
+
 
         public void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
         {

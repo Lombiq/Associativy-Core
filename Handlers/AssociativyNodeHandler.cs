@@ -13,11 +13,13 @@ namespace Associativy.Handlers
         private readonly Lazy<IGraphManager> _graphManager;
         private readonly Lazy<IGraphEventHandler> _graphEventHandler;
 
+
         public AssociativyNodeHandler(Lazy<IGraphManager> graphManager, Lazy<IGraphEventHandler> graphEventHandler)
         {
             _graphManager = graphManager;
             _graphEventHandler = graphEventHandler;
         }
+
 
         protected override void Created(CreateContentContext context)
         {

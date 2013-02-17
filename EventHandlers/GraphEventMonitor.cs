@@ -10,11 +10,13 @@ namespace Associativy.EventHandlers
         private readonly ISignals _signals;
         private readonly ISignalStorage _signalStorage;
 
+
         public GraphEventMonitor(ISignals signals, ISignalStorage signalStorage)
         {
             _signals = signals;
             _signalStorage = signalStorage;
         }
+
 
         public void MonitorChanged(IGraphContext graphContext, IAcquireContext acquireContext)
         {
