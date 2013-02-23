@@ -25,7 +25,7 @@ namespace Associativy.Tests.Stubs
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManySimilarNodesQuery(IGraphContext graphContext, IEnumerable<string> labels)
+        public IContentQuery<ContentItem> GetManyByLabelQuery(IGraphContext graphContext, IEnumerable<string> labels)
         {
             throw new NotImplementedException();
         }

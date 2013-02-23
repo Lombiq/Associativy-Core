@@ -35,7 +35,7 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
         /// <param name="labels">The labels</param>
-        IContentQuery<ContentItem> GetManySimilarNodesQuery(IGraphContext graphContext, IEnumerable<string> labels);
+        IContentQuery<ContentItem> GetManyByLabelQuery(IGraphContext graphContext, IEnumerable<string> labels);
 
         /// <summary>
         /// Gets the node with the specified label

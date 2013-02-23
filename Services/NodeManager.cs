@@ -50,7 +50,7 @@ namespace Associativy.Services
         }
 
 
-        public virtual IContentQuery<ContentItem> GetManySimilarNodesQuery(IGraphContext graphContext, IEnumerable<string> labels)
+        public virtual IContentQuery<ContentItem> GetManyByLabelQuery(IGraphContext graphContext, IEnumerable<string> labels)
         {
             var labelsArray = labels.ToArray();
             for (int i = 0; i < labelsArray.Length; i++)
