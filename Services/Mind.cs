@@ -42,7 +42,7 @@ namespace Associativy.Services
         }
 
 
-        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociations(
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(
             IGraphContext graphContext,
             IMindSettings settings = null)
         {
@@ -68,7 +68,7 @@ namespace Associativy.Services
                 "WholeGraph");
         }
 
-        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociations(
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(
             IGraphContext graphContext,
             IEnumerable<IContent> nodes,
             IMindSettings settings = null)
@@ -98,7 +98,7 @@ namespace Associativy.Services
             }
         }
 
-        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraph(
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(
             IGraphContext graphContext,
             IContent centerNode,
             IMindSettings settings = null)
@@ -120,8 +120,28 @@ namespace Associativy.Services
                 "PartialGraph." + centerNode.ContentItem.Id.ToString());
         }
 
+        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph, IMindSettings settings)
+        {
+            var query = _nodeManager.GetManyQuery(graphContext, idGraph.Vertices);
+            var nodes = query.List().ToDictionary(node => node.Id);
 
-        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetNeighboursGraph(
+            var graph = _graphEditor.GraphFactory<IContent>();
+            graph.AddVertexRange(nodes.Values);
+
+            foreach (var edge in idGraph.Edges)
+            {
+                // Since the query can be modified in an event handler and it could have removed items, this check is necessary
+                if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
+                {
+                    graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
+                }
+            }
+
+            return graph;
+        }
+
+
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IContent node,
@@ -146,7 +166,7 @@ namespace Associativy.Services
                 "NeighboursGraph." + node.ContentItem.Id.ToString());
         }
 
-        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSimpleAssociations(
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSimpleAssociations(
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
@@ -185,7 +205,7 @@ namespace Associativy.Services
                 "SimpleAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
         }
 
-        protected virtual IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeSophisticatedAssociations(
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSophisticatedAssociations(
             IGraphContext graphContext,
             GraphDescriptor descriptor,
             IEnumerable<IContent> nodes,
@@ -391,7 +411,7 @@ namespace Associativy.Services
                 "SophisticatedAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
         }
 
-        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeGraph(
+        protected IUndirectedGraph<int, IUndirectedEdge<int>> MakeGraph(
             IGraphContext graphContext,
             Func<IUndirectedGraph<int, IUndirectedEdge<int>>> createIdGraph,
             IMindSettings settings,
@@ -400,37 +420,16 @@ namespace Associativy.Services
             if (settings.UseCache)
             {
                 cacheKey = MakeCacheKey(graphContext.GraphName + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
-                var zoomedGraph = _cacheManager.Get(cacheKey, ctx =>
+                return _cacheManager.Get(cacheKey, ctx =>
                 {
                     _graphEventMonitor.MonitorChanged(graphContext, ctx);
                     return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
                 });
-
-                return MakeContentGraph(graphContext, zoomedGraph, settings);
-            }
-            else return MakeContentGraph(graphContext, _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount), settings);
-        }
-
-
-        protected IMutableUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph, IMindSettings settings)
-        {
-            var query = _nodeManager.GetManyQuery(graphContext, idGraph.Vertices);
-            var nodes = query.List().ToDictionary(node => node.Id);
-
-            var graph = _graphEditor.GraphFactory<IContent>();
-            graph.AddVertexRange(nodes.Values);
-
-            foreach (var edge in idGraph.Edges)
-            {
-                // Since the query can be modified in an event handler and it could have removed items, this check is necessary
-                if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
-                {
-                    graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
-                }
             }
 
-            return graph;
+            return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
+
 
         protected static string MakeCacheKey(string name)
         {
