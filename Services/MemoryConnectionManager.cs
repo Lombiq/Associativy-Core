@@ -58,6 +58,8 @@ namespace Associativy.Services
 
         public bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id)
         {
+            if (node1Id == node2Id) return true;
+
             ConcurrentDictionary<int, bool> subDictionary;
 
             if (GetGraphConnections(graphContext).TryGetValue(node1Id, out subDictionary))
