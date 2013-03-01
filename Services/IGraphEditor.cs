@@ -1,4 +1,6 @@
-﻿using Orchard;
+﻿using Associativy.GraphDiscovery;
+using Orchard;
+using Orchard.ContentManagement;
 using QuickGraph;
 
 namespace Associativy.Services
@@ -27,5 +29,12 @@ namespace Associativy.Services
         /// <param name="graph">The graph to check</param>
         /// <param name="zoomLevelCount">Number of zoom levels</param>
         int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount);
+
+        /// <summary>
+        /// Creates a graph of content items from a graph of content item IDs
+        /// </summary>
+        /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
+        /// <param name="idGraph">Graph of the IDs</param>
+        IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph);
     }
 }

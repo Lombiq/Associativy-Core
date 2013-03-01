@@ -120,26 +120,6 @@ namespace Associativy.Services
                 "PartialGraph." + centerNode.ContentItem.Id.ToString());
         }
 
-        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph, IMindSettings settings)
-        {
-            var query = _nodeManager.GetManyQuery(graphContext, idGraph.Vertices);
-            var nodes = query.List().ToDictionary(node => node.Id);
-
-            var graph = _graphEditor.GraphFactory<IContent>();
-            graph.AddVertexRange(nodes.Values);
-
-            foreach (var edge in idGraph.Edges)
-            {
-                // Since the query can be modified in an event handler and it could have removed items, this check is necessary
-                if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
-                {
-                    graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
-                }
-            }
-
-            return graph;
-        }
-
 
         protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(
             IGraphContext graphContext,

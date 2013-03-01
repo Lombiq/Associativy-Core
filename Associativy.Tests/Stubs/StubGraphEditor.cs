@@ -1,4 +1,5 @@
 ﻿using Associativy.Services;
+using Orchard.ContentManagement;
 using QuickGraph;
 
 namespace Associativy.Tests.Stubs
@@ -18,6 +19,12 @@ namespace Associativy.Tests.Stubs
         public virtual int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount)
         {
             return 1;
+        }
+
+
+        public IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(GraphDiscovery.IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        {
+            return GraphFactory<IContent>();
         }
     }
 }
