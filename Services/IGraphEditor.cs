@@ -24,11 +24,11 @@ namespace Associativy.Services
         IUndirectedGraph<TNode, IUndirectedEdge<TNode>> CreateZoomedGraph<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevel, int zoomLevelCount);
 
         /// <summary>
-        /// Computes the amount of real zoom levels for a graph for a given maximal zoom level
+        /// Computes the amount of actual zoom levels for a graph for a given maximal zoom level
         /// </summary>
         /// <param name="graph">The graph to check</param>
-        /// <param name="zoomLevelCount">Number of zoom levels</param>
-        int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount);
+        /// <param name="maximalZoomLevelCount">Number of zoom levels</param>
+        int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int maximalZoomLevelCount);
 
         /// <summary>
         /// Creates a graph of content items from a graph of content item IDs

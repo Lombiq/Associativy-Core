@@ -49,9 +49,9 @@ namespace Associativy.Services
             return zoomedGraph;
         }
 
-        public virtual int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int zoomLevelCount)
+        public virtual int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int maximalZoomLevelCount)
         {
-            return CalculateZoomPartitions(graph, zoomLevelCount).Count;
+            return CalculateZoomPartitions(graph, maximalZoomLevelCount).Count;
         }
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
