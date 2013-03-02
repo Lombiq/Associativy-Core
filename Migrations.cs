@@ -22,16 +22,18 @@ namespace Associativy.Migrations
                 );
 
             ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, part => part.Attachable());
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name, part => part.Attachable());
 
 
-            return 1;
+            return 2;
         }
 
-        //public int UpdateFrom1()
-        //{
+        public int UpdateFrom1()
+        {
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name, part => part.Attachable());
 
 
-        //    return 2;
-        //}
+            return 2;
+        }
     }
 }

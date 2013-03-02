@@ -9,5 +9,10 @@ namespace Associativy.Extensions
         {
             return builder.WithPart(typeof(AssociativyNodeLabelPart).Name);
         }
+
+        public static ContentTypeDefinitionBuilder WithTitleLabel(this ContentTypeDefinitionBuilder builder)
+        {
+            return builder.WithPart(typeof(AssociativyNodeTitleLabelPart).Name);
+        }
     }
 }
