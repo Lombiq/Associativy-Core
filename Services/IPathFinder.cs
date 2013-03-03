@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Associativy.GraphDiscovery;
+using Associativy.Models.PathFinder;
 using Orchard;
 using QuickGraph;
 
@@ -13,11 +14,10 @@ namespace Associativy.Services
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
         /// </summary>
-        /// <param name="startNode"></param>
-        /// <param name="targetNode"></param>
-        /// <param name="maxDistance"></param>
-        /// <param name="useCache"></param>
-        PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false);
+        /// <param name="startNodeId"></param>
+        /// <param name="targetNodeId"></param>
+        /// <param name="settings"></param>
+        PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, IPathFinderSettings settings);
     }
 
     public interface IPathResult
@@ -32,6 +32,7 @@ namespace Associativy.Services
         public IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; protected set; }
         public IEnumerable<IEnumerable<int>> SucceededPaths { get; protected set; }
         public IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; protected set; }
+
 
         public PathResult(IUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IEnumerable<IEnumerable<int>> succeededPaths, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models.Mind;
+using Associativy.Models.PathFinder;
 using Orchard.Caching;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
@@ -44,7 +45,7 @@ namespace Associativy.Services
 
         public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(
             IGraphContext graphContext,
-            IMindSettings settings = null)
+            IMindSettings settings)
         {
             var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
@@ -71,7 +72,7 @@ namespace Associativy.Services
         public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(
             IGraphContext graphContext,
             IEnumerable<IContent> nodes,
-            IMindSettings settings = null)
+            IMindSettings settings)
         {
             if (nodes == null) throw new ArgumentNullException("nodes");
 
@@ -101,7 +102,7 @@ namespace Associativy.Services
         public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(
             IGraphContext graphContext,
             IContent centerNode,
-            IMindSettings settings = null)
+            IMindSettings settings)
         {
             if (centerNode == null) throw new ArgumentNullException("centerNode");
 
@@ -112,7 +113,7 @@ namespace Associativy.Services
                 graphContext,
                 () =>
                 {
-                    var graph = descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.ContentItem.Id, -1, settings.MaxDistance).TraversedGraph;
+                    var graph = descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
                     _eventHandler.BeforePartialContentGraphBuilding(new BeforePartialContentGraphBuildingContext(graphContext, settings, centerNode, graph));
                     return graph;
                 },
@@ -309,7 +310,8 @@ namespace Associativy.Services
                             return graph;
                         };
 
-                    var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                    var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache };
+                    var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, pathFinderSettings).SucceededPaths;
 
                     if (allPairSucceededPaths.Count() == 0) return emptyResult();
 
@@ -336,7 +338,7 @@ namespace Associativy.Services
                             while (n < nodeList.Count)
                             {
                                 // Here could be multithreading
-                                var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, settings.MaxDistance, settings.UseCache).SucceededPaths;
+                                var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, pathFinderSettings).SucceededPaths;
                                 commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                                 allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -418,7 +420,7 @@ namespace Associativy.Services
 
         protected void MakeSettings(ref IMindSettings settings)
         {
-            if (settings == null) settings = new MindSettings();
+            if (settings == null) settings = MindSettings.Default;
         }
     }
 }

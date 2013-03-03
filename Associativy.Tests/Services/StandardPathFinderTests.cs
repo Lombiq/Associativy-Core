@@ -23,6 +23,7 @@ using Orchard.Tests.UI.Navigation;
 using Orchard.Tests.Utility;
 using QuickGraph;
 using Associativy.Tests.Helpers;
+using Associativy.Models.PathFinder;
 
 namespace Associativy.Tests.Services
 {
@@ -151,7 +152,7 @@ namespace Associativy.Tests.Services
 
         public PathResult CalcPathResult(IContent node1, IContent node2)
         {
-            return _pathFinder.FindPaths(TestGraphHelper.TestGraphContext(), node1.Id, node2.Id);
+            return _pathFinder.FindPaths(TestGraphHelper.TestGraphContext(), node1.Id, node2.Id, PathFinderSettings.Default);
         }
     }
 }

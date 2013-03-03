@@ -2,6 +2,7 @@
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
+using Associativy.Models.PathFinder;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
 using QuickGraph;
@@ -58,17 +59,19 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, int maxDistance = 3, bool useCache = false)
+        public virtual PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
+            if (settings == null) settings = PathFinderSettings.Default;
+
             // It could be that this is the only caching that's really needed and can work:
             // - With this tens of database queries can be saved (when the connection manager uses DB storage without in-memory caching).
             // - Caching the whole graph would be nice, but caching parts and their records cause problems.
-            if (useCache)
+            if (settings.UseCache)
             {
-                return _cacheManager.Get("Associativy.Paths." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + maxDistance, ctx =>
+                return _cacheManager.Get("Associativy.Paths." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
                     _graphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return FindPaths(graphContext, startNodeId, targetNodeId, maxDistance, false);
+                    return FindPaths(graphContext, startNodeId, targetNodeId, settings);
                 });
             }
 
@@ -99,7 +102,7 @@ namespace Associativy.Services
                 currentDistance = frontierNode.Distance;
 
                 // We can't traverse the graph further
-                if (currentDistance == maxDistance - 1)
+                if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
                     if (connectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
