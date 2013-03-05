@@ -112,33 +112,38 @@
     <Compile Include="GraphDiscovery\GraphContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
+    <Compile Include="GraphDiscovery\IGraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphDescriptorFilterer.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptorFilterer.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeTitleLabelPartHandler.cs" />
     <Compile Include="Migrations.cs" />
-    <Compile Include="Models\Nodes\AssociativyNodeTitleLabelPart.cs" />
-    <Compile Include="Models\Nodes\IAssociativyNodeLabelAspect.cs" />
-    <Compile Include="Models\Nodes\AssociativyNodeLabelPart.cs" />
-    <Compile Include="Models\Nodes\AssociativyNodeLabelPartRecord.cs" />
+    <Compile Include="Models\AssociativyNodeTitleLabelPart.cs" />
+    <Compile Include="Models\IAssociativyNodeLabelAspect.cs" />
+    <Compile Include="Models\AssociativyNodeLabelPart.cs" />
+    <Compile Include="Models\AssociativyNodeLabelPartRecord.cs" />
     <Compile Include="GraphDiscovery\GraphManager.cs" />
-    <Compile Include="Models\Nodes\NodeConnector.cs" />
-    <Compile Include="Models\PathFinder\IPathFinderSettings.cs" />
-    <Compile Include="Models\PathFinder\PathFinderSettings.cs" />
-    <Compile Include="Services\AssociativyServiceBase.cs" />
+    <Compile Include="Models\NodeConnector.cs" />
+    <Compile Include="Models\Services\GraphInfo.cs" />
+    <Compile Include="Models\Services\IGraphInfo.cs" />
+    <Compile Include="Models\Services\IPathFinderSettings.cs" />
+    <Compile Include="Models\Services\PathFinderSettings.cs" />
+    <Compile Include="Services\IGraphServices.cs" />
     <Compile Include="Services\GraphEditor.cs" />
     <Compile Include="GraphDiscovery\IGraphManager.cs" />
     <Compile Include="GraphDiscovery\IGraphProvider.cs" />
-    <Compile Include="Models\Mind\IMindSettings.cs" />
-    <Compile Include="Models\Nodes\INodeToNodeConnector.cs" />
-    <Compile Include="Models\Mind\MindSettings.cs" />
-    <Compile Include="Models\Nodes\NodeToNodeConnectorRecord.cs" />
+    <Compile Include="Models\Services\IMindSettings.cs" />
+    <Compile Include="Models\INodeToNodeConnector.cs" />
+    <Compile Include="Models\Services\MindSettings.cs" />
+    <Compile Include="Models\NodeToNodeConnectorRecord.cs" />
     <Compile Include="EventHandlers\GraphEventMonitor.cs" />
     <Compile Include="Services\AssociativyServices.cs" />
-    <Compile Include="Services\IPathServices.cs" />
-    <Compile Include="Services\IStandardPathFinder.cs" />
-    <Compile Include="Services\PathServices.cs" />
+    <Compile Include="Services\GraphServiceBase.cs" />
+    <Compile Include="Services\GraphServicesFactory.cs" />
+    <Compile Include="Services\IGraphStatisticsService.cs" />
+    <Compile Include="Services\StandardGraphStatisticsService.cs" />
+    <Compile Include="Services\GraphServices.cs" />
     <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />
@@ -149,8 +154,8 @@
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\IPathFinder.cs" />
-    <Compile Include="Services\Mind.cs" />
-    <Compile Include="Services\NodeManager.cs" />
+    <Compile Include="Services\StandardMind.cs" />
+    <Compile Include="Services\StandardNodeManager.cs" />
     <Compile Include="Services\StandardPathFinder.cs" />
     <Compile Include="Settings\AssociativyNodeLabelSettings.cs" />
   </ItemGroup>
@@ -179,6 +184,7 @@
   <ItemGroup>
     <Content Include="Views\DefinitionTemplates\AssociativyNodeLabelTypePartSettings.cshtml" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

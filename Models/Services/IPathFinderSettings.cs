@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Associativy.Models.PathFinder
+namespace Associativy.Models.Services
 {
     public interface IPathFinderSettings
     {

@@ -15,6 +15,7 @@ namespace Associativy
             var builder = new ContainerBuilder();
 
             builder.RegisterGeneric(typeof(SqlConnectionManager<>)).As(typeof(ISqlConnectionManager<>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(GraphServicesFactory<,,,,>)).As(typeof(IGraphServicesFactory<,,,,>)).InstancePerLifetimeScope();
 
             builder.Update(componentRegistry);
         }

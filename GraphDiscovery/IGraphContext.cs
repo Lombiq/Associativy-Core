@@ -15,7 +15,7 @@ namespace Associativy.GraphDiscovery
         /// <summary>
         /// Name of the graph used to identify it
         /// </summary>
-        string GraphName { get; }
+        string Name { get; }
 
         /// <summary>
         /// The types of the content items stored by the graph
@@ -28,7 +28,7 @@ namespace Associativy.GraphDiscovery
     {
         public static string Stringify(this IGraphContext graphContext)
         {
-            return graphContext.GraphName + String.Join(" ", graphContext.ContentTypes);
+            return graphContext.Name + String.Join(" ", graphContext.ContentTypes);
         }
     }
 }

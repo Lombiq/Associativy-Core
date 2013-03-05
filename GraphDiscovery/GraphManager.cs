@@ -11,14 +11,14 @@ namespace Associativy.GraphDiscovery
         private readonly IEnumerable<IGraphProvider> _graphProviders;
         private readonly IGraphDescriptorFilterer _descriptorFilterer;
 
-        private IEnumerable<GraphDescriptor> _descriptors;
-        private IEnumerable<GraphDescriptor> Descriptors
+        private IEnumerable<IGraphDescriptor> _descriptors;
+        private IEnumerable<IGraphDescriptor> Descriptors
         {
             get
             {
                 if (_descriptors == null)
                 {
-                    _descriptors = Enumerable.Empty<GraphDescriptor>();
+                    _descriptors = Enumerable.Empty<IGraphDescriptor>();
                     var describeContext = new DescribeContext();
                     foreach (var provider in _graphProviders)
                     {
@@ -41,23 +41,23 @@ namespace Associativy.GraphDiscovery
         }
 
 
-        public GraphDescriptor FindGraph(IGraphContext graphContext)
+        public IGraphDescriptor FindGraph(IGraphContext graphContext)
         {
             return FindGraphs(graphContext).LastOrDefault();
         }
 
-        public IEnumerable<GraphDescriptor> FindGraphs(IGraphContext graphContext)
+        public IEnumerable<IGraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
             return _descriptorFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
         }
 
-        public IEnumerable<GraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
+        public IEnumerable<IGraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
         {
-            var descriptors = new Dictionary<string, GraphDescriptor>();
+            var descriptors = new Dictionary<string, IGraphDescriptor>();
 
             foreach (var descriptor in FindGraphs(graphContext))
             {
-                if(!String.IsNullOrEmpty(descriptor.GraphName)) descriptors[descriptor.GraphName] = descriptor;
+                if(!String.IsNullOrEmpty(descriptor.Name)) descriptors[descriptor.Name] = descriptor;
             }
 
             return descriptors.Values;

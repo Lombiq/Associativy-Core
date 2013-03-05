@@ -18,17 +18,17 @@ namespace Associativy.EventHandlers
         }
 
 
-        public void MonitorChanged(IGraphContext graphContext, IAcquireContext acquireContext)
+        public void MonitorChanged(IGraphDescriptor graphDescriptor, IAcquireContext acquireContext)
         {
-            var signal = graphContext.GraphName + "ChangedSignal";
-            _signalStorage.Signals[graphContext.GraphName] = signal;
+            var signal = graphDescriptor.Name + "ChangedSignal";
+            _signalStorage.Signals[graphDescriptor.Name] = signal;
             acquireContext.Monitor(_signals.When(signal));
         }
 
-        public override void Changed(IGraphContext graphContext)
+        public override void Changed(IGraphDescriptor graphDescriptor)
         {
             string signal;
-            if (_signalStorage.Signals.TryGetValue(graphContext.GraphName, out signal))
+            if (_signalStorage.Signals.TryGetValue(graphDescriptor.Name, out signal))
             {
                 _signals.Trigger(signal);
             }

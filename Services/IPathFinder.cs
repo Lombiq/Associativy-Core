@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Associativy.GraphDiscovery;
-using Associativy.Models.PathFinder;
+using Associativy.Models.Services;
 using Orchard;
 using QuickGraph;
 
@@ -9,7 +9,7 @@ namespace Associativy.Services
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    public interface IPathFinder : IDependency
+    public interface IPathFinder
     {
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
@@ -17,7 +17,7 @@ namespace Associativy.Services
         /// <param name="startNodeId"></param>
         /// <param name="targetNodeId"></param>
         /// <param name="settings"></param>
-        PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, IPathFinderSettings settings);
+        PathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings);
     }
 
     public interface IPathResult

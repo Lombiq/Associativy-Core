@@ -2,15 +2,26 @@
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
-using Associativy.Models.PathFinder;
+using Associativy.Models.Services;
+using Orchard;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
 using QuickGraph;
 
 namespace Associativy.Services
 {
+    /// <summary>
+    /// Deals with node-to-node path calculations, by default using IConnectionManager
+    /// </summary>
+    /// <remarks>
+    /// E.g. when using a graph database as storage, you can write your own IPathFinder and IConnectionManager implementation for optimized results.
+    /// </remarks>
+    public interface IStandardPathFinder : IPathFinder, IDependency
+    {
+    }
+
     [OrchardFeature("Associativy")]
-    public class StandardPathFinder : AssociativyServiceBase, IStandardPathFinder
+    public class StandardPathFinder : GraphServiceBase, IStandardPathFinder
     {
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _graphEventMonitor;
@@ -18,11 +29,11 @@ namespace Associativy.Services
 
 
         public StandardPathFinder(
-            IGraphManager graphManager,
+            IGraphDescriptor graphDescriptor,
             IGraphEditor graphEditor,
             IGraphEventMonitor graphEventMonitor,
             ICacheManager cacheManager)
-            : base(graphManager)
+            : base(graphDescriptor)
         {
             _graphEditor = graphEditor;
             _graphEventMonitor = graphEventMonitor;
@@ -59,7 +70,7 @@ namespace Associativy.Services
         }
         #endregion
 
-        public virtual PathResult FindPaths(IGraphContext graphContext, int startNodeId, int targetNodeId, IPathFinderSettings settings)
+        public virtual PathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
             if (settings == null) settings = PathFinderSettings.Default;
 
@@ -68,16 +79,16 @@ namespace Associativy.Services
             // - Caching the whole graph would be nice, but caching parts and their records cause problems.
             if (settings.UseCache)
             {
-                return _cacheManager.Get("Associativy.Paths." + graphContext.GraphName + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
+                return _cacheManager.Get("Associativy.Paths." + _graphDescriptor.Name + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
-                    _graphEventMonitor.MonitorChanged(graphContext, ctx);
-                    return FindPaths(graphContext, startNodeId, targetNodeId, settings);
+                    _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
+                    return FindPaths(startNodeId, targetNodeId, settings);
                 });
             }
 
             // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
             // keeps track of the paths found.
-            var connectionManager = _graphManager.FindGraph(graphContext).PathServices.ConnectionManager;
+            var connectionManager = _graphDescriptor.Services.ConnectionManager;
 
             var explored = new Dictionary<int, PathNode>();
             var succeededGraph = _graphEditor.GraphFactory<int>();
@@ -105,7 +116,7 @@ namespace Associativy.Services
                 if (currentDistance == settings.MaxDistance - 1)
                 {
                     // Target will be only found if it's the direct neighbour of current
-                    if (connectionManager.AreNeighbours(graphContext, currentNode.Id, targetNodeId))
+                    if (connectionManager.AreNeighbours(currentNode.Id, targetNodeId))
                     {
                         if (!explored.ContainsKey(targetNodeId))
                         {
@@ -130,7 +141,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = connectionManager.GetNeighbourIds(graphContext, currentNode.Id);
+                        var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {
@@ -174,6 +185,7 @@ namespace Associativy.Services
 
             return new PathResult(succeededGraph, succeededPaths, traversedGraph);
         }
+
 
         private static void SavePathToGraph(IMutableUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, List<List<int>> succeededPaths, List<int> path)
         {

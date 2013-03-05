@@ -17,15 +17,5 @@ namespace Associativy.Services
         /// Performs work on graphs
         /// </summary>
         IGraphEditor GraphEditor { get; }
-
-        /// <summary>
-        /// Service for generating associations
-        /// </summary>
-        IMind Mind { get; }
-
-        /// <summary>
-        /// Service for handling nodes
-        /// </summary>
-        INodeManager NodeManager { get; }
     }
 }

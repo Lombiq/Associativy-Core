@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using Orchard.Environment.Extensions;
 
-namespace Associativy.Models.PathFinder
+namespace Associativy.Models.Services
 {
     [OrchardFeature("Associativy")]
     public class PathFinderSettings : IPathFinderSettings

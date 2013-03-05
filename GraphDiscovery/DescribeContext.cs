@@ -10,31 +10,25 @@ namespace Associativy.GraphDiscovery
     [OrchardFeature("Associativy")]
     public class DescribeContext
     {
-        private readonly List<GraphDescriptor> _descriptors;
+        private readonly List<IGraphDescriptor> _descriptors;
 
-        public IEnumerable<GraphDescriptor> Descriptors
-        {
-            get
-            {
-                return _descriptors.AsEnumerable();
-            }
-        }
+        public IEnumerable<IGraphDescriptor> Descriptors { get { return _descriptors.AsEnumerable(); } }
 
 
         public DescribeContext()
         {
-            _descriptors = new List<GraphDescriptor>();
+            _descriptors = new List<IGraphDescriptor>();
         }
 
 
-        public void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
+        public virtual void DescribeGraph(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IGraphDescriptor, IGraphServices> graphServicesFactory)
         {
             if (String.IsNullOrEmpty(name) || displayName == null || String.IsNullOrEmpty(displayName.Text))
             {
                 throw new ArgumentException("Associativy graphs should have their Name and DisplayName set properly.");
             }
 
-            _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, pathServicesFactory));
+            _descriptors.Add(new GraphDescriptor(name, displayName, contentTypes, graphServicesFactory));
         }
     }
 }

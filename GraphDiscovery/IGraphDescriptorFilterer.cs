@@ -5,6 +5,6 @@ namespace Associativy.GraphDiscovery
 {
     public interface IGraphDescriptorFilterer : IDependency
     {
-        IEnumerable<GraphDescriptor> FilterByMatchingGraphContext(IEnumerable<GraphDescriptor> descriptors, IGraphContext graphContext);
+        IEnumerable<IGraphDescriptor> FilterByMatchingGraphContext(IEnumerable<IGraphDescriptor> descriptors, IGraphContext graphContext);
     }
 }

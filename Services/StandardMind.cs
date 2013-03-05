@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
-using Associativy.Models.Mind;
-using Associativy.Models.PathFinder;
+using Associativy.Models.Services;
+using Orchard;
 using Orchard.Caching;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
@@ -12,10 +12,13 @@ using QuickGraph;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
-    public class Mind : AssociativyServiceBase, IMind
+    public interface IStandardMind : IMind, IDependency
     {
-        protected readonly INodeManager _nodeManager;
+    }
+
+    [OrchardFeature("Associativy")]
+    public class StandardMind : GraphServiceBase, IStandardMind
+    {
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly IMindEventHandler _eventHandler;
@@ -26,16 +29,14 @@ namespace Associativy.Services
         #endregion
 
 
-        public Mind(
-            IGraphManager graphManager,
-            INodeManager nodeManager,
+        public StandardMind(
+            IGraphDescriptor graphDescriptor,
             IGraphEditor graphEditor,
             IGraphEventMonitor graphEventMonitor,
             IMindEventHandler eventHandler,
             ICacheManager cacheManager)
-            : base(graphManager)
+            : base(graphDescriptor)
         {
-            _nodeManager = nodeManager;
             _graphEditor = graphEditor;
             _graphEventMonitor = graphEventMonitor;
             _eventHandler = eventHandler;
@@ -43,25 +44,21 @@ namespace Associativy.Services
         }
 
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(
-            IGraphContext graphContext,
-            IMindSettings settings)
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings)
         {
-            var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
             return MakeGraph(
-                graphContext,
                 () =>
                 {
                     var graph = _graphEditor.GraphFactory<int>();
 
                     // This won't include nodes that are not connected to anything
                     graph.AddVerticesAndEdgeRange(
-                        descriptor.PathServices.ConnectionManager.GetAll(graphContext)
+                        _graphDescriptor.Services.ConnectionManager.GetAll()
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
-                    _eventHandler.BeforeWholeContentGraphBuilding(new BeforeWholeContentGraphBuildingContext(graphContext, settings, graph));
+                    _eventHandler.BeforeWholeContentGraphBuilding(new BeforeWholeContentGraphBuildingContext(_graphDescriptor, settings, graph));
 
                     return graph;
                 },
@@ -69,52 +66,43 @@ namespace Associativy.Services
                 "WholeGraph");
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(
-            IGraphContext graphContext,
-            IEnumerable<IContent> nodes,
-            IMindSettings settings)
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             if (nodes == null) throw new ArgumentNullException("nodes");
 
             var nodeCount = nodes.Count();
             if (nodeCount == 0) throw new ArgumentException("The list of searched nodes can't be empty");
 
-            var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
             // If there's only one node, return its neighbours
             if (nodeCount == 1)
             {
-                return GetNeighboursGraph(graphContext, descriptor, nodes.First(), settings);
+                return GetNeighboursGraph(nodes.First(), settings);
             }
             // Simply calculate the intersection of the neighbours of the nodes
             else if (settings.Algorithm == "simple")
             {
-                return MakeSimpleAssociations(graphContext, descriptor, nodes, settings);
+                return MakeSimpleAssociations(nodes, settings);
             }
             // Calculate the routes between two nodes
             else
             {
-                return MakeSophisticatedAssociations(graphContext, descriptor, nodes, settings);
+                return MakeSophisticatedAssociations(nodes, settings);
             }
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(
-            IGraphContext graphContext,
-            IContent centerNode,
-            IMindSettings settings)
+        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings)
         {
             if (centerNode == null) throw new ArgumentNullException("centerNode");
 
-            var descriptor = _graphManager.FindGraph(graphContext);
             MakeSettings(ref settings);
 
             return MakeGraph(
-                graphContext,
                 () =>
                 {
-                    var graph = descriptor.PathServices.PathFinder.FindPaths(graphContext, centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
-                    _eventHandler.BeforePartialContentGraphBuilding(new BeforePartialContentGraphBuildingContext(graphContext, settings, centerNode, graph));
+                    var graph = _graphDescriptor.Services.PathFinder.FindPaths(centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
+                    _eventHandler.BeforePartialContentGraphBuilding(new BeforePartialContentGraphBuildingContext(_graphDescriptor, settings, centerNode, graph));
                     return graph;
                 },
                 settings,
@@ -122,24 +110,20 @@ namespace Associativy.Services
         }
 
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(
-            IGraphContext graphContext,
-            GraphDescriptor descriptor,
-            IContent node,
-            IMindSettings settings)
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(IContent node, IMindSettings settings)
         {
             return MakeGraph(
-                graphContext,
                 () =>
                 {
                     var graph = _graphEditor.GraphFactory<int>();
 
                     graph.AddVertex(node.ContentItem.Id);
                     graph.AddVerticesAndEdgeRange(
-                        descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.ContentItem.Id)
+                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)
+                            .Take(settings.MaxNodeCount)
                             .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, new IContent[] { node }, graph));
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(_graphDescriptor, settings, new IContent[] { node }, graph));
 
                     return graph;
                 },
@@ -147,23 +131,18 @@ namespace Associativy.Services
                 "NeighboursGraph." + node.ContentItem.Id.ToString());
         }
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSimpleAssociations(
-            IGraphContext graphContext,
-            GraphDescriptor descriptor,
-            IEnumerable<IContent> nodes,
-            IMindSettings settings)
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSimpleAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             return MakeGraph(
-                graphContext,
                 () =>
                 {
                     // Simply calculate the intersection of the neighbours of the nodes
                     var graph = _graphEditor.GraphFactory<int>();
 
-                    var commonNeighbourIds = descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, nodes.First().ContentItem.Id);
+                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id);
                     var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
                     remainingNodes.RemoveAt(0);
-                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(descriptor.PathServices.ConnectionManager.GetNeighbourIds(graphContext, node.ContentItem.Id)).ToList());
+                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList());
                     // Same as
                     //foreach (var node in remainingNodes)
                     //{
@@ -178,7 +157,7 @@ namespace Associativy.Services
                         }
                     }
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(_graphDescriptor, settings, nodes, graph));
 
                     return graph;
                 },
@@ -186,11 +165,7 @@ namespace Associativy.Services
                 "SimpleAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
         }
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSophisticatedAssociations(
-            IGraphContext graphContext,
-            GraphDescriptor descriptor,
-            IEnumerable<IContent> nodes,
-            IMindSettings settings)
+        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSophisticatedAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             var nodeList = nodes.ToList();
             var nodeCount = nodeList.Count;
@@ -210,7 +185,6 @@ namespace Associativy.Services
                 };
 
             return MakeGraph(
-                graphContext,
                 () =>
                 {
                     #region Experimental graph merging
@@ -225,7 +199,7 @@ namespace Associativy.Services
                     //Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
                     //    () =>
                     //    {
-                    //        _eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                    //        _eventHandler.BeforeSearchedContentGraphBuilding(nodes, graph);
                     //        return graph;
                     //    };
 
@@ -234,7 +208,7 @@ namespace Associativy.Services
                     //{
                     //    var node1 = nodeList[i].ContentItem.Id;
                     //    var node2 = nodeList[i + 1].ContentItem.Id;
-                    //    var resultGraph = pathFinder.FindPaths(graphContext, node1, node2, settings.MaxDistance, settings.UseCache).SucceededGraph;
+                    //    var resultGraph = pathFinder.FindPaths(node1, node2, settings.MaxDistance, settings.UseCache).SucceededGraph;
 
                     //    if (resultGraph.VertexCount == 0 || resultGraph.EdgeCount == 0) return emptyResult();
 
@@ -295,7 +269,7 @@ namespace Associativy.Services
 
                     //graph.AddEdgeRange(commonEdges);
 
-                    //_eventHandler.BeforeSearchedContentGraphBuilding(graphContext, nodes, graph);
+                    //_eventHandler.BeforeSearchedContentGraphBuilding(nodes, graph);
 
                     //return graph;
                     #endregion
@@ -306,12 +280,12 @@ namespace Associativy.Services
                     Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
                         () =>
                         {
-                            _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
+                            _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(_graphDescriptor, settings, nodes, graph));
                             return graph;
                         };
 
                     var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache };
-                    var allPairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[0].Id, nodeList[1].Id, pathFinderSettings).SucceededPaths;
+                    var allPairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[0].Id, nodeList[1].Id, pathFinderSettings).SucceededPaths;
 
                     if (allPairSucceededPaths.Count() == 0) return emptyResult();
 
@@ -338,7 +312,7 @@ namespace Associativy.Services
                             while (n < nodeList.Count)
                             {
                                 // Here could be multithreading
-                                var pairSucceededPaths = descriptor.PathServices.PathFinder.FindPaths(graphContext, nodeList[i].Id, nodeList[n].Id, pathFinderSettings).SucceededPaths;
+                                var pairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[i].Id, nodeList[n].Id, pathFinderSettings).SucceededPaths;
                                 commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
                                 allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
 
@@ -385,7 +359,7 @@ namespace Associativy.Services
                         }
                     }
 
-                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(graphContext, settings, nodes, graph));
+                    _eventHandler.BeforeSearchedContentGraphBuilding(new BeforeSearchedContentGraphBuildingContext(_graphDescriptor, settings, nodes, graph));
 
                     return graph;
                 },
@@ -394,17 +368,16 @@ namespace Associativy.Services
         }
 
         protected IUndirectedGraph<int, IUndirectedEdge<int>> MakeGraph(
-            IGraphContext graphContext,
             Func<IUndirectedGraph<int, IUndirectedEdge<int>>> createIdGraph,
             IMindSettings settings,
             string cacheKey)
         {
             if (settings.UseCache)
             {
-                cacheKey = MakeCacheKey(graphContext.GraphName + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
+                cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
                 return _cacheManager.Get(cacheKey, ctx =>
                 {
-                    _graphEventMonitor.MonitorChanged(graphContext, ctx);
+                    _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
                     return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
                 });
             }

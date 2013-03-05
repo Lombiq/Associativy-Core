@@ -5,6 +5,6 @@ namespace Associativy.Services
 {
     public interface IMemoryConnectionManager : IConnectionManager, IDependency
     {
-        int GetConnectionCount(IGraphContext graphContext);
+        int GetConnectionCount();
     }
 }

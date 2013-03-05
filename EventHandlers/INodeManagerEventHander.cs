@@ -16,13 +16,13 @@ namespace Associativy.EventHandlers
 
     public class QueryBuiltContext
     {
-        public IGraphContext GraphContext { get; private set; }
+        public IGraphDescriptor GraphDescriptor { get; private set; }
         public IContentQuery<ContentItem> Query { get; private set; }
 
 
-        public QueryBuiltContext(IGraphContext graphContext, IContentQuery<ContentItem> query)
+        public QueryBuiltContext(IGraphDescriptor graphDescriptor, IContentQuery<ContentItem> query)
         {
-            GraphContext = graphContext;
+            GraphDescriptor = graphDescriptor;
             Query = query;
         }
     }

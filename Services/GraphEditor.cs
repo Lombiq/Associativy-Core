@@ -11,15 +11,6 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class GraphEditor : IGraphEditor
     {
-        private readonly INodeManager _nodeManager;
-
-
-        public GraphEditor(INodeManager nodeManager)
-        {
-            _nodeManager = nodeManager;
-        }
-
-
         public IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> GraphFactory<TNode>()
         {
             return new UndirectedGraph<TNode, IUndirectedEdge<TNode>>(false);
@@ -52,26 +43,6 @@ namespace Associativy.Services
         public virtual int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int maximalZoomLevelCount)
         {
             return CalculateZoomPartitions(graph, maximalZoomLevelCount).Count;
-        }
-
-        public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
-        {
-            var query = _nodeManager.GetManyQuery(graphContext, idGraph.Vertices);
-            var nodes = query.List().ToDictionary(node => node.Id);
-
-            var graph = GraphFactory<IContent>();
-            graph.AddVertexRange(nodes.Values);
-
-            foreach (var edge in idGraph.Edges)
-            {
-                // Since the query can be modified in an event handler and it could have removed items, this check is necessary
-                if (nodes.ContainsKey(edge.Source) && nodes.ContainsKey(edge.Target))
-                {
-                    graph.AddEdge(new UndirectedEdge<IContent>(nodes[edge.Source], nodes[edge.Target]));
-                }
-            }
-
-            return graph;
         }
 
 

@@ -8,14 +8,14 @@ namespace Associativy.GraphDiscovery
     [OrchardFeature("Associativy")]
     public class GraphDescriptorFilterer : IGraphDescriptorFilterer
     {
-        public IEnumerable<GraphDescriptor> FilterByMatchingGraphContext(IEnumerable<GraphDescriptor> descriptors, IGraphContext graphContext) 
+        public IEnumerable<IGraphDescriptor> FilterByMatchingGraphContext(IEnumerable<IGraphDescriptor> descriptors, IGraphContext graphContext) 
         {
             var filteredDescriptors = descriptors;
 
-            if (!String.IsNullOrEmpty(graphContext.GraphName))
+            if (!String.IsNullOrEmpty(graphContext.Name))
             {
                 // Catch-alls with empty name property are kept
-                filteredDescriptors = filteredDescriptors.Where((descriptor) => descriptor.GraphName == graphContext.GraphName || String.IsNullOrEmpty(descriptor.GraphName));
+                filteredDescriptors = filteredDescriptors.Where((descriptor) => descriptor.Name == graphContext.Name || String.IsNullOrEmpty(descriptor.Name));
             }
 
 

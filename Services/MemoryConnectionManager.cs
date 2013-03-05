@@ -13,7 +13,7 @@ namespace Associativy.Services
     /// <summary>
     /// Connections manager storing the graph in memory (i.e. not persisting it)
     /// </summary>
-    public class MemoryConnectionManager : AssociativyServiceBase, IMemoryConnectionManager
+    public class MemoryConnectionManager : GraphServiceBase, IMemoryConnectionManager
     {
         protected readonly ICacheManager _cacheManager;
         protected readonly IGraphEventHandler _graphEventHandler;
@@ -39,30 +39,30 @@ namespace Associativy.Services
 
 
         public MemoryConnectionManager(
-            IGraphManager graphManager,
+            IGraphDescriptor graphDescriptor,
             ICacheManager cacheManager,
             IGraphEventHandler graphEventHandler)
-            : base(graphManager)
+            : base(graphDescriptor)
         {
             _cacheManager = cacheManager;
             _graphEventHandler = graphEventHandler;
         }
 
 
-        public int GetConnectionCount(IGraphContext graphContext)
+        public int GetConnectionCount()
         {
-            if (!Connections.ContainsKey(graphContext.GraphName)) return 0;
+            if (!Connections.ContainsKey(_graphDescriptor.Name)) return 0;
             // Dividing by 2 since connections are stored both ways
-            return Connections[graphContext.GraphName].Count / 2;
+            return Connections[_graphDescriptor.Name].Count / 2;
         }
 
-        public bool AreNeighbours(IGraphContext graphContext, int node1Id, int node2Id)
+        public bool AreNeighbours(int node1Id, int node2Id)
         {
             if (node1Id == node2Id) return true;
 
             ConcurrentDictionary<int, bool> subDictionary;
 
-            if (GetGraphConnections(graphContext).TryGetValue(node1Id, out subDictionary))
+            if (GetGraphConnections().TryGetValue(node1Id, out subDictionary))
             {
                 return subDictionary.ContainsKey(node2Id);
             } 
@@ -70,14 +70,14 @@ namespace Associativy.Services
             return false;
         }
 
-        public void Connect(IGraphContext graphContext, int node1Id, int node2Id)
+        public void Connect(int node1Id, int node2Id)
         {
-            if (AreNeighbours(graphContext, node1Id, node2Id)) return;
+            if (AreNeighbours(node1Id, node2Id)) return;
 
             Action<int, int> storeConnection =
                 (id1, id2) =>
                 {
-                    var subDictionary = GetGraphConnections(graphContext).GetOrAdd(id1, new ConcurrentDictionary<int, bool>());
+                    var subDictionary = GetGraphConnections().GetOrAdd(id1, new ConcurrentDictionary<int, bool>());
                     subDictionary[id2] = true;
                 };
 
@@ -85,12 +85,12 @@ namespace Associativy.Services
             storeConnection(node1Id, node2Id);
             storeConnection(node2Id, node1Id);
 
-            _graphEventHandler.ConnectionAdded(graphContext, node1Id, node2Id);
+            _graphEventHandler.ConnectionAdded(_graphDescriptor, node1Id, node2Id);
         }
 
-        public void DeleteFromNode(IGraphContext graphContext, int nodeId)
+        public void DeleteFromNode(int nodeId)
         {
-            var graphConnections = GetGraphConnections(graphContext);
+            var graphConnections = GetGraphConnections();
             ConcurrentDictionary<int, bool> subDictionary;
             if (graphConnections.TryRemove(nodeId, out subDictionary))
             {
@@ -101,27 +101,27 @@ namespace Associativy.Services
                 }
             }
 
-            _graphEventHandler.ConnectionsDeletedFromNode(graphContext, nodeId);
+            _graphEventHandler.ConnectionsDeletedFromNode(_graphDescriptor, nodeId);
         }
 
-        public void Disconnect(IGraphContext graphContext, int node1Id, int node2Id)
+        public void Disconnect(int node1Id, int node2Id)
         {
-            if (!AreNeighbours(graphContext, node1Id, node2Id)) return;
+            if (!AreNeighbours(node1Id, node2Id)) return;
 
-            var graphConnections = GetGraphConnections(graphContext);
+            var graphConnections = GetGraphConnections();
             bool dummyValue;
             graphConnections[node1Id].TryRemove(node2Id, out dummyValue);
             graphConnections[node2Id].TryRemove(node1Id, out dummyValue);
 
-            _graphEventHandler.ConnectionDeleted(graphContext, node1Id, node2Id);
+            _graphEventHandler.ConnectionDeleted(_graphDescriptor, node1Id, node2Id);
         }
 
-        public IEnumerable<INodeToNodeConnector> GetAll(IGraphContext graphContext)
+        public IEnumerable<INodeToNodeConnector> GetAll()
         {
             var addedConnections = new HashSet<string>();
             var connectors = new List<INodeToNodeConnector>();
 
-            foreach (var connections in GetGraphConnections(graphContext))
+            foreach (var connections in GetGraphConnections())
             {
                 foreach (var connection in connections.Value)
                 {
@@ -136,28 +136,24 @@ namespace Associativy.Services
             return connectors.Cast<INodeToNodeConnector>();
         }
 
-        public IEnumerable<int> GetNeighbourIds(IGraphContext graphContext, int nodeId)
+        public IEnumerable<int> GetNeighbourIds(int nodeId)
         {
             ConcurrentDictionary<int, bool> subDictionary;
 
-            if (GetGraphConnections(graphContext).TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
+            if (GetGraphConnections().TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys;
 
             return Enumerable.Empty<int>();
         }
 
-        public int GetNeighbourCount(IGraphContext graphContext, int nodeId)
+        public int GetNeighbourCount(int nodeId)
         {
-            return GetNeighbourIds(graphContext, nodeId).Count();
+            return GetNeighbourIds(nodeId).Count();
         }
 
-        private string GetGraphName(IGraphContext graphContext)
-        {
-            return _graphManager.FindGraph(graphContext).GraphName;
-        }
 
-        private ConcurrentDictionary<int, ConcurrentDictionary<int, bool>> GetGraphConnections(IGraphContext graphContext)
+        private ConcurrentDictionary<int, ConcurrentDictionary<int, bool>> GetGraphConnections()
         {
-            return Connections.GetOrAdd(_graphManager.FindGraph(graphContext).GraphName, new ConcurrentDictionary<int, ConcurrentDictionary<int, bool>>());
+            return Connections.GetOrAdd(_graphDescriptor.Name, new ConcurrentDictionary<int, ConcurrentDictionary<int, bool>>());
         }
     }
 }

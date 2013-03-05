@@ -23,34 +23,32 @@ namespace Associativy.Handlers
 
         protected override void Created(CreateContentContext context)
         {
-            TryInvokeEventHandler(context.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.Value.NodeAdded(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentType, graphDescriptor => _graphEventHandler.Value.NodeAdded(graphDescriptor, context.ContentItem));
         }
 
         protected override void UpdateEditorShape(UpdateEditorContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) => _graphEventHandler.Value.NodeChanged(graphContext, context.ContentItem));
+            TryInvokeEventHandler(context.ContentItem.ContentType, graphDescriptor => _graphEventHandler.Value.NodeChanged(graphDescriptor, context.ContentItem));
         }
 
         protected override void Removed(RemoveContentContext context)
         {
-            TryInvokeEventHandler(context.ContentItem.ContentType, (graphContext, graphDescriptor) =>
+            TryInvokeEventHandler(context.ContentItem.ContentType, graphDescriptor =>
                 {
-                    graphDescriptor.PathServices.ConnectionManager.DeleteFromNode(graphContext, context.ContentItem);
-                    _graphEventHandler.Value.NodeRemoved(graphContext, context.ContentItem);
+                    graphDescriptor.Services.ConnectionManager.DeleteFromNode(context.ContentItem);
+                    _graphEventHandler.Value.NodeRemoved(graphDescriptor, context.ContentItem);
                 });
         }
 
-        private void TryInvokeEventHandler(string contentType, Action<IGraphContext, GraphDescriptor> eventHandler)
+        private void TryInvokeEventHandler(string contentType, Action<IGraphDescriptor> eventHandler)
         {
-            var context = new GraphContext { ContentTypes = new string[] { contentType }};
-            var descriptors = _graphManager.Value.FindGraphs(context);
+            var descriptors = _graphManager.Value.FindGraphs(new GraphContext { ContentTypes = new string[] { contentType } });
 
             foreach (var descriptor in descriptors)
             {
                 // descriptor.ProduceContext() could be erroneous as the context with only the current content type is needed,
                 // not all content types stored by the graph.
-                context.GraphName = descriptor.GraphName;
-                eventHandler(context, descriptor);
+                eventHandler(descriptor);
             }
         }
     }

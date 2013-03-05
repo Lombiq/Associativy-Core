@@ -6,7 +6,7 @@ using Orchard.Events;
 using QuickGraph;
 using Associativy.GraphDiscovery;
 using Orchard.ContentManagement;
-using Associativy.Models.Mind;
+using Associativy.Models.Services;
 
 namespace Associativy.EventHandlers
 {
@@ -20,13 +20,13 @@ namespace Associativy.EventHandlers
 
     public abstract class MindEventContext
     {
-        public IGraphContext GraphContext { get; private set; }
+        public IGraphDescriptor GraphDescriptor { get; private set; }
         public IMindSettings Settings { get; set; }
         public IUndirectedGraph<int, IUndirectedEdge<int>> IdGraph { get; private set; }
 
-        protected MindEventContext(IGraphContext graphContext, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        protected MindEventContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
         {
-            GraphContext = graphContext;
+            GraphDescriptor = graphDescriptor;
             Settings = settings;
             IdGraph = idGraph;
         }
@@ -34,8 +34,8 @@ namespace Associativy.EventHandlers
 
     public class BeforeWholeContentGraphBuildingContext : MindEventContext
     {
-        public BeforeWholeContentGraphBuildingContext(IGraphContext graphContext, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
-            : base(graphContext, settings, idGraph)
+        public BeforeWholeContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+            : base(graphDescriptor, settings, idGraph)
         {
         }
     }
@@ -44,8 +44,8 @@ namespace Associativy.EventHandlers
     {
         public IContent CenterNode { get; private set; }
 
-        public BeforePartialContentGraphBuildingContext(IGraphContext graphContext, IMindSettings settings, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
-            : base(graphContext, settings, idGraph)
+        public BeforePartialContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+            : base(graphDescriptor, settings, idGraph)
         {
             CenterNode = centerNode;
         }
@@ -55,8 +55,8 @@ namespace Associativy.EventHandlers
     {
         public IEnumerable<IContent> Nodes { get; private set; }
 
-        public BeforeSearchedContentGraphBuildingContext(IGraphContext graphContext, IMindSettings settings, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
-            : base(graphContext, settings, idGraph)
+        public BeforeSearchedContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+            : base(graphDescriptor, settings, idGraph)
         {
             Nodes = nodes;
         }

@@ -9,15 +9,12 @@ namespace Associativy.Tests.Helpers
     {
         public static IGraphContext TestGraphContext()
         {
-            return new GraphContext { GraphName = "TestGraph", ContentTypes = new string[] { "Notion" } };
+            return new GraphContext { Name = "TestGraph", ContentTypes = new string[] { "Notion" } };
         }
 
-        public static NotionGraphBuilder BuildTestGraph(IContainer container, IGraphContext graphContext = null)
+        public static NotionGraphBuilder BuildTestGraph(IContentManager contentManager, IGraphDescriptor graphDescriptor)
         {
-            graphContext = graphContext ?? TestGraphContext();
-            var connectionManager = container.Resolve<IGraphManager>().FindGraph(graphContext).PathServices.ConnectionManager;
-
-            var graphBuilder = new NotionGraphBuilder(container.Resolve<IContentManager>(), graphContext, connectionManager);
+            var graphBuilder = new NotionGraphBuilder(contentManager, graphDescriptor);
             graphBuilder.Build(false, false);
             return graphBuilder;
         }

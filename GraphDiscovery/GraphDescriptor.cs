@@ -10,28 +10,22 @@ namespace Associativy.GraphDiscovery
     /// Describes the capabilities of an associative graph
     /// </summary>
     [OrchardFeature("Associativy")]
-    public class GraphDescriptor
+    public class GraphDescriptor : IGraphDescriptor
     {
-        public string GraphName { get; private set; }
-        public LocalizedString DisplayGraphName { get; private set; }
+        public string Name { get; private set; }
+        public LocalizedString DisplayName { get; private set; }
         public IEnumerable<string> ContentTypes { get; private set; }
 
-        private readonly Lazy<IPathServices> _pathServicesField;
-        public IPathServices PathServices
-        {
-            get
-            {
-                return _pathServicesField.Value;
-            }
-        }
+        private readonly Lazy<IGraphServices> _graphServicesField;
+        public IGraphServices Services { get { return _graphServicesField.Value; } }
 
 
-        public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IPathServices> pathServicesFactory)
+        public GraphDescriptor(string name, LocalizedString displayName, IEnumerable<string> contentTypes, Func<IGraphDescriptor, IGraphServices> servicesFactory)
         {
-            GraphName = name;
-            DisplayGraphName = displayName;
+            Name = name;
+            DisplayName = displayName;
             ContentTypes = contentTypes;
-            _pathServicesField = new Lazy<IPathServices>(pathServicesFactory);
+            _graphServicesField = new Lazy<IGraphServices>(() => servicesFactory(this));
         }
     }
 

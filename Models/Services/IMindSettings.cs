@@ -1,6 +1,6 @@
 ﻿using Orchard.ContentManagement;
 
-namespace Associativy.Models.Mind
+namespace Associativy.Models.Services
 {
     public interface IMindSettings
     {
@@ -20,7 +20,7 @@ namespace Associativy.Models.Mind
         int ZoomLevel { get; set; }
 
         /// <summary>
-        /// Maximal number of zoom levels.
+        /// Maximal number of zoom levels
         /// </summary>
         int ZoomLevelCount { get; set; }
 
@@ -28,6 +28,11 @@ namespace Associativy.Models.Mind
         /// Maximal distance between two nodes that can be considered as related
         /// </summary>
         int MaxDistance { get; set; }
+
+        /// <summary>
+        /// Maximal number of nodes retrieved
+        /// </summary>
+        int MaxNodeCount { get; set; }
     }
 
     public static class MindSettingsExtensions
@@ -41,6 +46,7 @@ namespace Associativy.Models.Mind
                 ZoomLevel = settings.ZoomLevel,
                 ZoomLevelCount = settings.ZoomLevelCount,
                 MaxDistance = settings.MaxDistance,
+                MaxNodeCount = settings.MaxNodeCount
             };
         }
     }

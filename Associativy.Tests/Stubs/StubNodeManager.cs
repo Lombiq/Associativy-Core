@@ -5,35 +5,42 @@ using System.Text;
 using Associativy.Services;
 using Orchard.ContentManagement;
 using Associativy.GraphDiscovery;
+using QuickGraph;
 
 namespace Associativy.Tests.Stubs
 {
     public class StubNodeManager : INodeManager
     {
-        public IContentQuery<ContentItem> GetQuery(IGraphContext graphContext)
+        public IContentQuery<ContentItem> GetQuery()
         {
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManyQuery(IGraphContext graphContext, IEnumerable<int> ids)
+        public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)
         {
             return new StubContentQuery();
         }
 
-        public IContentQuery<ContentItem> GetSimilarNodesQuery(IGraphContext graphContext, string labelSnippet)
+        public IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet)
         {
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManyByLabelQuery(IGraphContext graphContext, IEnumerable<string> labels)
+        public IContentQuery<ContentItem> GetManyByLabelQuery(IEnumerable<string> labels)
         {
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetByLabelQuery(IGraphContext graphContext, string label)
+        public IContentQuery<ContentItem> GetByLabelQuery(string label)
         {
             throw new NotImplementedException();
         }
+
+        public IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        {
+            throw new NotImplementedException();
+        }
+
 
         private class StubContentQuery : IContentQuery<ContentItem>
         {

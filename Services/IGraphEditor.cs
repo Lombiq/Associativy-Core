@@ -29,12 +29,5 @@ namespace Associativy.Services
         /// <param name="graph">The graph to check</param>
         /// <param name="maximalZoomLevelCount">Number of zoom levels</param>
         int CalculateZoomLevelCount<TNode>(IUndirectedGraph<TNode, IUndirectedEdge<TNode>> graph, int maximalZoomLevelCount);
-
-        /// <summary>
-        /// Creates a graph of content items from a graph of content item IDs
-        /// </summary>
-        /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
-        /// <param name="idGraph">Graph of the IDs</param>
-        IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IGraphContext graphContext, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph);
     }
 }

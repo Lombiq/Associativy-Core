@@ -5,42 +5,51 @@ using Associativy.Services;
 using Moq;
 using Orchard.Tests.Stubs;
 using Associativy.Tests.Helpers;
+using System;
+using Autofac;
 
 namespace Associativy.Tests.Stubs
 {
     public class StubGraphManager : IGraphManager
     {
-        private static PathServices _pathServices;
+        private readonly IGraphServicesFactory _graphServicesFactory;
 
-        public StubGraphManager()
+
+        public StubGraphManager(IGraphServicesFactory<IMind, IConnectionManager, IPathFinder, INodeManager, IGraphStatisticsService> graphServicesFactory)
         {
-            if (_pathServices == null) _pathServices = new PathServices(
-                new MemoryConnectionManager(this, new StubCacheManager(), new Mock<IGraphEventHandler>().Object),
-                new StandardPathFinder(this, new StubGraphEditor(), new Mock<IGraphEventMonitor>().Object, new StubCacheManager()));
+            _graphServicesFactory = graphServicesFactory;
         }
 
-        public GraphDescriptor FindGraph(IGraphContext graphContext)
+
+        public IGraphDescriptor FindGraph(IGraphContext graphContext)
         {
             return TestGraphDescriptor();
         }
 
-        public IEnumerable<GraphDescriptor> FindGraphs(IGraphContext graphContext)
+        public IEnumerable<IGraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
             return new GraphDescriptor[] { TestGraphDescriptor() };
         }
 
-        public IEnumerable<GraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
+        public IEnumerable<IGraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
         {
             return new GraphDescriptor[] { TestGraphDescriptor() };
         }
+
+
+        public static void Setup(ContainerBuilder builder)
+        {
+            builder.RegisterGeneric(typeof(GraphServicesFactory<,,,,>)).As(typeof(IGraphServicesFactory<,,,,>));
+        }
+
 
         private GraphDescriptor TestGraphDescriptor()
         {
-            return new GraphDescriptor(
-                TestGraphHelper.TestGraphContext().GraphName,
-                new Orchard.Localization.LocalizedString("Test Graph"),
-                TestGraphHelper.TestGraphContext().ContentTypes,
-                () => _pathServices);
+            return  new GraphDescriptor(
+                    TestGraphHelper.TestGraphContext().Name,
+                    new Orchard.Localization.LocalizedString("Test Graph"),
+                    TestGraphHelper.TestGraphContext().ContentTypes,
+                    _graphServicesFactory.Factory);
         }
     }
 }

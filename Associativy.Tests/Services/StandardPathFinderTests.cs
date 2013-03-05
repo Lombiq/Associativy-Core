@@ -23,14 +23,15 @@ using Orchard.Tests.UI.Navigation;
 using Orchard.Tests.Utility;
 using QuickGraph;
 using Associativy.Tests.Helpers;
-using Associativy.Models.PathFinder;
+using Associativy.Models.Services;
 
 namespace Associativy.Tests.Services
 {
     [TestFixture]
     public class StandardPathFinderTests : ContentManagerEnabledTestBase
     {
-        private IPathFinder _pathFinder;
+        private IGraphDescriptor _graphDescriptor;
+        private IContentManager _contentManager;
 
         [SetUp]
         public override void Init()
@@ -41,14 +42,17 @@ namespace Associativy.Tests.Services
 
 
             builder.RegisterInstance(new GraphEventMonitor(new Signals(), new SignalStorage())).As<IGraphEventMonitor>();
-            builder.RegisterInstance(new StubGraphManager()).As<IGraphManager>();
             builder.RegisterInstance(new StubGraphEditor()).As<IGraphEditor>();
+            builder.RegisterInstance(new StubCacheManager()).As<ICacheManager>();
+            builder.RegisterType<StubGraphManager>().As<IGraphManager>();
+            builder.RegisterType<MemoryConnectionManager>().As<IConnectionManager>();
             builder.RegisterType<StandardPathFinder>().As<IPathFinder>();
-
+            StubGraphManager.Setup(builder);
 
             builder.Update(_container);
 
-            _pathFinder = _container.Resolve<IPathFinder>();
+            _graphDescriptor = _container.Resolve<IGraphManager>().FindGraph(null);
+            _contentManager = _container.Resolve<IContentManager>();
         }
 
         [TestFixtureTearDown]
@@ -59,7 +63,7 @@ namespace Associativy.Tests.Services
         [Test]
         public void SinglePathsAreFound()
         {
-            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+            var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["medicine"], nodes["colour"]);
             var succeededGraph = result.SucceededGraph;
@@ -79,7 +83,7 @@ namespace Associativy.Tests.Services
         [Test]
         public void SinglePathsAreFound2()
         {
-            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+            var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["American"], nodes["writer"]);
             var succeededGraph = result.SucceededGraph;
@@ -99,7 +103,7 @@ namespace Associativy.Tests.Services
         [Test]
         public void DualPathsAreFound()
         {
-            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+            var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["yellow"], nodes["light year"]);
             var succeededGraph = result.SucceededGraph;
@@ -123,7 +127,7 @@ namespace Associativy.Tests.Services
         [Test]
         public void TooLongPathsAreNotFound()
         {
-            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+            var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["blue"], nodes["medicine"]);
             var succeededGraph = result.SucceededGraph;
@@ -138,7 +142,7 @@ namespace Associativy.Tests.Services
         [Test]
         public void NotConnectedPathsAreNotFound()
         {
-            var nodes = TestGraphHelper.BuildTestGraph(_container).Nodes;
+            var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["writer"], nodes["plant"]);
             var succeededGraph = result.SucceededGraph;
@@ -152,7 +156,7 @@ namespace Associativy.Tests.Services
 
         public PathResult CalcPathResult(IContent node1, IContent node2)
         {
-            return _pathFinder.FindPaths(TestGraphHelper.TestGraphContext(), node1.Id, node2.Id, PathFinderSettings.Default);
+            return _graphDescriptor.Services.PathFinder.FindPaths(node1.Id, node2.Id, PathFinderSettings.Default);
         }
     }
 }

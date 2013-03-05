@@ -5,36 +5,36 @@ namespace Associativy.EventHandlers
 {
     public abstract class GraphEventHandlerBase : IGraphEventHandler
     {
-        public virtual void NodeAdded(IGraphContext graphContext, IContent node)
+        public virtual void NodeAdded(IGraphDescriptor graphDescriptor, IContent node)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public virtual void NodeRemoved(IGraphContext graphContext, IContent node)
+        public virtual void NodeRemoved(IGraphDescriptor graphDescriptor, IContent node)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public virtual void NodeChanged(IGraphContext graphContext, IContent node)
+        public virtual void NodeChanged(IGraphDescriptor graphDescriptor, IContent node)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionAdded(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual void ConnectionAdded(IGraphDescriptor graphDescriptor, int nodeId1, int nodeId2)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionsDeletedFromNode(IGraphContext graphContext, int nodeId)
+        public virtual void ConnectionsDeletedFromNode(IGraphDescriptor graphDescriptor, int nodeId)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public virtual void ConnectionDeleted(IGraphContext graphContext, int nodeId1, int nodeId2)
+        public virtual void ConnectionDeleted(IGraphDescriptor graphDescriptor, int nodeId1, int nodeId2)
         {
-            Changed(graphContext);
+            Changed(graphDescriptor);
         }
 
-        public abstract void Changed(IGraphContext graphContext);
+        public abstract void Changed(IGraphDescriptor graphDescriptor);
     }
 }
