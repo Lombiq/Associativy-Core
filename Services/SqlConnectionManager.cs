@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
@@ -24,12 +25,12 @@ namespace Associativy.Services
         public SqlConnectionManager(
             IGraphDescriptor graphDescriptor,
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
-            IMemoryConnectionManager memoryConnectionManager,
+            Func<IGraphDescriptor, IMemoryConnectionManager> memoryConnectionManagerFactory,
             IGraphEventHandler graphEventHandler)
             : base(graphDescriptor)
         {
             _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            _memoryConnectionManager = memoryConnectionManager;
+            _memoryConnectionManager = memoryConnectionManagerFactory(graphDescriptor);
             _graphEventHandler = graphEventHandler;
         }
 

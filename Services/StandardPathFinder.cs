@@ -70,6 +70,7 @@ namespace Associativy.Services
         }
         #endregion
 
+
         public virtual PathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
             if (settings == null) settings = PathFinderSettings.Default;
@@ -82,10 +83,15 @@ namespace Associativy.Services
                 return _cacheManager.Get("Associativy.Paths." + _graphDescriptor.Name + startNodeId.ToString() + targetNodeId.ToString() + settings.MaxDistance, ctx =>
                 {
                     _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
-                    return FindPaths(startNodeId, targetNodeId, settings);
+                    return FindPathsUncached(startNodeId, targetNodeId, settings);
                 });
             }
 
+            return FindPathsUncached(startNodeId, targetNodeId, settings);
+        }
+
+        protected PathResult FindPathsUncached(int startNodeId, int targetNodeId, IPathFinderSettings settings)
+        {
             // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
             // keeps track of the paths found.
             var connectionManager = _graphDescriptor.Services.ConnectionManager;
