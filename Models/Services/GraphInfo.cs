@@ -11,5 +11,6 @@ namespace Associativy.Models.Services
     {
         public int NodeCount { get; set; }
         public int ConnectionCount { get; set; }
+        public int CentralNodeId { get; set; }
     }
 }
