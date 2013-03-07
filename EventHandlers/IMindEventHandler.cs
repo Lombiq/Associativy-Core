@@ -12,9 +12,9 @@ namespace Associativy.EventHandlers
 {
     public interface IMindEventHandler : IEventHandler
     {
-        void BeforeWholeContentGraphBuilding(BeforeWholeContentGraphBuildingContext context);
-        void BeforePartialContentGraphBuilding(BeforePartialContentGraphBuildingContext context);
-        void BeforeSearchedContentGraphBuilding(BeforeSearchedContentGraphBuildingContext context);
+        void AllAssociationsGraphBuilt(AllAssociationsGraphBuiltContext context);
+        void PartialGraphBuilt(PartialGraphBuiltContext context);
+        void SearchedGraphBuilt(SearchedGraphBuiltContext context);
     }
 
 
@@ -32,30 +32,30 @@ namespace Associativy.EventHandlers
         }
     }
 
-    public class BeforeWholeContentGraphBuildingContext : MindEventContext
+    public class AllAssociationsGraphBuiltContext : MindEventContext
     {
-        public BeforeWholeContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public AllAssociationsGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
         }
     }
 
-    public class BeforePartialContentGraphBuildingContext : MindEventContext
+    public class PartialGraphBuiltContext : MindEventContext
     {
         public IContent CenterNode { get; private set; }
 
-        public BeforePartialContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public PartialGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
             CenterNode = centerNode;
         }
     }
 
-    public class BeforeSearchedContentGraphBuildingContext : MindEventContext
+    public class SearchedGraphBuiltContext : MindEventContext
     {
         public IEnumerable<IContent> Nodes { get; private set; }
 
-        public BeforeSearchedContentGraphBuildingContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public SearchedGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
             Nodes = nodes;
