@@ -44,11 +44,11 @@ namespace Associativy.Services
         }
 
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings)
+        public virtual IMindResult GetAllAssociations(IMindSettings settings)
         {
             MakeSettings(ref settings);
 
-            return MakeGraph(
+            return MakeResult(
                 () =>
                 {
                     var graph = _graphEditor.GraphFactory<int>();
@@ -66,7 +66,7 @@ namespace Associativy.Services
                 "WholeGraph");
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        public virtual IMindResult MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             if (nodes == null) throw new ArgumentNullException("nodes");
 
@@ -92,13 +92,13 @@ namespace Associativy.Services
             }
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings)
+        public virtual IMindResult GetPartialGraph(IContent centerNode, IMindSettings settings)
         {
             if (centerNode == null) throw new ArgumentNullException("centerNode");
 
             MakeSettings(ref settings);
 
-            return MakeGraph(
+            return MakeResult(
                 () =>
                 {
                     var graph = _graphDescriptor.Services.PathFinder.FindPaths(centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
@@ -110,9 +110,9 @@ namespace Associativy.Services
         }
 
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(IContent node, IMindSettings settings)
+        protected virtual IMindResult GetNeighboursGraph(IContent node, IMindSettings settings)
         {
-            return MakeGraph(
+            return MakeResult(
                 () =>
                 {
                     var graph = _graphEditor.GraphFactory<int>();
@@ -131,9 +131,9 @@ namespace Associativy.Services
                 "NeighboursGraph." + node.ContentItem.Id.ToString());
         }
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSimpleAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        protected virtual IMindResult MakeSimpleAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
-            return MakeGraph(
+            return MakeResult(
                 () =>
                 {
                     // Simply calculate the intersection of the neighbours of the nodes
@@ -165,7 +165,7 @@ namespace Associativy.Services
                 "SimpleAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
         }
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSophisticatedAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        protected virtual IMindResult MakeSophisticatedAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             var nodeList = nodes.ToList();
             var nodeCount = nodeList.Count;
@@ -184,7 +184,7 @@ namespace Associativy.Services
                     return succeededNodeIds;
                 };
 
-            return MakeGraph(
+            return MakeResult(
                 () =>
                 {
                     #region Experimental graph merging
@@ -367,22 +367,38 @@ namespace Associativy.Services
                 "SophisticatedAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
         }
 
-        protected IUndirectedGraph<int, IUndirectedEdge<int>> MakeGraph(
+        protected IMindResult MakeResult(
             Func<IUndirectedGraph<int, IUndirectedEdge<int>>> createIdGraph,
             IMindSettings settings,
             string cacheKey)
         {
-            if (settings.UseCache)
-            {
-                cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
-                return _cacheManager.Get(cacheKey, ctx =>
+            return new MindResult(
+                (mindResult) =>
                 {
-                    _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
-                    return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
-                });
-            }
+                    return createIdGraph();
+                },
+                (mindResult) =>
+                {
+                    if (settings.UseCache)
+                    {
+                        cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
+                        return _cacheManager.Get(cacheKey, ctx =>
+                        {
+                            _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
+                            return _graphEditor.CreateZoomedGraph<int>(mindResult.UnzoomedIdGraph, settings.ZoomLevel, settings.ZoomLevelCount);
+                        });
+                    }
 
-            return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+                    return _graphEditor.CreateZoomedGraph<int>(mindResult.UnzoomedIdGraph, settings.ZoomLevel, settings.ZoomLevelCount);
+                },
+                (mindResult) =>
+                {
+                    return _graphDescriptor.Services.NodeManager.MakeContentGraph(mindResult.IdGraph);
+                },
+                (mindResult) =>
+                {
+                    return _graphEditor.CalculateZoomLevelCount(mindResult.UnzoomedIdGraph, settings.ZoomLevelCount);
+                });
         }
 
 

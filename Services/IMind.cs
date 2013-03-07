@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
 using Orchard;
@@ -13,56 +14,54 @@ namespace Associativy.Services
     public interface IMind
     {
         /// <summary>
-        /// Returns the whole association graph, containing the ids of the content items
+        /// Returns all the associations
         /// </summary>
         /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings);
+        IMindResult GetAllAssociations(IMindSettings settings);
 
         /// <summary>
-        /// Makes associations upon the specified nodes, containing the ids of the content items
+        /// Makes associations upon the specified nodes
         /// </summary>
         /// <param name="nodes">The nodes to search associations between</param>
         /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings);
+        IMindResult MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings);
 
         /// <summary>
-        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing the ids of the content items
+        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range
         /// </summary>
         /// <param name="centerNode">The node paths willl be calculated from</param>
         /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings);
+        IMindResult GetPartialGraph(IContent centerNode, IMindSettings settings);
     }
 
-
-    public static class MindExtensions
+    public interface IMindResult
     {
-        /// <summary>
-        /// Returns the whole association graph, containing content items
-        /// </summary>
-        /// <param name="settings">Mind settings</param>
-        public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociationsContent(this IMind mind, INodeManager nodeManager, IMindSettings settings)
-        {
-            return nodeManager.MakeContentGraph(mind.GetAllAssociations(settings));
-        }
+        IUndirectedGraph<int, IUndirectedEdge<int>> IdGraph { get; }
+        IUndirectedGraph<IContent, IUndirectedEdge<IContent>> ContentGraph { get; }
+        int ActualZoomLevelCount { get; }
+    }
 
-        /// <summary>
-        /// Makes associations upon the specified nodes, containing content items
-        /// </summary>
-        /// <param name="nodes">The nodes to search associations between</param>
-        /// <param name="settings">Mind settings</param>
-        public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociationsContent(this IMind mind, INodeManager nodeManager, IEnumerable<IContent> nodes, IMindSettings settings)
-        {
-            return nodeManager.MakeContentGraph(mind.MakeAssociations(nodes, settings));
-        }
+    public class MindResult : IMindResult
+    {
+        private readonly Lazy<IUndirectedGraph<int, IUndirectedEdge<int>>> _unzoomedIdGraphLazy;
+        public IUndirectedGraph<int, IUndirectedEdge<int>> UnzoomedIdGraph { get { return _unzoomedIdGraphLazy.Value; } }
 
-        /// <summary>
-        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing content items
-        /// </summary>
-        /// <param name="centerNode">The node paths willl be calculated from</param>
-        /// <param name="settings">Mind settings</param>
-        public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraphContent(this IMind mind, INodeManager nodeManager, IContent centerNode, IMindSettings settings)
+        private readonly Lazy<IUndirectedGraph<int, IUndirectedEdge<int>>> _idGraphLazy;
+        public IUndirectedGraph<int, IUndirectedEdge<int>> IdGraph { get { return _idGraphLazy.Value; } }
+
+        private readonly Lazy<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>> _contentGraphLazy;
+        public IUndirectedGraph<IContent, IUndirectedEdge<IContent>> ContentGraph { get { return _contentGraphLazy.Value; } }
+
+        private readonly Lazy<int> _actualZoomLevelCountLazy;
+        public int ActualZoomLevelCount { get { return _actualZoomLevelCountLazy.Value; } }
+
+
+        public MindResult(Func<MindResult, IUndirectedGraph<int, IUndirectedEdge<int>>> unzoomedIdGraphFactory, Func<MindResult, IUndirectedGraph<int, IUndirectedEdge<int>>> idGraphFactory, Func<MindResult, IUndirectedGraph<IContent, IUndirectedEdge<IContent>>> contentGraphFactory, Func<MindResult, int> actualZoomLevelCountFactory)
         {
-            return nodeManager.MakeContentGraph(mind.GetPartialGraph(centerNode, settings));
+            _unzoomedIdGraphLazy = new Lazy<IUndirectedGraph<int, IUndirectedEdge<int>>>(() => unzoomedIdGraphFactory(this));
+            _idGraphLazy = new Lazy<IUndirectedGraph<int, IUndirectedEdge<int>>>(() => idGraphFactory(this));
+            _contentGraphLazy = new Lazy<IUndirectedGraph<IContent, IUndirectedEdge<IContent>>>(() => contentGraphFactory(this));
+            _actualZoomLevelCountLazy = new Lazy<int>(() => actualZoomLevelCountFactory(this));
         }
     }
 }
