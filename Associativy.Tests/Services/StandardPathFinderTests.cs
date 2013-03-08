@@ -154,7 +154,7 @@ namespace Associativy.Tests.Services
             Assert.That(succeededPaths.Count(), Is.EqualTo(0));
         }
 
-        public PathResult CalcPathResult(IContent node1, IContent node2)
+        public IPathResult CalcPathResult(IContent node1, IContent node2)
         {
             return _graphDescriptor.Services.PathFinder.FindPaths(node1.Id, node2.Id, PathFinderSettings.Default);
         }

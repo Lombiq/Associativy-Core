@@ -71,7 +71,7 @@ namespace Associativy.Services
         #endregion
 
 
-        public virtual PathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings)
+        public virtual IPathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
             if (settings == null) settings = PathFinderSettings.Default;
 
@@ -90,7 +90,7 @@ namespace Associativy.Services
             return FindPathsUncached(startNodeId, targetNodeId, settings);
         }
 
-        protected PathResult FindPathsUncached(int startNodeId, int targetNodeId, IPathFinderSettings settings)
+        protected IPathResult FindPathsUncached(int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
             // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
             // keeps track of the paths found.

@@ -17,7 +17,7 @@ namespace Associativy.Services
         /// <param name="startNodeId"></param>
         /// <param name="targetNodeId"></param>
         /// <param name="settings"></param>
-        PathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings);
+        IPathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings);
     }
 
     public interface IPathResult
