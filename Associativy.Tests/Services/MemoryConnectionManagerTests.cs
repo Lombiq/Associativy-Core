@@ -33,6 +33,8 @@ namespace Associativy.Tests.Services
             _container = builder.Build();
 
             _memoryConnectionManager = _container.Resolve<IMemoryConnectionManager>();
+
+            SetupTestGraph();
         }
 
         [TestFixtureTearDown]
@@ -43,8 +45,6 @@ namespace Associativy.Tests.Services
         [Test]
         public void ConnectionsShouldBePersisted()
         {
-            SetupTestGraph();
-
             Assert.That(_memoryConnectionManager.GetConnectionCount(), Is.EqualTo(6));
 
             var connections = _memoryConnectionManager.GetAll(0, int.MaxValue);
@@ -67,8 +67,6 @@ namespace Associativy.Tests.Services
         [Test]
         public void NeighbourCountsAreValid()
         {
-            SetupTestGraph();
-
             Assert.That(_memoryConnectionManager.GetNeighbourCount(1), Is.EqualTo(3));
             Assert.That(_memoryConnectionManager.GetNeighbourCount(2), Is.EqualTo(3));
             Assert.That(_memoryConnectionManager.GetNeighbourCount(3), Is.EqualTo(2));
@@ -79,8 +77,6 @@ namespace Associativy.Tests.Services
         [Test]
         public void AllNeighboursCanBeDeleted()
         {
-            SetupTestGraph();
-
             _memoryConnectionManager.DeleteFromNode(1);
 
             Assert.That(_memoryConnectionManager.GetConnectionCount(), Is.EqualTo(3));
@@ -91,8 +87,6 @@ namespace Associativy.Tests.Services
         [Test]
         public void NeighboursAreProperlyFetched()
         {
-            SetupTestGraph();
-
             var neighbours = _memoryConnectionManager.GetNeighbourIds(2);
 
             Assert.That(neighbours.Count(), Is.EqualTo(3));
@@ -104,8 +98,6 @@ namespace Associativy.Tests.Services
         [Test]
         public void DisconnectRemovesConnection()
         {
-            SetupTestGraph();
-
             _memoryConnectionManager.Disconnect(4, 2);
 
             Assert.That(!_memoryConnectionManager.AreNeighbours(2, 4));
