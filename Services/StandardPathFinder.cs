@@ -147,7 +147,7 @@ namespace Associativy.Services
                     // If we haven't already fetched current's neighbours, fetch them
                     if (currentNode.Neighbours.Count == 0)
                     {
-                        var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id, 0, int.MaxValue);
+                        var neighbourIds = connectionManager.GetNeighbourIds(currentNode.Id);
                         currentNode.Neighbours = new List<PathNode>(neighbourIds.Count());
                         foreach (var neighbourId in neighbourIds)
                         {

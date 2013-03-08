@@ -85,7 +85,7 @@ namespace Associativy.Tests.Services
 
             Assert.That(_memoryConnectionManager.GetConnectionCount(), Is.EqualTo(3));
             Assert.That(_memoryConnectionManager.GetNeighbourCount(1), Is.EqualTo(0));
-            Assert.That(_memoryConnectionManager.GetNeighbourIds(1, 0, int.MaxValue).Count(), Is.EqualTo(0));
+            Assert.That(_memoryConnectionManager.GetNeighbourIds(1).Count(), Is.EqualTo(0));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace Associativy.Tests.Services
         {
             SetupTestGraph();
 
-            var neighbours = _memoryConnectionManager.GetNeighbourIds(2, 0, int.MaxValue);
+            var neighbours = _memoryConnectionManager.GetNeighbourIds(2);
 
             Assert.That(neighbours.Count(), Is.EqualTo(3));
             Assert.That(neighbours.Contains(1));
@@ -110,7 +110,7 @@ namespace Associativy.Tests.Services
 
             Assert.That(!_memoryConnectionManager.AreNeighbours(2, 4));
             Assert.That(_memoryConnectionManager.GetNeighbourCount(4), Is.EqualTo(0));
-            Assert.That(_memoryConnectionManager.GetNeighbourIds(4, 0, int.MaxValue).Count(), Is.EqualTo(0));
+            Assert.That(_memoryConnectionManager.GetNeighbourIds(4).Count(), Is.EqualTo(0));
         }
 
 

@@ -87,10 +87,28 @@ namespace Associativy.Services
             connectionManager.Disconnect(node1.ContentItem.Id, node2.ContentItem.Id);
         }
 
+        public static IEnumerable<INodeToNodeConnector> GetAll<TConnectionManager>(this TConnectionManager connectionManager)
+            where TConnectionManager : IConnectionManager
+        {
+            return connectionManager.GetAll(0, int.MaxValue);
+        }
+
+        public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, int nodeId)
+            where TConnectionManager : IConnectionManager
+        {
+            return connectionManager.GetNeighbourIds(nodeId, 0, int.MaxValue);
+        }
+
         public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IContent node, int skip, int count)
             where TConnectionManager : IConnectionManager
         {
             return connectionManager.GetNeighbourIds(node.ContentItem.Id, skip, count);
+        }
+
+        public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IContent node)
+            where TConnectionManager : IConnectionManager
+        {
+            return connectionManager.GetNeighbourIds(node.ContentItem.Id);
         }
 
         public static int GetNeighbourCount<TConnectionManager>(this TConnectionManager connectionManager, IContent node)

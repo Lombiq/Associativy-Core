@@ -119,7 +119,7 @@ namespace Associativy.Services
 
                     graph.AddVertex(node.ContentItem.Id);
                     graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id, 0, int.MaxValue)
+                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)
                             .Take(settings.MaxNodeCount)
                             .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
 
@@ -139,10 +139,10 @@ namespace Associativy.Services
                     // Simply calculate the intersection of the neighbours of the nodes
                     var graph = _graphEditor.GraphFactory<int>();
 
-                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id, 0, int.MaxValue);
+                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id);
                     var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
                     remainingNodes.RemoveAt(0);
-                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id, 0, int.MaxValue)).ToList());
+                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList());
                     // Same as
                     //foreach (var node in remainingNodes)
                     //{
