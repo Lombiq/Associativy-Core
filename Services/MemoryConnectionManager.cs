@@ -20,7 +20,7 @@ namespace Associativy.Services
 
         /// <summary>
         /// Stores the connections.
-        /// Schema: [graphName][node1Id][node2Id] = connectionId. This aims fast lookup of connections between two nodes.
+        /// Schema: [graphName][node1Id][node2Id] = dummy. This aims fast lookup of connections between two nodes.
         /// </summary>
         /// <remarks>
         /// Race conditions could occur, revise if necessary.
