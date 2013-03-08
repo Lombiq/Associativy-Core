@@ -116,7 +116,7 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionDeleted(_graphDescriptor, node1Id, node2Id);
         }
 
-        public IEnumerable<INodeToNodeConnector> GetAll()
+        public IEnumerable<INodeToNodeConnector> GetAll(int skip, int count)
         {
             var addedConnections = new HashSet<string>();
             var connectors = new List<INodeToNodeConnector>();
@@ -136,7 +136,7 @@ namespace Associativy.Services
             return connectors.Cast<INodeToNodeConnector>();
         }
 
-        public IEnumerable<int> GetNeighbourIds(int nodeId)
+        public IEnumerable<int> GetNeighbourIds(int nodeId, int skip, int count)
         {
             ConcurrentDictionary<int, bool> subDictionary;
 
@@ -147,7 +147,7 @@ namespace Associativy.Services
 
         public int GetNeighbourCount(int nodeId)
         {
-            return GetNeighbourIds(nodeId).Count();
+            return GetNeighbourIds(nodeId, 0, int.MaxValue).Count();
         }
 
 

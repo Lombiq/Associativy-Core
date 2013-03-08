@@ -45,15 +45,19 @@ namespace Associativy.Services
         /// Returns all connector objects
         /// </summary>
         /// <param name="graphContext">The IGraphContext instance to use with the operation</param>
+        /// <param name="skip">Number of items to skip from the beginning of the sequence</param>
+        /// <param name="count">The maximal number of items to return</param>
         /// <returns>All connector objects</returns>
-        IEnumerable<INodeToNodeConnector> GetAll();
+        IEnumerable<INodeToNodeConnector> GetAll(int skip, int count);
 
         /// <summary>
         /// Returns the ids of all the directly connected (= neighbour) nodes
         /// </summary>
         /// <param name="nodeId">Id of the node</param>
+        /// <param name="skip">Number of items to skip from the beginning of the sequence</param>
+        /// <param name="count">The maximal number of items to return</param>
         /// <returns>The ids of all the directly connected (= neighbour) nodes</returns>
-        IEnumerable<int> GetNeighbourIds(int nodeId);
+        IEnumerable<int> GetNeighbourIds(int nodeId, int skip, int count);
 
         /// <summary>
         /// Returns the count of all the directly connected (= neighbour) nodes
@@ -83,10 +87,10 @@ namespace Associativy.Services
             connectionManager.Disconnect(node1.ContentItem.Id, node2.ContentItem.Id);
         }
 
-        public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IContent node)
+        public static IEnumerable<int> GetNeighbourIds<TConnectionManager>(this TConnectionManager connectionManager, IContent node, int skip, int count)
             where TConnectionManager : IConnectionManager
         {
-            return connectionManager.GetNeighbourIds(node.ContentItem.Id);
+            return connectionManager.GetNeighbourIds(node.ContentItem.Id, skip, count);
         }
 
         public static int GetNeighbourCount<TConnectionManager>(this TConnectionManager connectionManager, IContent node)

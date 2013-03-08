@@ -55,7 +55,7 @@ namespace Associativy.Services
 
                     // This won't include nodes that are not connected to anything
                     graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetAll()
+                        _graphDescriptor.Services.ConnectionManager.GetAll(0, int.MaxValue)
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
                     _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
@@ -119,7 +119,7 @@ namespace Associativy.Services
 
                     graph.AddVertex(node.ContentItem.Id);
                     graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)
+                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id, 0, int.MaxValue)
                             .Take(settings.MaxNodeCount)
                             .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
 
@@ -139,10 +139,10 @@ namespace Associativy.Services
                     // Simply calculate the intersection of the neighbours of the nodes
                     var graph = _graphEditor.GraphFactory<int>();
 
-                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id);
+                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id, 0, int.MaxValue);
                     var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
                     remainingNodes.RemoveAt(0);
-                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList());
+                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id, 0, int.MaxValue)).ToList());
                     // Same as
                     //foreach (var node in remainingNodes)
                     //{
