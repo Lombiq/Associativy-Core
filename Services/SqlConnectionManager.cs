@@ -116,6 +116,8 @@ namespace Associativy.Services
 
         public virtual int GetNeighbourCount(int nodeId)
         {
+            TryLoadConnections();
+
             return _memoryConnectionManager.GetNeighbourCount(nodeId);
         }
     }

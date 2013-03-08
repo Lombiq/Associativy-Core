@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Associativy.GraphDiscovery;
+using Associativy.Models;
 using Associativy.Services;
 using Associativy.Tests.Stubs;
 using Autofac;
@@ -47,7 +48,7 @@ namespace Associativy.Tests.Services
         {
             Assert.That(_memoryConnectionManager.GetConnectionCount(), Is.EqualTo(6));
 
-            var connections = _memoryConnectionManager.GetAll(0, int.MaxValue);
+            var connections = _memoryConnectionManager.GetAll();
 
             Action<int, int> checkBothWays =
             (node1Id, node2Id) =>
@@ -103,6 +104,54 @@ namespace Associativy.Tests.Services
             Assert.That(!_memoryConnectionManager.AreNeighbours(2, 4));
             Assert.That(_memoryConnectionManager.GetNeighbourCount(4), Is.EqualTo(0));
             Assert.That(_memoryConnectionManager.GetNeighbourIds(4).Count(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetAllPagingWorks()
+        {
+            Action<INodeToNodeConnector, int, int> checkConnection =
+                (connector, id1, id2) =>
+                {
+                    Assert.That(connector.Node1Id == id1 && connector.Node2Id == id2 || connector.Node1Id == id2 && connector.Node2Id == id1);
+                };
+
+            var page1 = _memoryConnectionManager.GetAll(0, 2);
+            var page2 = _memoryConnectionManager.GetAll(2, 2);
+            var page3 = _memoryConnectionManager.GetAll(4, 5);
+            var page4 = _memoryConnectionManager.GetAll(6, 2);
+
+            Assert.That(page1.Count(), Is.EqualTo(2));
+            Assert.That(page2.Count(), Is.EqualTo(2));
+            Assert.That(page3.Count(), Is.EqualTo(2));
+            Assert.That(page4.Count(), Is.EqualTo(0));
+
+            checkConnection(page1.First(), 1, 2);
+            checkConnection(page1.Last(), 1, 3);
+            checkConnection(page2.First(), 1, 5);
+            checkConnection(page2.Last(), 2, 4);
+            checkConnection(page3.First(), 2, 5);
+            checkConnection(page3.Last(), 3, 5);
+        }
+
+        [Test]
+        public void GetNeighbourIdsPagingWorsk()
+        {
+            Action<IEnumerable<int>, IEnumerable<int>> checkSequence =
+                (sequence1, sequence2) =>
+                    {
+                        Assert.That(sequence1.Except(sequence2).Count(), Is.EqualTo(0));
+                    };
+
+            var oneNeighbourIds1 = _memoryConnectionManager.GetNeighbourIds(1, 0, 2);
+            var oneNeighbourIds2 = _memoryConnectionManager.GetNeighbourIds(1, 2, 2);
+
+            var fiveNeighbourIds1 = _memoryConnectionManager.GetNeighbourIds(5, 1, 5);
+            var fivetNeighbourIds2 = _memoryConnectionManager.GetNeighbourIds(5, 3, 2);
+
+            checkSequence(oneNeighbourIds1, new[] { 2, 3 });
+            checkSequence(oneNeighbourIds2, new[] { 5 });
+            checkSequence(fiveNeighbourIds1, new[] { 2, 3 });
+            checkSequence(fivetNeighbourIds2, new int[] { });
         }
 
 

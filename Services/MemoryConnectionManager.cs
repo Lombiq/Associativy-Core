@@ -21,7 +21,7 @@ namespace Associativy.Services
 
         /// <summary>
         /// Stores the connections.
-        /// Schema for connections: [graphName]->Graph.Connections[node1Id][node2Id] = dummy. This aims fast lookup of connections between two nodes.
+        /// Schema for connections: [graphName]->Graph.Connections[node1Id][node2Id] = 0/1 (even/odd). This aims fast lookup of connections between two nodes.
         /// </summary>
         /// <remarks>
         /// Race conditions could occur, revise if necessary.
@@ -58,7 +58,14 @@ namespace Associativy.Services
         {
             if (node1Id == node2Id) return true;
 
-            return GetNode(node1Id).Connections.ContainsKey(node2Id);
+            ConcurrentDictionary<int, byte> subDictionary;
+
+            if (GetGraph().Connections.TryGetValue(node1Id, out subDictionary))
+            {
+                return subDictionary.ContainsKey(node2Id);
+            }
+
+            return false;
         }
 
         public void Connect(int node1Id, int node2Id)
@@ -67,11 +74,16 @@ namespace Associativy.Services
 
             var graph = GetGraph();
 
-            var node1 = GetNode(node1Id);
-            var node2 = GetNode(node2Id);
-            node1.Connections[node2Id] = node2;
-            node2.Connections[node1Id] = node1;
+            Action<int, int, byte> storeConnection =
+                (id1, id2, parity) =>
+                {
+                    var subDictionary = graph.Connections.GetOrAdd(id1, new ConcurrentDictionary<int, byte>());
+                    subDictionary[id2] = parity;
+                };
 
+            // Storing both ways for fast access.
+            storeConnection(node1Id, node2Id, 0);
+            storeConnection(node2Id, node1Id, 1);
             Interlocked.Increment(ref graph.ConnectionCount);
 
             _graphEventHandler.ConnectionAdded(_graphDescriptor, node1Id, node2Id);
@@ -80,14 +92,13 @@ namespace Associativy.Services
         public void DeleteFromNode(int nodeId)
         {
             var graph = GetGraph();
-
-            Node node;
-            Node dummy;
-            if (graph.Nodes.TryRemove(nodeId, out node))
+            ConcurrentDictionary<int, byte> subDictionary;
+            if (graph.Connections.TryRemove(nodeId, out subDictionary))
             {
-                foreach (var neighbourId in node.Connections.Keys)
+                byte dummyValue;
+                foreach (var neighbourId in subDictionary.Keys)
                 {
-                    graph.Nodes[neighbourId].Connections.TryRemove(nodeId, out dummy);
+                    graph.Connections[neighbourId].TryRemove(nodeId, out dummyValue);
                     Interlocked.Decrement(ref graph.ConnectionCount);
                 }
             }
@@ -101,9 +112,9 @@ namespace Associativy.Services
 
             var graph = GetGraph();
 
-            Node dummy;
-            GetNode(node1Id).Connections.TryRemove(node2Id, out dummy);
-            GetNode(node2Id).Connections.TryRemove(node1Id, out dummy);
+            byte dummyValue;
+            graph.Connections[node1Id].TryRemove(node2Id, out dummyValue);
+            graph.Connections[node2Id].TryRemove(node1Id, out dummyValue);
 
             Interlocked.Decrement(ref graph.ConnectionCount);
 
@@ -112,32 +123,30 @@ namespace Associativy.Services
 
         public IEnumerable<INodeToNodeConnector> GetAll(int skip, int count)
         {
-            var addedConnections = new HashSet<string>();
-            var connectors = new List<INodeToNodeConnector>();
-
-            foreach (var node in GetGraph().Nodes.Values)
-            {
-                foreach (var connection in node.Connections)
-                {
-                    if (!addedConnections.Contains(node.Id + "-" + connection.Key) && !addedConnections.Contains(connection.Key + "-" + node.Id))
-                    {
-                        connectors.Add(new NodeConnector { Node1Id = node.Id, Node2Id = connection.Key });
-                        addedConnections.Add(node.Id + "-" + connection.Key);
-                    }
-                }
-            }
-
-            return connectors.Cast<INodeToNodeConnector>();
+            return GetGraph().Connections
+                    .SelectMany(subDictionaryKvp => subDictionaryKvp.Value
+                        .Where(kvp => kvp.Value == 0)
+                        .Select(kvp => new Associativy.Models.Nodes.NodeConnector { Node1Id = subDictionaryKvp.Key, Node2Id = kvp.Key })
+                        )
+                    .Skip(skip)
+                    .Take(count);
         }
 
         public IEnumerable<int> GetNeighbourIds(int nodeId, int skip, int count)
         {
-            return GetNode(nodeId).Connections.Keys;
+            ConcurrentDictionary<int, byte> subDictionary;
+
+            if (GetGraph().Connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys.Skip(skip).Take(count);
+
+            return Enumerable.Empty<int>();
         }
 
         public int GetNeighbourCount(int nodeId)
         {
-            return GetNeighbourIds(nodeId, 0, int.MaxValue).Count();
+            ConcurrentDictionary<int, byte> subDictionary;
+            if (GetGraph().Connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Count;
+
+            return 0;
         }
 
 
@@ -146,33 +155,16 @@ namespace Associativy.Services
             return Storage.GetOrAdd(_graphDescriptor.Name, new Graph());
         }
 
-        protected Node GetNode(int id)
-        {
-            return GetGraph().Nodes.GetOrAdd(id, new Node(id));
-        }
-
 
         protected class Graph
         {
             public int ConnectionCount;
-            public ConcurrentDictionary<int, Node> Nodes { get; private set; }
+            public ConcurrentDictionary<int, ConcurrentDictionary<int, byte>> Connections;
 
             public Graph()
             {
                 ConnectionCount = 0;
-                Nodes = new ConcurrentDictionary<int, Node>();
-            }
-        }
-
-        protected class Node
-        {
-            public int Id { get; private set; }
-            public ConcurrentDictionary<int, Node> Connections { get; private set; }
-
-            public Node(int id)
-            {
-                Id = id;
-                Connections = new ConcurrentDictionary<int, Node>();
+                Connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, byte>>();
             }
         }
     }
