@@ -41,7 +41,6 @@ namespace Associativy.Tests.Services
 
             var builder = new ContainerBuilder();
 
-
             builder.RegisterInstance(new GraphEventMonitor(new Signals(), new SignalStorage())).As<IGraphEventMonitor>();
             builder.RegisterInstance(new StubNodeManager()).As<INodeManager>();
             builder.RegisterInstance(new StubGraphEditor()).As<IGraphEditor>();

@@ -52,8 +52,9 @@ namespace Associativy.Services
         public int GetConnectionCount()
         {
             if (!Connections.ContainsKey(_graphDescriptor.Name)) return 0;
+
             // Dividing by 2 since connections are stored both ways
-            return Connections[_graphDescriptor.Name].Count / 2;
+            return Connections[_graphDescriptor.Name].Values.Sum(subDictionary => subDictionary.Count) / 2;
         }
 
         public bool AreNeighbours(int node1Id, int node2Id)
@@ -97,7 +98,7 @@ namespace Associativy.Services
                 byte dummyValue;
                 foreach (var neighbourId in subDictionary.Keys)
                 {
-                    graphConnections[neighbourId].TryRemove(neighbourId, out dummyValue);
+                    graphConnections[neighbourId].TryRemove(nodeId, out dummyValue);
                 }
             }
 

@@ -141,6 +141,7 @@
     <Compile Include="ContentManagerEnabledTestBase.cs" />
     <Compile Include="Helpers\PathVerifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\MemoryConnectionManagerTests.cs" />
     <Compile Include="Services\MindTests.cs" />
     <Compile Include="Services\StandardPathFinderTests.cs" />
     <Compile Include="Stubs\StubGraphEditor.cs" />
