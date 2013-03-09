@@ -129,6 +129,10 @@
     <Compile Include="Models\Services\IGraphInfo.cs" />
     <Compile Include="Models\Services\IPathFinderSettings.cs" />
     <Compile Include="Models\Services\PathFinderSettings.cs" />
+    <Compile Include="Queryable\IQueryableGraph.cs" />
+    <Compile Include="Queryable\IQueryableGraphFactory.cs" />
+    <Compile Include="Queryable\QueryableGraph.cs" />
+    <Compile Include="Queryable\QueryableGraphFactory.cs" />
     <Compile Include="Services\IGraphServices.cs" />
     <Compile Include="Services\GraphEditor.cs" />
     <Compile Include="GraphDiscovery\IGraphManager.cs" />
