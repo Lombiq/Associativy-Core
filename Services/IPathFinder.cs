@@ -3,6 +3,8 @@ using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
 using Orchard;
 using QuickGraph;
+using Associativy.Queryable;
+using Orchard.ContentManagement;
 
 namespace Associativy.Services
 {
@@ -18,27 +20,18 @@ namespace Associativy.Services
         /// <param name="targetNodeId"></param>
         /// <param name="settings"></param>
         IPathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings);
+
+        /// <summary>
+        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing the ids of the content items
+        /// </summary>
+        /// <param name="centralNodeId">The node paths will be calculated from</param>
+        /// <param name="settings"></param>
+        IQueryableGraph<int> GetPartialGraph(int centralNodeId, IPathFinderSettings settings);
     }
 
     public interface IPathResult
     {
-        IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; }
+        IQueryableGraph<int> SucceededGraph { get; }
         IEnumerable<IEnumerable<int>> SucceededPaths { get; }
-        IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; }
-    }
-
-    public class PathResult : IPathResult
-    {
-        public IUndirectedGraph<int, IUndirectedEdge<int>> SucceededGraph { get; protected set; }
-        public IEnumerable<IEnumerable<int>> SucceededPaths { get; protected set; }
-        public IUndirectedGraph<int, IUndirectedEdge<int>> TraversedGraph { get; protected set; }
-
-
-        public PathResult(IUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, IEnumerable<IEnumerable<int>> succeededPaths, IUndirectedGraph<int, IUndirectedEdge<int>> traversedGraph)
-        {
-            SucceededGraph = succeededGraph;
-            SucceededPaths = succeededPaths;
-            TraversedGraph = traversedGraph;
-        }
     }
 }

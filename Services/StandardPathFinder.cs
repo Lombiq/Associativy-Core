@@ -7,6 +7,9 @@ using Orchard;
 using Orchard.Caching;
 using Orchard.Environment.Extensions;
 using QuickGraph;
+using System;
+using Associativy.Queryable;
+using Orchard.ContentManagement;
 
 namespace Associativy.Services
 {
@@ -26,18 +29,21 @@ namespace Associativy.Services
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly ICacheManager _cacheManager;
+        protected readonly IQueryableGraphFactory _queryableFactory;
 
 
         public StandardPathFinder(
             IGraphDescriptor graphDescriptor,
             IGraphEditor graphEditor,
             IGraphEventMonitor graphEventMonitor,
-            ICacheManager cacheManager)
+            ICacheManager cacheManager,
+            IQueryableGraphFactory queryableFactory)
             : base(graphDescriptor)
         {
             _graphEditor = graphEditor;
             _graphEventMonitor = graphEventMonitor;
             _cacheManager = cacheManager;
+            _queryableFactory = queryableFactory;
         }
 
 
@@ -90,6 +96,52 @@ namespace Associativy.Services
             return FindPathsUncached(startNodeId, targetNodeId, settings);
         }
 
+        public virtual IQueryableGraph<int> GetPartialGraph(int centralNodeId, IPathFinderSettings settings)
+        {
+            if (settings == null) settings = PathFinderSettings.Default;
+
+            return _queryableFactory.Factory<int>((parameters) =>
+                {
+                    // TODO: caching
+                    var connectionManager = _graphDescriptor.Services.ConnectionManager;
+                    var graph = _graphEditor.GraphFactory<int>();
+                    var visited = new Dictionary<int, PathNode>();
+                    var frontier = new Stack<PathNode>();
+
+                    frontier.Push(new PathNode(centralNodeId) { MinDistance = 0 });
+
+                    while (frontier.Count != 0)
+                    {
+                        var current = frontier.Pop();
+
+                        if (current.MinDistance == settings.MaxDistance) continue;
+
+                        if (!visited.ContainsKey(current.Id))
+                        {
+                            visited[current.Id] = current;
+
+                            foreach (var neighbourId in connectionManager.GetNeighbourIds(current.Id))
+                            {
+                                var neighbour = visited.ContainsKey(neighbourId) ? visited[neighbourId] : new PathNode(neighbourId);
+
+                                current.Neighbours.Add(neighbour);
+                                graph.AddVerticesAndEdge(new UndirectedEdge<int>(current.Id, neighbourId));
+                            } 
+                        }
+
+
+                        var neighbourMinDistance = current.MinDistance + 1;
+                        foreach (var neighbour in current.Neighbours)
+                        {
+                            if (neighbourMinDistance < neighbour.MinDistance) neighbour.MinDistance = neighbourMinDistance;
+                            frontier.Push(neighbour);
+                        }
+                    }
+
+                    return graph;
+                });
+        }
+
         protected IPathResult FindPathsUncached(int startNodeId, int targetNodeId, IPathFinderSettings settings)
         {
             // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
@@ -97,14 +149,11 @@ namespace Associativy.Services
             var connectionManager = _graphDescriptor.Services.ConnectionManager;
 
             var explored = new Dictionary<int, PathNode>();
-            var succeededGraph = _graphEditor.GraphFactory<int>();
             var succeededPaths = new List<List<int>>();
-            var traversedGraph = _graphEditor.GraphFactory<int>();
             var frontier = new Stack<FrontierNode>();
 
             explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
             frontier.Push(new FrontierNode { Node = explored[startNodeId] });
-            traversedGraph.AddVertex(startNodeId);
 
             FrontierNode frontierNode;
             PathNode currentNode;
@@ -127,7 +176,6 @@ namespace Associativy.Services
                         if (!explored.ContainsKey(targetNodeId))
                         {
                             explored[targetNodeId] = new PathNode(targetNodeId);
-                            traversedGraph.AddVertex(targetNodeId);
                         }
 
                         if (explored[targetNodeId].MinDistance > currentDistance + 1)
@@ -137,8 +185,7 @@ namespace Associativy.Services
 
                         currentNode.Neighbours.Add(explored[targetNodeId]);
                         currentPath.Add(targetNodeId);
-                        SavePathToGraph(succeededGraph, succeededPaths, currentPath);
-                        traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, targetNodeId));
+                        succeededPaths.Add(currentPath);
                     }
                 }
                 // We can traverse the graph further
@@ -161,7 +208,7 @@ namespace Associativy.Services
                         if (neighbour.Id == targetNodeId)
                         {
                             var succeededPath = new List<int>(currentPath) { targetNodeId }; // Since we will use currentPath in further iterations too
-                            SavePathToGraph(succeededGraph, succeededPaths, succeededPath);
+                            succeededPaths.Add(succeededPath);
                         }
                         // We can traverse further, push the neighbour onto the stack
                         else if (neighbour.Id != startNodeId)
@@ -182,25 +229,83 @@ namespace Associativy.Services
                             }
 
                             explored[neighbour.Id] = neighbour;
-                            traversedGraph.AddVertex(neighbour.Id);
-                            traversedGraph.AddEdge(new UndirectedEdge<int>(currentNode.Id, neighbour.Id));
                         }
                     }
                 }
             }
 
-            return new PathResult(succeededGraph, succeededPaths, traversedGraph);
+            return new PathResult
+                {
+                    SucceededPaths = succeededPaths,
+                    SucceededGraph = PathToGraph(succeededPaths)
+                };
         }
 
 
-        private static void SavePathToGraph(IMutableUndirectedGraph<int, IUndirectedEdge<int>> succeededGraph, List<List<int>> succeededPaths, List<int> path)
+        private IQueryableGraph<int> PathToGraph(List<List<int>> succeededPaths)
         {
-            for (int i = 1; i < path.Count; i++)
-            {
-                succeededGraph.AddVerticesAndEdge(new UndirectedEdge<int>(path[i-1], path[i]));
-            }
+            return _queryableFactory.Factory<int>((parameters) =>
+                {
+                    var method = parameters.Method;
+                    var zoom = parameters.Zoom;
+                    var paging = parameters.Paging;
 
-            succeededPaths.Add(path);
+                    var graph = _graphEditor.GraphFactory<int>();
+
+                    Action fillGraph =
+                        () =>
+                        {
+                            if (paging.TakeConnections == 0) return;
+
+                            var skipped = 0;
+                            var enumerated = 0;
+                            foreach (var path in succeededPaths)
+                            {
+                                var iStart = 1;
+
+                                if (skipped < paging.SkipConnections)
+                                {
+                                    if (path.Count < paging.SkipConnections - skipped)
+                                    {
+                                        skipped += path.Count;
+                                        iStart = path.Count;
+                                    }
+                                    else
+                                    {
+                                        iStart += paging.SkipConnections - skipped;
+                                        skipped = paging.SkipConnections;
+                                    }
+                                }
+
+                                for (int i = iStart; i < path.Count; i++)
+                                {
+                                    graph.AddVerticesAndEdge(new UndirectedEdge<int>(path[i - 1], path[i]));
+                                    enumerated++;
+                                    if (enumerated == paging.TakeConnections) return;
+                                }
+                            }
+                        };
+
+                    switch (parameters.Method)
+                    {
+                        case ExecutionMethod.NodeCount:
+                            return graph.VertexCount;
+                        case ExecutionMethod.ConnectionCount:
+                            return graph.EdgeCount;
+                        case ExecutionMethod.ZoomLevelCount:
+                            return _graphEditor.CalculateZoomLevelCount(graph, parameters.Zoom.Count);
+                        default:
+                            if (!zoom.IsFlat()) return _graphEditor.CreateZoomedGraph(graph, zoom.Level, zoom.Count);
+                            return graph;
+                    }
+                });
+        }
+
+
+        private class PathResult : IPathResult
+        {
+            public IQueryableGraph<int> SucceededGraph { get; set; }
+            public IEnumerable<IEnumerable<int>> SucceededPaths { get; set; }
         }
     }
 }

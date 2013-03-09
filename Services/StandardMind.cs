@@ -94,7 +94,7 @@ namespace Associativy.Services
                         return _graphEditor.CalculateZoomLevelCount(graph, zoom.Count);
                     }
 
-                    if (zoom.Level != zoom.Count - 1)
+                    if (!zoom.IsFlat())
                     {
                         return _graphEditor.CreateZoomedGraph(graph, zoom.Level, zoom.Count);
                     }
@@ -102,26 +102,9 @@ namespace Associativy.Services
 
                     return graph;
                 });
-
-            //return MakeGraph(
-            //    () =>
-            //    {
-            //        var graph = _graphEditor.GraphFactory<int>();
-
-            //        // This won't include nodes that are not connected to anything
-            //        graph.AddVerticesAndEdgeRange(
-            //            _graphDescriptor.Services.ConnectionManager.GetAll(0, int.MaxValue)
-            //                .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
-
-            //        _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
-
-            //        return graph;
-            //    },
-            //    settings,
-            //    "WholeGraph");
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        public virtual IQueryableGraph<int> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
         {
             if (nodes == null) throw new ArgumentNullException("nodes");
 
@@ -145,23 +128,6 @@ namespace Associativy.Services
             {
                 return MakeSophisticatedAssociations(nodes, settings);
             }
-        }
-
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings)
-        {
-            if (centerNode == null) throw new ArgumentNullException("centerNode");
-
-            MakeSettings(ref settings);
-
-            return MakeGraph(
-                () =>
-                {
-                    var graph = _graphDescriptor.Services.PathFinder.FindPaths(centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
-                    _eventHandler.PartialGraphBuilt(new PartialGraphBuiltContext(_graphDescriptor, settings, centerNode, graph));
-                    return graph;
-                },
-                settings,
-                "PartialGraph." + centerNode.ContentItem.Id.ToString());
         }
 
 

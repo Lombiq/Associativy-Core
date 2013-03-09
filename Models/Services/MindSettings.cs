@@ -7,10 +7,7 @@ namespace Associativy.Models.Services
     {
         public string Algorithm { get; set; }
         public bool UseCache { get; set; }
-        public int ZoomLevel { get; set; }
-        public int ZoomLevelCount { get; set; }
         public int MaxDistance { get; set; }
-        public int MaxNodeCount { get; set; }
 
         private static MindSettings _default = new MindSettings();
         public static MindSettings Default { get { return _default; } }
@@ -20,10 +17,7 @@ namespace Associativy.Models.Services
         {
             Algorithm = "sophisticated";
             UseCache = false;
-            ZoomLevel = 0;
-            ZoomLevelCount = 10;
             MaxDistance = 3;
-            MaxNodeCount = 50;
         }
     }
 }

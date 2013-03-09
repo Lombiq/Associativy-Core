@@ -24,14 +24,7 @@ namespace Associativy.Services
         /// </summary>
         /// <param name="nodes">The nodes to search associations between</param>
         /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings);
-
-        /// <summary>
-        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing the ids of the content items
-        /// </summary>
-        /// <param name="centerNode">The node paths willl be calculated from</param>
-        /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings);
+        IQueryableGraph<int> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings);
     }
 
 
@@ -53,7 +46,7 @@ namespace Associativy.Services
         /// <param name="settings">Mind settings</param>
         public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeAssociationsContent(this IMind mind, INodeManager nodeManager, IEnumerable<IContent> nodes, IMindSettings settings)
         {
-            return nodeManager.MakeContentGraph(mind.MakeAssociations(nodes, settings));
+            return nodeManager.MakeContentGraph(mind.MakeAssociations(nodes, settings).ToGraph());
         }
 
         /// <summary>
@@ -63,7 +56,7 @@ namespace Associativy.Services
         /// <param name="settings">Mind settings</param>
         public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetPartialGraphContent(this IMind mind, INodeManager nodeManager, IContent centerNode, IMindSettings settings)
         {
-            return nodeManager.MakeContentGraph(mind.GetPartialGraph(centerNode, settings));
+            return nodeManager.MakeContentGraph(mind.GetPartialGraph(centerNode, settings).ToGraph());
         }
     }
 }

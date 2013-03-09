@@ -22,6 +22,14 @@ namespace Associativy.Queryable
         IUndirectedGraph<TNode, IUndirectedEdge<TNode>> ToGraph();
     }
 
+    //public static class QueryableGraphExtensions
+    //{
+    //    public static IUndirectedGraph<TNode, IUndirectedEdge<TNode>> ToGraph<TNode>(this IQueryableGraph<TNode> queryable)
+    //    {
+    //        return queryable.ToGraph();
+    //    }
+    //}
+
 
     public enum ExecutionMethod
     {
@@ -32,16 +40,24 @@ namespace Associativy.Queryable
     }
 
     public interface IExecutionParams
-	{
+    {
         ExecutionMethod Method { get; }
         IZoom Zoom { get; }
         IPaging Paging { get; }
-	}
+    }
 
     public interface IZoom
     {
         int Level { get; }
         int Count { get; }
+    }
+
+    public static class ZoomExtensions
+    {
+        public static bool IsFlat(this IZoom zoom)
+        {
+            return zoom.Level == zoom.Count - 1;
+        }
     }
 
     public interface IPaging
