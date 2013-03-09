@@ -29,16 +29,16 @@ namespace Associativy.Queryable
             return this;
         }
 
-        public IQueryableGraph<TNode> Skip(int count)
+        public IQueryableGraph<TNode> SkipConnections(int count)
         {
-            _executionParams.PagingImpl.Skip = count;
+            _executionParams.PagingImpl.SkipConnections = count;
 
             return this;
         }
 
-        public IQueryableGraph<TNode> Take(int count)
+        public IQueryableGraph<TNode> TakeConnections(int count)
         {
-            _executionParams.PagingImpl.Take = count;
+            _executionParams.PagingImpl.TakeConnections = count;
 
             return this;
         }
@@ -100,12 +100,22 @@ namespace Associativy.Queryable
         {
             public int Level { get; set; }
             public int Count { get; set; }
+
+            public ZoomImpl()
+            {
+                Count = 1;
+            }
         }
 
         private class PagingImpl : IPaging
         {
-            public int Skip { get; set; }
-            public int Take { get; set; }
+            public int SkipConnections { get; set; }
+            public int TakeConnections { get; set; }
+
+            public PagingImpl()
+            {
+                TakeConnections = int.MaxValue;
+            }
         }
     }
 }

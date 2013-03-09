@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
+using Associativy.Queryable;
 using Orchard;
 using Orchard.ContentManagement;
 using QuickGraph;
@@ -16,7 +17,7 @@ namespace Associativy.Services
         /// Returns the whole association graph, containing the ids of the content items
         /// </summary>
         /// <param name="settings">Mind settings</param>
-        IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings);
+        IQueryableGraph<int> GetAllAssociations(IMindSettings settings);
 
         /// <summary>
         /// Makes associations upon the specified nodes, containing the ids of the content items
@@ -42,7 +43,7 @@ namespace Associativy.Services
         /// <param name="settings">Mind settings</param>
         public static IUndirectedGraph<IContent, IUndirectedEdge<IContent>> GetAllAssociationsContent(this IMind mind, INodeManager nodeManager, IMindSettings settings)
         {
-            return nodeManager.MakeContentGraph(mind.GetAllAssociations(settings));
+            return nodeManager.MakeContentGraph(mind.GetAllAssociations(settings).ToGraph());
         }
 
         /// <summary>

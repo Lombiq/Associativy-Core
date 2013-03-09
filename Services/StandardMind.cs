@@ -4,6 +4,7 @@ using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
+using Associativy.Queryable;
 using Orchard;
 using Orchard.Caching;
 using Orchard.ContentManagement;
@@ -19,6 +20,7 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class StandardMind : GraphServiceBase, IStandardMind
     {
+        protected readonly IQueryableGraphFactory _queryableFactory;
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly IMindEventHandler _eventHandler;
@@ -31,12 +33,14 @@ namespace Associativy.Services
 
         public StandardMind(
             IGraphDescriptor graphDescriptor,
+            IQueryableGraphFactory queryableFactory,
             IGraphEditor graphEditor,
             IGraphEventMonitor graphEventMonitor,
             IMindEventHandler eventHandler,
             ICacheManager cacheManager)
             : base(graphDescriptor)
         {
+            _queryableFactory = queryableFactory;
             _graphEditor = graphEditor;
             _graphEventMonitor = graphEventMonitor;
             _eventHandler = eventHandler;
@@ -44,26 +48,77 @@ namespace Associativy.Services
         }
 
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings)
+        public virtual IQueryableGraph<int> GetAllAssociations(IMindSettings settings)
         {
             MakeSettings(ref settings);
 
-            return MakeGraph(
-                () =>
+            return _queryableFactory.Factory<int>(
+                (parameters) =>
                 {
+                    var method = parameters.Method;
+                    var zoom = parameters.Zoom;
+
+                    if ((method == ExecutionMethod.NodeCount || method == ExecutionMethod.ConnectionCount)
+                            && zoom.Level == zoom.Count - 1  && parameters.Paging.SkipConnections == 0)
+                    {
+                        var graphInfo = _graphDescriptor.Services.GraphStatisticsService.GetGraphInfo();
+                        var totalConnectionCount = graphInfo.ConnectionCount;
+
+                        if (method == ExecutionMethod.ConnectionCount)
+                        {
+                            return totalConnectionCount > parameters.Paging.TakeConnections ? parameters.Paging.TakeConnections : totalConnectionCount;
+                        }
+
+                        if (method == ExecutionMethod.NodeCount && totalConnectionCount > parameters.Paging.TakeConnections)
+                        {
+                            return graphInfo.NodeCount;
+                        }
+                    }
+
+
                     var graph = _graphEditor.GraphFactory<int>();
+
+                    if (parameters.Zoom.Count == 0) return graph;
 
                     // This won't include nodes that are not connected to anything
                     graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetAll(0, int.MaxValue)
+                        _graphDescriptor.Services.ConnectionManager.GetAll(parameters.Paging.SkipConnections, parameters.Paging.TakeConnections)
                             .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
                     _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
 
+                    
+
+                    if (method == ExecutionMethod.ZoomLevelCount)
+                    {
+                        return _graphEditor.CalculateZoomLevelCount(graph, zoom.Count);
+                    }
+
+                    if (zoom.Level != zoom.Count - 1)
+                    {
+                        return _graphEditor.CreateZoomedGraph(graph, zoom.Level, zoom.Count);
+                    }
+                    
+
                     return graph;
-                },
-                settings,
-                "WholeGraph");
+                });
+
+            //return MakeGraph(
+            //    () =>
+            //    {
+            //        var graph = _graphEditor.GraphFactory<int>();
+
+            //        // This won't include nodes that are not connected to anything
+            //        graph.AddVerticesAndEdgeRange(
+            //            _graphDescriptor.Services.ConnectionManager.GetAll(0, int.MaxValue)
+            //                .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
+
+            //        _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
+
+            //        return graph;
+            //    },
+            //    settings,
+            //    "WholeGraph");
         }
 
         public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
@@ -120,7 +175,6 @@ namespace Associativy.Services
                     graph.AddVertex(node.ContentItem.Id);
                     graph.AddVerticesAndEdgeRange(
                         _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)
-                            .Take(settings.MaxNodeCount)
                             .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
 
                     _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, new IContent[] { node }, graph));
@@ -372,17 +426,19 @@ namespace Associativy.Services
             IMindSettings settings,
             string cacheKey)
         {
-            if (settings.UseCache)
-            {
-                cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
-                return _cacheManager.Get(cacheKey, ctx =>
-                {
-                    _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
-                    return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
-                });
-            }
+            throw new NotImplementedException();
 
-            return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            //if (settings.UseCache)
+            //{
+            //    cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
+            //    return _cacheManager.Get(cacheKey, ctx =>
+            //    {
+            //        _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
+            //        return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+            //    });
+            //}
+
+            //return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
 

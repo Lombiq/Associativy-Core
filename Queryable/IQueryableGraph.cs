@@ -10,12 +10,12 @@ namespace Associativy.Queryable
     public delegate dynamic ValueFactory<TNode>(IExecutionParams parameters);
 
 
-    public interface IQueryableGraph<TNode> : ITransientDependency
+    public interface IQueryableGraph<TNode>
     {
         ValueFactory<TNode> ValueFactory { get; }
         IQueryableGraph<TNode> Zoom(int level, int count);
-        IQueryableGraph<TNode> Skip(int count);
-        IQueryableGraph<TNode> Take(int count);
+        IQueryableGraph<TNode> SkipConnections(int count);
+        IQueryableGraph<TNode> TakeConnections(int count);
         int NodeCount();
         int ConnectionCount();
         int ZoomLevelCount(int maximalZoomLevelCount);
@@ -46,7 +46,7 @@ namespace Associativy.Queryable
 
     public interface IPaging
     {
-        int Skip { get; }
-        int Take { get; }
+        int SkipConnections { get; }
+        int TakeConnections { get; }
     }
 }
