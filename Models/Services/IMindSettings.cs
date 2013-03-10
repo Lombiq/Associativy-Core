@@ -5,7 +5,7 @@ namespace Associativy.Models.Services
     public interface IMindSettings
     {
         /// <summary>
-        /// The algorithm to use to fing associations
+        /// The algorithm to use to find associations
         /// </summary>
         string Algorithm { get; set; }
 

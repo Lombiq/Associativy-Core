@@ -12,9 +12,11 @@ namespace Associativy.Queryable
 
     public interface IQueryableGraph<TNode>
     {
-        ValueFactory<TNode> ValueFactory { get; }
+        ValueFactory<TNode> ValueFactory { get; } // Is this and copying necessary?
+        IQueryParams Params { get; } 
+
         IQueryableGraph<TNode> Zoom(int level, int count);
-        IQueryableGraph<TNode> SkipConnections(int count);
+        IQueryableGraph<TNode> SkipConnections  (int count);
         IQueryableGraph<TNode> TakeConnections(int count);
         int NodeCount();
         int ConnectionCount();
@@ -22,14 +24,12 @@ namespace Associativy.Queryable
         IUndirectedGraph<TNode, IUndirectedEdge<TNode>> ToGraph();
     }
 
-    //public static class QueryableGraphExtensions
-    //{
-    //    public static IUndirectedGraph<TNode, IUndirectedEdge<TNode>> ToGraph<TNode>(this IQueryableGraph<TNode> queryable)
-    //    {
-    //        return queryable.ToGraph();
-    //    }
-    //}
 
+    public interface IQueryParams
+    {
+        IZoom Zoom { get; }
+        IPaging Paging { get; }
+    }
 
     public enum ExecutionMethod
     {
@@ -39,11 +39,9 @@ namespace Associativy.Queryable
         ToGraph
     }
 
-    public interface IExecutionParams
+    public interface IExecutionParams : IQueryParams
     {
         ExecutionMethod Method { get; }
-        IZoom Zoom { get; }
-        IPaging Paging { get; }
     }
 
     public interface IZoom

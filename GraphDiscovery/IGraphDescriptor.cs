@@ -14,4 +14,13 @@ namespace Associativy.GraphDiscovery
         IEnumerable<string> ContentTypes { get; }
         IGraphServices Services { get; }
     }
+
+
+    public static class GraphDescriptorExtensions
+    {
+        public static IGraphContext MaximalContext(this IGraphDescriptor descriptor)
+        {
+            return new GraphContext { Name = descriptor.Name, ContentTypes = descriptor.ContentTypes };
+        }
+    }
 }

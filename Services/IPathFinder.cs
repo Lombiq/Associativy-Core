@@ -34,4 +34,17 @@ namespace Associativy.Services
         IQueryableGraph<int> SucceededGraph { get; }
         IEnumerable<IEnumerable<int>> SucceededPaths { get; }
     }
+
+    public static class PathFinderExtensions
+	{
+                /// <summary>
+        /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing the ids of the content items
+        /// </summary>
+        /// <param name="centralNodeId">The node paths will be calculated from</param>
+        /// <param name="settings"></param>
+        public static IQueryableGraph<int> GetPartialGraph(this IPathFinder pathFinder, IContent centralNode, IPathFinderSettings settings)
+        {
+            return pathFinder.GetPartialGraph(centralNode.ContentItem.Id, settings);
+        }
+	}
 }

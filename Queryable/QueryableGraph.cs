@@ -6,12 +6,21 @@ using QuickGraph;
 
 namespace Associativy.Queryable
 {
-    public class QueryableGraph<TNode> : IQueryableGraph<TNode>
+    public abstract class QueryableGraph
+    {
+        public static dynamic ThrowNotSupported(ExecutionMethod method)
+        {
+            throw new NotSupportedException("The operation " + method + " was not supported for this query.");
+        }
+    }
+
+    public class QueryableGraph<TNode> : QueryableGraph, IQueryableGraph<TNode>
     {
         private readonly ValueFactory<TNode> _valueFactory;
         private readonly ExecutionParamsImpl _executionParams;
 
         public ValueFactory<TNode> ValueFactory { get { return _valueFactory; } }
+        public IQueryParams Params { get { return _executionParams; } }
 
 
         public QueryableGraph(ValueFactory<TNode> valueFactory)

@@ -6,9 +6,12 @@ using Orchard;
 
 namespace Associativy.Queryable
 {
+    /// <summary>
+    /// Creates IQueryableGraph instances
+    /// </summary>
     public interface IQueryableGraphFactory : IDependency
     {
-        IQueryableGraph<TNode> Factory<TNode>(ValueFactory<TNode> graphFactory);
+        IQueryableGraph<TNode> Create<TNode>(ValueFactory<TNode> valueFactory);
     }
 
 
@@ -16,7 +19,7 @@ namespace Associativy.Queryable
     {
         public static IQueryableGraph<TNode> CopyValueFactory<TNode>(this IQueryableGraphFactory factory, IQueryableGraph<TNode> queryableGraph)
         {
-            return factory.Factory(queryableGraph.ValueFactory);
+            return factory.Create(queryableGraph.ValueFactory);
         }
     }
 }

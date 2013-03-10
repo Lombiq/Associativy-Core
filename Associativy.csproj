@@ -118,6 +118,7 @@
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeTitleLabelPartHandler.cs" />
+    <Compile Include="Helpers\QueryableGraphHelper.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="Models\AssociativyNodeTitleLabelPart.cs" />
     <Compile Include="Models\IAssociativyNodeLabelAspect.cs" />
@@ -129,10 +130,13 @@
     <Compile Include="Models\Services\IGraphInfo.cs" />
     <Compile Include="Models\Services\IPathFinderSettings.cs" />
     <Compile Include="Models\Services\PathFinderSettings.cs" />
+    <Compile Include="Queryable\GraphExtensions.cs" />
     <Compile Include="Queryable\IQueryableGraph.cs" />
     <Compile Include="Queryable\IQueryableGraphFactory.cs" />
     <Compile Include="Queryable\QueryableGraph.cs" />
     <Compile Include="Queryable\QueryableGraphFactory.cs" />
+    <Compile Include="Services\GraphCacheService.cs" />
+    <Compile Include="Services\IGraphCacheService.cs" />
     <Compile Include="Services\IGraphServices.cs" />
     <Compile Include="Services\GraphEditor.cs" />
     <Compile Include="GraphDiscovery\IGraphManager.cs" />
@@ -171,6 +175,10 @@
     <ProjectReference Include="..\..\Core\Orchard.Core.csproj">
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orchard.Caching\Orchard.Caching.csproj">
+      <Project>{7528bf74-25c7-4abe-883a-443b4eec4776}</Project>
+      <Name>Orchard.Caching</Name>
     </ProjectReference>
     <ProjectReference Include="..\Orchard.Tokens\Orchard.Tokens.csproj">
       <Project>{6F759635-13D7-4E94-BCC9-80445D63F117}</Project>

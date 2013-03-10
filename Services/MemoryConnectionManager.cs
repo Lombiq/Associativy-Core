@@ -8,6 +8,7 @@ using Associativy.Models;
 using Orchard.Caching;
 using Associativy.Models.Nodes;
 using System.Threading;
+using Orchard.Caching.Services;
 
 namespace Associativy.Services
 {
@@ -16,7 +17,7 @@ namespace Associativy.Services
     /// </summary>
     public class MemoryConnectionManager : GraphServiceBase, IMemoryConnectionManager
     {
-        protected readonly ICacheManager _cacheManager;
+        protected readonly ICacheService _cacheService;
         protected readonly IGraphEventHandler _graphEventHandler;
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace Associativy.Services
         {
             get
             {
-                return _cacheManager.Get("Associativy.GraphStorage", ctx =>
+                return _cacheService.Get("Associativy.MemoryConnectionManager.GraphStorage", () =>
                 {
                     return new ConcurrentDictionary<string, Graph>();
                 });
@@ -40,11 +41,11 @@ namespace Associativy.Services
 
         public MemoryConnectionManager(
             IGraphDescriptor graphDescriptor,
-            ICacheManager cacheManager,
+            ICacheService cacheService,
             IGraphEventHandler graphEventHandler)
             : base(graphDescriptor)
         {
-            _cacheManager = cacheManager;
+            _cacheService = cacheService;
             _graphEventHandler = graphEventHandler;
         }
 

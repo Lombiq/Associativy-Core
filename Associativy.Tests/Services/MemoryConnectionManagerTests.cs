@@ -10,6 +10,7 @@ using Autofac;
 using Moq;
 using NUnit.Framework;
 using Orchard.Caching;
+using Orchard.Caching.Services;
 using Orchard.Tests.Stubs;
 using Orchard.Tests.Utility;
 
@@ -28,7 +29,7 @@ namespace Associativy.Tests.Services
 
             builder.RegisterAutoMocking(MockBehavior.Loose);
             builder.RegisterInstance(new StubGraphDescriptor()).As<IGraphDescriptor>();
-            builder.RegisterInstance(new StubCacheManager()).As<ICacheManager>();
+            builder.RegisterInstance(new StubCacheService()).As<ICacheService>();
             builder.RegisterType<MemoryConnectionManager>().As<IMemoryConnectionManager>();
 
             _container = builder.Build();

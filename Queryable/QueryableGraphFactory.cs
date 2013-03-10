@@ -17,7 +17,7 @@ namespace Associativy.Queryable
         }
 
 
-        public IQueryableGraph<TNode> Factory<TNode>(ValueFactory<TNode> valueFactory)
+        public IQueryableGraph<TNode> Create<TNode>(ValueFactory<TNode> valueFactory)
         {
             var factory = _wca.GetContext().Resolve<Func<ValueFactory<TNode>, IQueryableGraph<TNode>>>();
             return factory(valueFactory);

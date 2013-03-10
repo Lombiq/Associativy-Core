@@ -144,15 +144,21 @@
     <Compile Include="Services\MemoryConnectionManagerTests.cs" />
     <Compile Include="Services\MindTests.cs" />
     <Compile Include="Services\StandardPathFinderTests.cs" />
+    <Compile Include="Stubs\StubCacheService.cs" />
     <Compile Include="Stubs\StubGraphEditor.cs" />
     <Compile Include="Stubs\StubGraphManager.cs" />
     <Compile Include="Stubs\StubNodeManager.cs" />
     <Compile Include="Helpers\TestGraphHelper.cs" />
+    <Compile Include="Stubs\StubQueryableGraphFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Associativy.Instances.Notions\Associativy.Instances.Notions.csproj">
       <Project>{FE145AFC-3B8B-49A0-BCAE-520CC45918B3}</Project>
       <Name>Associativy.Instances.Notions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Orchard.Caching\Orchard.Caching.csproj">
+      <Project>{7528bf74-25c7-4abe-883a-443b4eec4776}</Project>
+      <Name>Orchard.Caching</Name>
     </ProjectReference>
     <ProjectReference Include="..\Associativy.csproj">
       <Project>{A8EE4964-4880-4EE1-AC0A-75492D89BBE8}</Project>

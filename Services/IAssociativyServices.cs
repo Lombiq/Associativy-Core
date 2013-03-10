@@ -1,4 +1,5 @@
 ﻿using Associativy.GraphDiscovery;
+using Associativy.Queryable;
 using Orchard;
 
 namespace Associativy.Services
@@ -17,5 +18,10 @@ namespace Associativy.Services
         /// Performs work on graphs
         /// </summary>
         IGraphEditor GraphEditor { get; }
+
+        /// <summary>
+        /// Creates IQueryableGraph instances
+        /// </summary>
+        IQueryableGraphFactory QueryableGraphFactory { get; }
     }
 }
