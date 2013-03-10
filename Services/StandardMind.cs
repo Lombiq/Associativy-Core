@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
+using Associativy.Helpers;
 using Associativy.Models.Services;
+using Associativy.Queryable;
 using Orchard;
 using Orchard.Caching;
+using Orchard.Caching.Services;
 using Orchard.ContentManagement;
 using Orchard.Environment.Extensions;
 using QuickGraph;
@@ -19,155 +22,176 @@ namespace Associativy.Services
     [OrchardFeature("Associativy")]
     public class StandardMind : GraphServiceBase, IStandardMind
     {
+        protected readonly IQueryableGraphFactory _queryableFactory;
         protected readonly IGraphEditor _graphEditor;
-        protected readonly IGraphEventMonitor _graphEventMonitor;
         protected readonly IMindEventHandler _eventHandler;
+        protected readonly IGraphCacheService _cacheService;
 
-        #region Caching fields
-        protected readonly ICacheManager _cacheManager;
-        protected const string _cachePrefix = "Associativy.";
-        #endregion
+        protected const string CachePrefix = "Associativy.StandardMind.";
 
 
         public StandardMind(
             IGraphDescriptor graphDescriptor,
+            IQueryableGraphFactory queryableFactory,
             IGraphEditor graphEditor,
-            IGraphEventMonitor graphEventMonitor,
             IMindEventHandler eventHandler,
-            ICacheManager cacheManager)
+            IGraphCacheService cacheService)
             : base(graphDescriptor)
         {
+            _queryableFactory = queryableFactory;
             _graphEditor = graphEditor;
-            _graphEventMonitor = graphEventMonitor;
             _eventHandler = eventHandler;
-            _cacheManager = cacheManager;
+            _cacheService = cacheService;
         }
 
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetAllAssociations(IMindSettings settings)
+        public virtual IQueryableGraph<int> GetAllAssociations(IMindSettings settings)
         {
             MakeSettings(ref settings);
 
-            return MakeGraph(
-                () =>
+            return _queryableFactory.Create<int>(
+                (parameters) =>
                 {
-                    var graph = _graphEditor.GraphFactory<int>();
+                    var method = parameters.Method;
+                    var zoom = parameters.Zoom;
 
-                    // This won't include nodes that are not connected to anything
-                    graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetAll(0, int.MaxValue)
-                            .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
+                    if ((method == ExecutionMethod.NodeCount || method == ExecutionMethod.ConnectionCount)
+                            && zoom.IsFlat() && parameters.Paging.SkipConnections == 0)
+                    {
+                        var graphInfo = _graphDescriptor.Services.GraphStatisticsService.GetGraphInfo();
+                        var totalConnectionCount = graphInfo.ConnectionCount;
+
+                        if (method == ExecutionMethod.ConnectionCount)
+                        {
+                            return totalConnectionCount > parameters.Paging.TakeConnections ? parameters.Paging.TakeConnections : totalConnectionCount;
+                        }
+
+                        if (method == ExecutionMethod.NodeCount && totalConnectionCount > parameters.Paging.TakeConnections)
+                        {
+                            return graphInfo.NodeCount;
+                        }
+                    }
+
+
+                    var graph = _cacheService.GetMonitored(_graphDescriptor, QueryableGraphHelper.MakeCacheKey(MakeCacheKey("GetAllAssociations.BaseGraph", settings), parameters), () =>
+                        {
+                            var g = _graphEditor.GraphFactory<int>();
+
+                            if (parameters.Zoom.Count == 0) return g;
+
+                            // This won't include nodes that are not connected to anything
+                            g.AddVerticesAndEdgeRange(
+                                _graphDescriptor.Services.ConnectionManager.GetAll(parameters.Paging.SkipConnections, parameters.Paging.TakeConnections)
+                                    .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
+
+                            return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
+                        }, settings.UseCache);
+
 
                     _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
 
-                    return graph;
-                },
-                settings,
-                "WholeGraph");
+
+                    return LastSteps(parameters, graph, "GetAllAssociations", settings);
+                });
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        public virtual IQueryableGraph<int> MakeAssociations(IEnumerable<int> nodeIds, IMindSettings settings)
         {
-            if (nodes == null) throw new ArgumentNullException("nodes");
+            if (nodeIds == null) throw new ArgumentNullException("nodeIds");
 
-            var nodeCount = nodes.Count();
-            if (nodeCount == 0) throw new ArgumentException("The list of searched nodes can't be empty");
+            var nodeCount = nodeIds.Count();
+            if (nodeCount == 0) throw new ArgumentException("The list of searched node ids can't be empty");
 
             MakeSettings(ref settings);
 
             // If there's only one node, return its neighbours
             if (nodeCount == 1)
             {
-                return GetNeighboursGraph(nodes.First(), settings);
+                return GetNeighboursGraph(nodeIds.First(), settings);
             }
             // Simply calculate the intersection of the neighbours of the nodes
             else if (settings.Algorithm == "simple")
             {
-                return MakeSimpleAssociations(nodes, settings);
+                return MakeSimpleAssociations(nodeIds, settings);
             }
             // Calculate the routes between two nodes
             else
             {
-                return MakeSophisticatedAssociations(nodes, settings);
+                return MakeSophisticatedAssociations(nodeIds, settings);
             }
         }
 
-        public virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetPartialGraph(IContent centerNode, IMindSettings settings)
+
+        protected virtual IQueryableGraph<int> GetNeighboursGraph(int nodeId, IMindSettings settings)
         {
-            if (centerNode == null) throw new ArgumentNullException("centerNode");
-
-            MakeSettings(ref settings);
-
-            return MakeGraph(
-                () =>
+            return _queryableFactory.Create<int>(
+                (parameters) =>
                 {
-                    var graph = _graphDescriptor.Services.PathFinder.FindPaths(centerNode.ContentItem.Id, -1, new PathFinderSettings { MaxDistance = settings.MaxDistance }).TraversedGraph;
-                    _eventHandler.PartialGraphBuilt(new PartialGraphBuiltContext(_graphDescriptor, settings, centerNode, graph));
-                    return graph;
-                },
-                settings,
-                "PartialGraph." + centerNode.ContentItem.Id.ToString());
-        }
+                    var method = parameters.Method;
+                    var zoom = parameters.Zoom;
 
-
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> GetNeighboursGraph(IContent node, IMindSettings settings)
-        {
-            return MakeGraph(
-                () =>
-                {
-                    var graph = _graphEditor.GraphFactory<int>();
-
-                    graph.AddVertex(node.ContentItem.Id);
-                    graph.AddVerticesAndEdgeRange(
-                        _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)
-                            .Take(settings.MaxNodeCount)
-                            .Select(neighbourId => new UndirectedEdge<int>(node.ContentItem.Id, neighbourId)));
-
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, new IContent[] { node }, graph));
-
-                    return graph;
-                },
-                settings,
-                "NeighboursGraph." + node.ContentItem.Id.ToString());
-        }
-
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSimpleAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
-        {
-            return MakeGraph(
-                () =>
-                {
-                    // Simply calculate the intersection of the neighbours of the nodes
-                    var graph = _graphEditor.GraphFactory<int>();
-
-                    var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodes.First().ContentItem.Id);
-                    var remainingNodes = new List<IContent>(nodes); // Maybe later we will need all the searched nodes
-                    remainingNodes.RemoveAt(0);
-                    commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList());
-                    // Same as
-                    //foreach (var node in remainingNodes)
-                    //{
-                    //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList();
-                    //}
-
-                    foreach (var node in nodes)
-                    {
-                        foreach (var neighbourId in commonNeighbourIds)
+                    var graph = _cacheService.GetMonitored(_graphDescriptor, QueryableGraphHelper.MakeCacheKey(MakeCacheKey("GetNeighboursGraph.BaseGrap." + nodeId, settings), parameters), () =>
                         {
-                            graph.AddVerticesAndEdge(new UndirectedEdge<int>(node.ContentItem.Id, neighbourId));
-                        }
-                    }
+                            var g = _graphEditor.GraphFactory<int>();
 
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodes, graph));
+                            g.AddVertex(nodeId);
+                            g.AddVerticesAndEdgeRange(
+                                _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodeId, parameters.Paging.SkipConnections, parameters.Paging.TakeConnections)
+                                    .Select(neighbourId => new UndirectedEdge<int>(nodeId, neighbourId)));
 
-                    return graph;
-                },
-                settings,
-                "SimpleAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
+                            return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
+                        }, settings.UseCache);
+
+                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, new[] { nodeId }, graph));
+
+                    return LastSteps(parameters, graph, "GetNeighboursGraph." + nodeId, settings);
+                });
         }
 
-        protected virtual IUndirectedGraph<int, IUndirectedEdge<int>> MakeSophisticatedAssociations(IEnumerable<IContent> nodes, IMindSettings settings)
+        protected virtual IQueryableGraph<int> MakeSimpleAssociations(IEnumerable<int> nodeIds, IMindSettings settings)
         {
-            var nodeList = nodes.ToList();
+            return _queryableFactory.Create<int>(
+                (parameters) =>
+                {
+                    var idsJoined = string.Join(", ", nodeIds.Select(node => node.ToString()));
+
+                    var graph = _cacheService.GetMonitored(_graphDescriptor, QueryableGraphHelper.MakeCacheKey(MakeCacheKey("SimpleAssociations.BaseGrap." + idsJoined, settings), parameters), () =>
+                        {
+                            var paging = parameters.Paging;
+
+                            // Simply calculate the intersection of the neighbours of the nodes
+                            var g = _graphEditor.GraphFactory<int>();
+
+                            var commonNeighbourIds = _graphDescriptor.Services.ConnectionManager.GetNeighbourIds(nodeIds.First());
+                            var remainingNodes = new List<int>(nodeIds); // Maybe later we will need all the searched nodes
+                            remainingNodes.RemoveAt(0);
+                            commonNeighbourIds = remainingNodes.Aggregate(commonNeighbourIds, (current, node) => current.Intersect(_graphDescriptor.Services.ConnectionManager.GetNeighbourIds(node)).ToList()).Skip(paging.SkipConnections).Take(paging.TakeConnections);
+                            // Same as
+                            //foreach (var node in remainingNodes)
+                            //{
+                            //    commonNeighbourIds = commonNeighbourIds.Intersect(connectionManager.GetNeighbourIds(node.ContentItem.Id)).ToList();
+                            //}
+
+                            foreach (var node in nodeIds)
+                            {
+                                foreach (var neighbourId in commonNeighbourIds)
+                                {
+                                    g.AddVerticesAndEdge(new UndirectedEdge<int>(node, neighbourId));
+                                }
+                            }
+
+                            return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
+                        }, settings.UseCache);
+
+                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
+
+                    return LastSteps(parameters, graph, "SimpleAssociations." + idsJoined, settings);
+                });
+        }
+
+        protected virtual IQueryableGraph<int> MakeSophisticatedAssociations(IEnumerable<int> nodeIds, IMindSettings settings)
+        {
+            var nodeList = nodeIds.ToList();
             var nodeCount = nodeList.Count;
             if (nodeCount < 2) throw new ArgumentException("The count of nodes should be at least two.");
 
@@ -184,211 +208,133 @@ namespace Associativy.Services
                     return succeededNodeIds;
                 };
 
-            return MakeGraph(
-                () =>
+            return _queryableFactory.Create<int>(
+                (parameters) =>
                 {
-                    #region Experimental graph merging
-                    //// Non-fully working
-                    //// Needs proper paired merging
-                    //var pathFinder = descriptor.PathServices.PathFinder;
-                    //var resultGraphs = new List<IUndirectedGraph<int, IUndirectedEdge<int>>>(nodeCount);
-                    //var graph = _graphEditor.GraphFactory<int>();
-                    //var nodeIds = nodeList.Select(node => node.ContentItem.Id);
-                    //var commonVertices = new List<int>(nodeIds);
+                    var idsJoined = string.Join(", ", nodeIds.Select(node => node.ToString()));
 
-                    //Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
-                    //    () =>
-                    //    {
-                    //        _eventHandler.BeforeSearchedContentGraphBuilding(nodes, graph);
-                    //        return graph;
-                    //    };
-
-
-                    //for (int i = 0; i < nodeCount - 1; i++)
-                    //{
-                    //    var node1 = nodeList[i].ContentItem.Id;
-                    //    var node2 = nodeList[i + 1].ContentItem.Id;
-                    //    var resultGraph = pathFinder.FindPaths(node1, node2, settings.MaxDistance, settings.UseCache).SucceededGraph;
-
-                    //    if (resultGraph.VertexCount == 0 || resultGraph.EdgeCount == 0) return emptyResult();
-
-                    //    if (commonVertices.Count == 0) commonVertices.AddRange(resultGraph.Vertices);
-                    //    else
-                    //    {
-                    //        commonVertices = commonVertices.Intersect(resultGraph.Vertices.Union(nodeIds)).ToList();
-                    //        if (commonVertices.Count == 0) return emptyResult();
-                    //    }
-
-                    //    resultGraphs.Add(resultGraph);
-                    //}
-
-                    //graph.AddVertexRange(commonVertices);
-
-                    //for (int i = 0; i < resultGraphs.Count; i++)
-                    //{
-                    //    var rawResultGraph = resultGraphs[i];
-                    //    var resultGraph = _graphEditor.GraphFactory<int>();
-                    //    resultGraphs[i] = resultGraph;
-                    //    resultGraph.AddVertexRange(commonVertices); // This is more than needed, but causes no problem
-                    //    resultGraph.AddEdgeRange(rawResultGraph.Edges.Where(edge => commonVertices.Contains(edge.Source) && commonVertices.Contains(edge.Target)));
-
-                    //    // Here we remove every vertex that is not among the common ones. Where a vertex has only two edges (i.e. there's a path through it,
-                    //    // that only goes through it) the two neighbouring nodes will be directly connected, if not, the vertex is removed with all of its
-                    //    // connections.
-                    //    foreach (var vertex in rawResultGraph.Vertices.Where(vertex => !commonVertices.Contains(vertex)))
-                    //    {
-                    //        if (rawResultGraph.AdjacentDegree(vertex) == 2)
-                    //        {
-                    //            var edges = rawResultGraph.AdjacentEdges(vertex);
-                    //            var firstEdge = edges.First();
-                    //            var secondEdge = edges.Last();
-                    //            var vertex1 = firstEdge.Target == vertex ? firstEdge.Source : firstEdge.Target;
-                    //            var vertex2 = secondEdge.Target == vertex ? secondEdge.Source : secondEdge.Target;
-                    //            resultGraph.AddEdge(new UndirectedEdge<int>(vertex1, vertex2));
-                    //        }
-                    //    }
-                    //}
-
-                    //// Distilling edges to only keep common ones.
-                    //var commonEdges = new List<IUndirectedEdge<int>>();
-                    //commonEdges.AddRange(resultGraphs.SelectMany(resultGraph => resultGraph.Edges));
-
-                    //for (int i = 0; i < commonEdges.Count; i++)
-                    //{
-                    //    var current = commonEdges[i];
-                    //    var equivalentEdges = commonEdges.Where(edge => edge.Target == current.Target && edge.Source == current.Source
-                    //                                            || edge.Source == current.Target && edge.Target == current.Source).ToList();
-                    //    if (equivalentEdges.Count != nodeCount)
-                    //    {
-                    //        foreach (var edge in equivalentEdges)
-                    //        {
-                    //            commonEdges.Remove(edge);
-                    //        }
-                    //    }
-                    //}
-
-                    //graph.AddEdgeRange(commonEdges);
-
-                    //_eventHandler.BeforeSearchedContentGraphBuilding(nodes, graph);
-
-                    //return graph;
-                    #endregion
-
-                    var graph = _graphEditor.GraphFactory<int>();
-                    IList<IEnumerable<int>> succeededPaths;
-
-                    Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
-                        () =>
+                    var graph = _cacheService.GetMonitored(_graphDescriptor, MakeCacheKey("SophisticatedAssociations.BaseGraph." + idsJoined, settings), () =>
                         {
-                            _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodes, graph));
-                            return graph;
-                        };
+                            var g = _graphEditor.GraphFactory<int>();
+                            IList<IEnumerable<int>> succeededPaths;
 
-                    var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache };
-                    var allPairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[0].Id, nodeList[1].Id, pathFinderSettings).SucceededPaths;
+                            Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
+                                () =>
+                                {
+                                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, g));
+                                    return g;
+                                };
 
-                    if (allPairSucceededPaths.Count() == 0) return emptyResult();
+                            var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache };
+                            var allPairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[0], nodeList[1], pathFinderSettings).SucceededPaths;
 
-                    if (nodeList.Count == 2)
-                    {
-                        succeededPaths = allPairSucceededPaths.ToList();
-                    }
-                    // Calculate the routes between every nodes pair, then calculate the intersection of the routes
-                    else
-                    {
-                        // We have to preserve the searched node ids in the succeeded paths despite the intersections
-                        var searchedNodeIds = new List<int>(nodeList.Count);
-                        nodes.ToList().ForEach(
-                                node => searchedNodeIds.Add(node.Id)
-                            );
+                            if (allPairSucceededPaths.Count() == 0) return emptyResult();
 
-                        var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
-
-                        for (int i = 0; i < nodeList.Count - 1; i++)
-                        {
-                            int n = i + 1;
-                            if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
-
-                            while (n < nodeList.Count)
+                            if (nodeList.Count == 2)
                             {
-                                // Here could be multithreading
-                                var pairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[i].Id, nodeList[n].Id, pathFinderSettings).SucceededPaths;
-                                commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
-                                allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
-
-                                n++;
+                                succeededPaths = allPairSucceededPaths.ToList();
                             }
-                        }
-
-
-                        if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return emptyResult();
-
-                        succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
-
-                        foreach (var path in allPairSucceededPaths)
-                        {
-                            var succeededPath = path.Intersect(commonSucceededNodeIds);
-                            if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
-                        }
-
-
-                        if (succeededPaths.Count() == 0) return emptyResult();
-                    }
-
-                    graph.AddVertexRange(getSucceededNodeIds(succeededPaths));
-
-                    foreach (var path in succeededPaths)
-                    {
-                        var pathList = path.ToList();
-                        for (int i = 1; i < pathList.Count; i++)
-                        {
-                            var node1Id = pathList[i - 1];
-                            var node2Id = pathList[i];
-
-                            // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
-                            // different order of source and dest are recognized as different edges.
-                            // See issue: http://quickgraph.codeplex.com/workitem/21805
-                            var newEdge = new UndirectedEdge<int>(node1Id, node2Id);
-                            IUndirectedEdge<int> reversedNewEdge;
-
-                            // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
-                            if (!graph.TryGetEdge(node2Id, node1Id, out reversedNewEdge))
+                            // Calculate the routes between every nodes pair, then calculate the intersection of the routes
+                            else
                             {
-                                graph.AddEdge(newEdge);
+                                // We have to preserve the searched node ids in the succeeded paths despite the intersections
+                                var searchedNodeIds = new List<int>(nodeList.Count);
+                                nodeIds.ToList().ForEach(
+                                        node => searchedNodeIds.Add(node)
+                                    );
+
+                                var commonSucceededNodeIds = getSucceededNodeIds(allPairSucceededPaths).Union(searchedNodeIds).ToList();
+
+                                for (int i = 0; i < nodeList.Count - 1; i++)
+                                {
+                                    int n = i + 1;
+                                    if (i == 0) n = 2; // Because of the calculation of intersections the first iteration is already done above
+
+                                    while (n < nodeList.Count)
+                                    {
+                                        // Here could be multithreading
+                                        var pairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[i], nodeList[n], pathFinderSettings).SucceededPaths;
+                                        commonSucceededNodeIds = commonSucceededNodeIds.Intersect(getSucceededNodeIds(pairSucceededPaths).Union(searchedNodeIds)).ToList();
+                                        allPairSucceededPaths = allPairSucceededPaths.Union(pairSucceededPaths).ToList();
+
+                                        n++;
+                                    }
+                                }
+
+
+                                if (allPairSucceededPaths.Count() == 0 || commonSucceededNodeIds.Count == 0) return emptyResult();
+
+                                succeededPaths = new List<IEnumerable<int>>(allPairSucceededPaths.Count()); // We are oversizing, but it's worth the performance gain
+
+                                foreach (var path in allPairSucceededPaths)
+                                {
+                                    var succeededPath = path.Intersect(commonSucceededNodeIds);
+                                    if (succeededPath.Count() > 2) succeededPaths.Add(succeededPath); // Only paths where intersecting nodes are present
+                                }
+
+
+                                if (succeededPaths.Count() == 0) return emptyResult();
                             }
-                        }
-                    }
 
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodes, graph));
+                            g.AddVertexRange(getSucceededNodeIds(succeededPaths));
 
-                    return graph;
-                },
-                settings,
-                "SophisticatedAssociations." + String.Join(", ", nodes.Select(node => node.ContentItem.Id.ToString())));
-        }
+                            foreach (var path in succeededPaths)
+                            {
+                                var pathList = path.ToList();
+                                for (int i = 1; i < pathList.Count; i++)
+                                {
+                                    var node1Id = pathList[i - 1];
+                                    var node2Id = pathList[i];
 
-        protected IUndirectedGraph<int, IUndirectedEdge<int>> MakeGraph(
-            Func<IUndirectedGraph<int, IUndirectedEdge<int>>> createIdGraph,
-            IMindSettings settings,
-            string cacheKey)
-        {
-            if (settings.UseCache)
-            {
-                cacheKey = MakeCacheKey(_graphDescriptor.Name + "." + cacheKey + ".MindSettings:" + settings.Algorithm + settings.MaxDistance + ".Zoom:" + settings.ZoomLevel + "/" + settings.ZoomLevelCount);
-                return _cacheManager.Get(cacheKey, ctx =>
-                {
-                    _graphEventMonitor.MonitorChanged(_graphDescriptor, ctx);
-                    return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
+                                    // Despite the graph being undirected and not allowing parallel edges, the same edges, registered with a 
+                                    // different order of source and dest are recognized as different edges.
+                                    // See issue: http://quickgraph.codeplex.com/workitem/21805
+                                    var newEdge = new UndirectedEdge<int>(node1Id, node2Id);
+                                    IUndirectedEdge<int> reversedNewEdge;
+
+                                    // It's sufficient to only check the reversed edge; if newEdge is present it will be overwritten without problems
+                                    if (!g.TryGetEdge(node2Id, node1Id, out reversedNewEdge))
+                                    {
+                                        g.AddEdge(newEdge);
+                                    }
+                                }
+                            }
+
+                            return g;
+                        }, settings.UseCache);
+
+                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
+
+                    return QueryableGraphHelper.LastStepsWithPaging(new Params
+                    {
+                        CacheService = _cacheService,
+                        GraphEditor = _graphEditor,
+                        GraphDescriptor = _graphDescriptor,
+                        ExecutionParameters = parameters,
+                        Graph = graph,
+                        BaseCacheKey = MakeCacheKey("SophisticatedAssociations." + idsJoined, settings),
+                        UseCache = settings.UseCache
+                    });
                 });
-            }
-
-            return _graphEditor.CreateZoomedGraph<int>(createIdGraph(), settings.ZoomLevel, settings.ZoomLevelCount);
         }
 
-
-        protected static string MakeCacheKey(string name)
+        protected dynamic LastSteps(IExecutionParams parameters, IUndirectedGraph<int, IUndirectedEdge<int>> graph, string cacheName, IMindSettings settings)
         {
-            return _cachePrefix + name;
+            return QueryableGraphHelper.LastSteps(new Params
+            {
+                CacheService = _cacheService,
+                GraphEditor = _graphEditor,
+                GraphDescriptor = _graphDescriptor,
+                ExecutionParameters = parameters,
+                Graph = graph,
+                BaseCacheKey = MakeCacheKey(cacheName, settings),
+                UseCache = settings.UseCache
+            });
+        }
+
+        protected string MakeCacheKey(string name, IMindSettings settings)
+        {
+            return CachePrefix + _graphDescriptor.Name + "." + name + ".MindSettings:" + settings.Algorithm + "/" + settings.MaxDistance;
         }
 
         protected void MakeSettings(ref IMindSettings settings)

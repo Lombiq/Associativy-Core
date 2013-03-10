@@ -1,4 +1,5 @@
-﻿using Associativy.Services;
+﻿using Associativy.Queryable;
+using Associativy.Services;
 using Autofac;
 using Autofac.Core;
 using Orchard.Environment.Extensions;
@@ -16,6 +17,7 @@ namespace Associativy
 
             builder.RegisterGeneric(typeof(SqlConnectionManager<>)).As(typeof(ISqlConnectionManager<>)).InstancePerLifetimeScope();
             builder.RegisterGeneric(typeof(GraphServicesFactory<,,,,>)).As(typeof(IGraphServicesFactory<,,,,>)).InstancePerLifetimeScope();
+            builder.RegisterGeneric(typeof(QueryableGraph<>)).As(typeof(IQueryableGraph<>));
 
             builder.Update(componentRegistry);
         }

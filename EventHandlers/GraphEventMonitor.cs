@@ -2,58 +2,43 @@
 using Associativy.GraphDiscovery;
 using Orchard;
 using Orchard.Caching;
+using Orchard.Caching.Services;
 
 namespace Associativy.EventHandlers
 {
     public class GraphEventMonitor : GraphEventHandlerBase, IGraphEventMonitor
     {
-        private readonly ISignals _signals;
-        private readonly ISignalStorage _signalStorage;
+        private const string KeyChainCacheKey = "Associativy.GraphEventMonitor.KeyChain";
+
+        private readonly ICacheService _cacheService;
 
 
-        public GraphEventMonitor(ISignals signals, ISignalStorage signalStorage)
+        public GraphEventMonitor(ICacheService cacheService)
         {
-            _signals = signals;
-            _signalStorage = signalStorage;
+            _cacheService = cacheService;
         }
 
 
-        public void MonitorChanged(IGraphDescriptor graphDescriptor, IAcquireContext acquireContext)
+        public void MonitorChanged(IGraphDescriptor graphDescriptor, string cacheKey)
         {
-            var signal = graphDescriptor.Name + "ChangedSignal";
-            _signalStorage.Signals[graphDescriptor.Name] = signal;
-            acquireContext.Monitor(_signals.When(signal));
+            GetKeys().TryAdd(cacheKey, 0);
         }
 
         public override void Changed(IGraphDescriptor graphDescriptor)
         {
-            string signal;
-            if (_signalStorage.Signals.TryGetValue(graphDescriptor.Name, out signal))
+            foreach (var keyKvp in GetKeys())
             {
-                _signals.Trigger(signal);
+                _cacheService.Remove(keyKvp.Key);
             }
         }
-    }
 
-    public interface ISignalStorage : ISingletonDependency
-    {
-        ConcurrentDictionary<string, string> Signals { get; }
-    }
 
-    /// <summary>
-    /// Stores signal objects
-    /// </summary>
-    /// <remarks>
-    /// It's crucial that this dictionary stays alive at least as long as the ISignals instance. ISignals is an 
-    /// ISingletonDependency too.
-    /// </remarks>
-    public class SignalStorage : ISignalStorage
-    {
-        private readonly ConcurrentDictionary<string, string> _signals = new ConcurrentDictionary<string, string>();
-
-        public ConcurrentDictionary<string, string> Signals
+        private ConcurrentDictionary<string, byte> GetKeys()
         {
-            get { return _signals; }
+            return _cacheService.Get(KeyChainCacheKey, () =>
+                        {
+                            return new ConcurrentDictionary<string, byte>();
+                        });
         }
     }
 }

@@ -24,6 +24,8 @@ using Orchard.Tests.Utility;
 using QuickGraph;
 using Associativy.Tests.Helpers;
 using Associativy.Models.Services;
+using Orchard.Caching.Services;
+using Associativy.Queryable;
 
 namespace Associativy.Tests.Services
 {
@@ -41,9 +43,12 @@ namespace Associativy.Tests.Services
             var builder = new ContainerBuilder();
 
 
-            builder.RegisterInstance(new GraphEventMonitor(new Signals(), new SignalStorage())).As<IGraphEventMonitor>();
+            var cacheService = new StubCacheService();
+            builder.RegisterInstance(new GraphEventMonitor(cacheService)).As<IGraphEventMonitor>();
             builder.RegisterInstance(new StubGraphEditor()).As<IGraphEditor>();
-            builder.RegisterInstance(new StubCacheManager()).As<ICacheManager>();
+            builder.RegisterInstance(cacheService).As<ICacheService>();
+            builder.RegisterInstance(new StubQueryableGraphFactory()).As<IQueryableGraphFactory>();
+            builder.RegisterType<GraphCacheService>().As<IGraphCacheService>();
             builder.RegisterType<StubGraphManager>().As<IGraphManager>();
             builder.RegisterType<MemoryConnectionManager>().As<IConnectionManager>();
             builder.RegisterType<StandardPathFinder>().As<IPathFinder>();
@@ -66,7 +71,7 @@ namespace Associativy.Tests.Services
             var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["medicine"], nodes["colour"]);
-            var succeededGraph = result.SucceededGraph;
+            var succeededGraph = result.SucceededGraph.ToGraph();
             var succeededPaths = result.SucceededPaths;
 
             var rightPath = new IContent[] { nodes["medicine"], nodes["cyanide"], nodes["cyan"], nodes["colour"] };
@@ -86,7 +91,7 @@ namespace Associativy.Tests.Services
             var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["American"], nodes["writer"]);
-            var succeededGraph = result.SucceededGraph;
+            var succeededGraph = result.SucceededGraph.ToGraph();
             var succeededPaths = result.SucceededPaths;
 
             var rightPath = new IContent[] { nodes["American"], nodes["Ernest Hemingway"], nodes["writer"] };
@@ -106,7 +111,7 @@ namespace Associativy.Tests.Services
             var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["yellow"], nodes["light year"]);
-            var succeededGraph = result.SucceededGraph;
+            var succeededGraph = result.SucceededGraph.ToGraph();
             var succeededPaths = result.SucceededPaths.ToList();
 
             var rightPath1 = new IContent[] { nodes["yellow"], nodes["sun"], nodes["light"], nodes["light year"] };
@@ -130,7 +135,7 @@ namespace Associativy.Tests.Services
             var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["blue"], nodes["medicine"]);
-            var succeededGraph = result.SucceededGraph;
+            var succeededGraph = result.SucceededGraph.ToGraph();
             var succeededPaths = result.SucceededPaths;
 
             Assert.That(succeededGraph.VertexCount, Is.EqualTo(0));
@@ -145,7 +150,7 @@ namespace Associativy.Tests.Services
             var nodes = TestGraphHelper.BuildTestGraph(_contentManager, _graphDescriptor).Nodes;
 
             var result = CalcPathResult(nodes["writer"], nodes["plant"]);
-            var succeededGraph = result.SucceededGraph;
+            var succeededGraph = result.SucceededGraph.ToGraph();
             var succeededPaths = result.SucceededPaths;
 
             Assert.That(succeededGraph.VertexCount, Is.EqualTo(0));

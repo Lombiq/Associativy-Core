@@ -13,7 +13,6 @@ namespace Associativy.EventHandlers
     public interface IMindEventHandler : IEventHandler
     {
         void AllAssociationsGraphBuilt(AllAssociationsGraphBuiltContext context);
-        void PartialGraphBuilt(PartialGraphBuiltContext context);
         void SearchedGraphBuilt(SearchedGraphBuiltContext context);
     }
 
@@ -40,25 +39,14 @@ namespace Associativy.EventHandlers
         }
     }
 
-    public class PartialGraphBuiltContext : MindEventContext
-    {
-        public IContent CenterNode { get; private set; }
-
-        public PartialGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IContent centerNode, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
-            : base(graphDescriptor, settings, idGraph)
-        {
-            CenterNode = centerNode;
-        }
-    }
-
     public class SearchedGraphBuiltContext : MindEventContext
     {
-        public IEnumerable<IContent> Nodes { get; private set; }
+        public IEnumerable<int> NodeIds { get; private set; }
 
-        public SearchedGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<IContent> nodes, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public SearchedGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<int> nodeIds, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
-            Nodes = nodes;
+            NodeIds = nodeIds;
         }
     }
 }

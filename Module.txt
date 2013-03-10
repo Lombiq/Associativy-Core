@@ -10,4 +10,4 @@ Features:
 		Name: Associativy Core
         Description: Core functionality of the Associativy platform
 		Category: Associativy
-		Dependencies: Orchard.jQuery, Orchard.Tokens, Title
+		Dependencies: Orchard.Caching, Orchard.jQuery, Orchard.Tokens, Title

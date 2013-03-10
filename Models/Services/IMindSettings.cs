@@ -5,7 +5,7 @@ namespace Associativy.Models.Services
     public interface IMindSettings
     {
         /// <summary>
-        /// The algorithm to use to fing associations
+        /// The algorithm to use to find associations
         /// </summary>
         string Algorithm { get; set; }
 
@@ -15,24 +15,9 @@ namespace Associativy.Models.Services
         bool UseCache { get; set; }
 
         /// <summary>
-        /// Current level of zoom
-        /// </summary>
-        int ZoomLevel { get; set; }
-
-        /// <summary>
-        /// Maximal number of zoom levels
-        /// </summary>
-        int ZoomLevelCount { get; set; }
-
-        /// <summary>
         /// Maximal distance between two nodes that can be considered as related
         /// </summary>
         int MaxDistance { get; set; }
-
-        /// <summary>
-        /// Maximal number of nodes retrieved
-        /// </summary>
-        int MaxNodeCount { get; set; }
     }
 
     public static class MindSettingsExtensions
@@ -43,10 +28,7 @@ namespace Associativy.Models.Services
             {
                 Algorithm = settings.Algorithm,
                 UseCache = settings.UseCache,
-                ZoomLevel = settings.ZoomLevel,
-                ZoomLevelCount = settings.ZoomLevelCount,
                 MaxDistance = settings.MaxDistance,
-                MaxNodeCount = settings.MaxNodeCount
             };
         }
     }
