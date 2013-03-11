@@ -7,7 +7,7 @@ using Associativy.Queryable;
 using Associativy.Services;
 using QuickGraph;
 
-namespace Associativy.Helpers
+namespace Associativy.Queryable
 {
     public static class QueryableGraphHelper
     {
@@ -30,7 +30,7 @@ namespace Associativy.Helpers
             var zoom = parameters.ExecutionParameters.Zoom;
             var graph = parameters.Graph;
 
-            if (!zoom.IsFlat())
+            if (zoom.IsSet() && !zoom.IsFlat())
             {
                 graph = parameters.CacheService.GetMonitored(
                     parameters.GraphDescriptor,

@@ -56,6 +56,11 @@ namespace Associativy.Queryable
         {
             return zoom.Level == zoom.Count - 1;
         }
+
+        public static bool IsSet(this IZoom zoom)
+        {
+            return zoom.Level >= 0 && zoom.Count >= 0;
+        }
     }
 
     public interface IPaging

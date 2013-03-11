@@ -69,6 +69,7 @@ namespace Associativy.Queryable
         public int ZoomLevelCount(int maximalZoomLevelCount)
         {
             _executionParams.Method = ExecutionMethod.ZoomLevelCount;
+            _executionParams.ZoomImpl.Count = maximalZoomLevelCount;
 
             return Value();
         }
@@ -112,7 +113,8 @@ namespace Associativy.Queryable
 
             public ZoomImpl()
             {
-                Count = 1;
+                Level = int.MinValue;
+                Count = int.MinValue;
             }
         }
 

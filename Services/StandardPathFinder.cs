@@ -10,7 +10,6 @@ using QuickGraph;
 using System;
 using Associativy.Queryable;
 using Orchard.ContentManagement;
-using Associativy.Helpers;
 
 namespace Associativy.Services
 {

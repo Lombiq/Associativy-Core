@@ -118,7 +118,7 @@
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeTitleLabelPartHandler.cs" />
-    <Compile Include="Helpers\QueryableGraphHelper.cs" />
+    <Compile Include="Queryable\QueryableGraphHelper.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="Models\AssociativyNodeTitleLabelPart.cs" />
     <Compile Include="Models\IAssociativyNodeLabelAspect.cs" />

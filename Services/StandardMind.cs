@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
-using Associativy.Helpers;
 using Associativy.Models.Services;
 using Associativy.Queryable;
 using Orchard;
