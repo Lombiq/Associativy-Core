@@ -16,7 +16,7 @@ namespace Associativy.Queryable
         IQueryParams Params { get; } 
 
         IQueryableGraph<TNode> Zoom(int level, int count);
-        IQueryableGraph<TNode> SkipConnections  (int count);
+        IQueryableGraph<TNode> SkipConnections(int count);
         IQueryableGraph<TNode> TakeConnections(int count);
         int NodeCount();
         int ConnectionCount();
