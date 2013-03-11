@@ -150,7 +150,6 @@
     <Compile Include="Services\GraphServiceBase.cs" />
     <Compile Include="Services\GraphServicesFactory.cs" />
     <Compile Include="Services\IGraphStatisticsService.cs" />
-    <Compile Include="Services\StandardGraphStatisticsService.cs" />
     <Compile Include="Services\GraphServices.cs" />
     <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />

@@ -7,6 +7,9 @@ using Orchard.Localization;
 
 namespace Associativy.GraphDiscovery
 {
+    /// <summary>
+    /// Describes the capabilities of an associative graph
+    /// </summary>
     public interface IGraphDescriptor
     {
         string Name { get; }

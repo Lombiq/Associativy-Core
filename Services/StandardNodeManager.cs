@@ -12,7 +12,7 @@ using QuickGraph;
 
 namespace Associativy.Services
 {
-    public interface IStandardNodeManager : INodeManager, IDependency
+    public interface IStandardNodeManager : INodeManager, ITransientDependency
     {
     }
 

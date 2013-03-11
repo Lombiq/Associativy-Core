@@ -13,6 +13,5 @@ namespace Associativy.Services
     public interface IGraphStatisticsService
     {
         IGraphInfo GetGraphInfo();
-        IEnumerable<int> GetBiggestNodes(int maxCount);
     }
 }

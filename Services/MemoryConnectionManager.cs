@@ -9,6 +9,7 @@ using Orchard.Caching;
 using Associativy.Models.Nodes;
 using System.Threading;
 using Orchard.Caching.Services;
+using Associativy.Models.Services;
 
 namespace Associativy.Services
 {
@@ -150,6 +151,15 @@ namespace Associativy.Services
             return 0;
         }
 
+        public IGraphInfo GetGraphInfo()
+        {
+            return new GraphInfo
+            {
+                NodeCountLazy = new Lazy<int>(() => GetGraph().Connections.Count),
+                ConnectionCount = GetGraph().ConnectionCount
+            };
+        }
+
 
         protected Graph GetGraph()
         {
@@ -167,6 +177,15 @@ namespace Associativy.Services
                 ConnectionCount = 0;
                 Connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, byte>>();
             }
+        }
+
+
+        protected class GraphInfo : IGraphInfo
+        {
+            public Lazy<int> NodeCountLazy { get; set; }
+            public int NodeCount { get { return NodeCountLazy.Value; } }
+            public int ConnectionCount { get; set; }
+            public int CentralNodeId { get; set; }
         }
     }
 }

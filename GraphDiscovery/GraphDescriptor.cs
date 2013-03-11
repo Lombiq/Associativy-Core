@@ -6,9 +6,6 @@ using Orchard.Localization;
 
 namespace Associativy.GraphDiscovery
 {
-    /// <summary>
-    /// Describes the capabilities of an associative graph
-    /// </summary>
     [OrchardFeature("Associativy")]
     public class GraphDescriptor : IGraphDescriptor
     {
@@ -28,16 +25,4 @@ namespace Associativy.GraphDiscovery
             _graphServicesField = new Lazy<IGraphServices>(() => servicesFactory(this));
         }
     }
-
-    //[OrchardFeature("Associativy")]
-    //public static class GraphDescriptorExtensions
-    //{
-    //    /// <summary>
-    //    /// Creates the maximal context the descriptor supports
-    //    /// </summary>
-    //    public static IGraphContext ProduceMaximalContext(this GraphDescriptor descriptor)
-    //    {
-    //        return new GraphContext { GraphName = descriptor.GraphName, ContentTypes = descriptor.ContentTypes };
-    //    }
-    //}
 }

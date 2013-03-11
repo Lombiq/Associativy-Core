@@ -15,7 +15,7 @@ using QuickGraph;
 
 namespace Associativy.Services
 {
-    public interface IStandardMind : IMind, IDependency
+    public interface IStandardMind : IMind, ITransientDependency
     {
     }
 

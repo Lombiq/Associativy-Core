@@ -4,6 +4,7 @@ using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models;
+using Associativy.Models.Services;
 using Orchard.Data;
 using Orchard.Environment.Extensions;
 
@@ -119,6 +120,13 @@ namespace Associativy.Services
             TryLoadConnections();
 
             return _memoryConnectionManager.GetNeighbourCount(nodeId);
+        }
+
+        public virtual IGraphInfo GetGraphInfo()
+        {
+            TryLoadConnections();
+
+            return _memoryConnectionManager.GetGraphInfo();
         }
     }
 }
