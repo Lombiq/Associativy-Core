@@ -11,7 +11,7 @@ namespace Associativy.Services
     /// <summary>
     /// Deals with node-to-node path calculations
     /// </summary>
-    public interface IPathFinder
+    public interface IPathFinder : IGraphAwareService
     {
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.

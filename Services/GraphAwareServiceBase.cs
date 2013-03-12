@@ -8,11 +8,11 @@ using Orchard.Environment.Extensions;
 namespace Associativy.Services
 {
     [OrchardFeature("Associativy")]
-    public class GraphServiceBase
+    public class GraphAwareServiceBase
     {
         protected readonly IGraphDescriptor _graphDescriptor;
 
-        protected GraphServiceBase(IGraphDescriptor graphDescriptor)
+        protected GraphAwareServiceBase(IGraphDescriptor graphDescriptor)
         {
             _graphDescriptor = graphDescriptor;
         }

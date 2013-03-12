@@ -9,7 +9,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    public interface INodeManager
+    public interface INodeManager : IGraphAwareService
     {
         /// <summary>
         /// Query for customized retrieving of nodes

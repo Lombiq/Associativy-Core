@@ -29,10 +29,5 @@ namespace Associativy.Services
         /// Service for handling nodes
         /// </summary>
         INodeManager NodeManager { get; }
-
-        /// <summary>
-        /// Provides information about a graph
-        /// </summary>
-        IGraphStatisticsService GraphStatisticsService { get; }
     }
 }

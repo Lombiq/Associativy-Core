@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Associativy.GraphDiscovery;
 using Associativy.Models;
+using Associativy.Models.Services;
 using Orchard.ContentManagement;
 
 namespace Associativy.Services
@@ -8,7 +9,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for dealing with connections between nodes
     /// </summary>
-    public interface IConnectionManager
+    public interface IConnectionManager : IGraphAwareService
     {
         /// <summary>
         /// Checks if the nodes are neighbours (= directly connected to each other)
@@ -65,6 +66,12 @@ namespace Associativy.Services
         /// <param name="nodeId">Id of the node</param>
         /// <returns>The count of all the directly connected (= neighbour) nodes</returns>
         int GetNeighbourCount(int nodeId);
+
+        /// <summary>
+        /// Provides basic information about the graph
+        /// </summary>
+        /// <returns></returns>
+        IGraphInfo GetGraphInfo();
     }
 
     public static class ConnectionManagerExtensions

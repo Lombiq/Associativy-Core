@@ -19,7 +19,7 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class StandardMind : GraphServiceBase, IStandardMind
+    public class StandardMind : GraphAwareServiceBase, IStandardMind
     {
         protected readonly IQueryableGraphFactory _queryableFactory;
         protected readonly IGraphEditor _graphEditor;
@@ -57,7 +57,7 @@ namespace Associativy.Services
                     if ((method == ExecutionMethod.NodeCount || method == ExecutionMethod.ConnectionCount)
                             && zoom.IsFlat() && parameters.Paging.SkipConnections == 0)
                     {
-                        var graphInfo = _graphDescriptor.Services.GraphStatisticsService.GetGraphInfo();
+                        var graphInfo = _graphDescriptor.Services.ConnectionManager.GetGraphInfo();
                         var totalConnectionCount = graphInfo.ConnectionCount;
 
                         if (method == ExecutionMethod.ConnectionCount)

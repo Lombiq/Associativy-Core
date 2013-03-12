@@ -18,9 +18,6 @@ namespace Associativy.Services
 
         protected INodeManager _nodeManager;
         public INodeManager NodeManager { get { return _nodeManager; } }
-
-        protected IGraphStatisticsService _graphStatisticsService;
-        public IGraphStatisticsService GraphStatisticsService { get { return _graphStatisticsService; } }
     }
 
     [OrchardFeature("Associativy")]
@@ -30,14 +27,12 @@ namespace Associativy.Services
             IMind mind,
             IConnectionManager connectionManager,
             IPathFinder pathFinder,
-            INodeManager nodeManager,
-            IGraphStatisticsService graphStatisticsService)
+            INodeManager nodeManager)
         {
             _mind = mind;
             _connectionManager = connectionManager;
             _pathFinder = pathFinder;
             _nodeManager = nodeManager;
-            _graphStatisticsService = graphStatisticsService;
         }
     }
 }

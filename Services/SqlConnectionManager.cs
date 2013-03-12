@@ -15,7 +15,7 @@ namespace Associativy.Services
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
     [OrchardFeature("Associativy")]
-    public class SqlConnectionManager<TNodeToNodeConnectorRecord> : GraphServiceBase, ISqlConnectionManager<TNodeToNodeConnectorRecord>
+    public class SqlConnectionManager<TNodeToNodeConnectorRecord> : GraphAwareServiceBase, ISqlConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
         protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;

@@ -16,7 +16,7 @@ namespace Associativy.Services
     /// <summary>
     /// Connections manager storing the graph in memory (i.e. not persisting it)
     /// </summary>
-    public class MemoryConnectionManager : GraphServiceBase, IMemoryConnectionManager
+    public class MemoryConnectionManager : GraphAwareServiceBase, IMemoryConnectionManager
     {
         protected readonly ICacheService _cacheService;
         protected readonly IGraphEventHandler _graphEventHandler;

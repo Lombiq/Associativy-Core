@@ -24,7 +24,7 @@ namespace Associativy.Services
     }
 
     [OrchardFeature("Associativy")]
-    public class StandardPathFinder : GraphServiceBase, IStandardPathFinder
+    public class StandardPathFinder : GraphAwareServiceBase, IStandardPathFinder
     {
         protected readonly IGraphEditor _graphEditor;
         protected readonly IGraphCacheService _cacheService;

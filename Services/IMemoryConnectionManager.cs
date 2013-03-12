@@ -3,7 +3,7 @@ using Orchard;
 
 namespace Associativy.Services
 {
-    public interface IMemoryConnectionManager : IConnectionManager, IGraphStatisticsService, ITransientDependency
+    public interface IMemoryConnectionManager : IConnectionManager, ITransientDependency
     {
         int GetConnectionCount();
     }

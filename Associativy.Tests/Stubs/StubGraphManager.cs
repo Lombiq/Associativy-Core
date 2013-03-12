@@ -15,7 +15,7 @@ namespace Associativy.Tests.Stubs
         private readonly IGraphServicesFactory _graphServicesFactory;
 
 
-        public StubGraphManager(IGraphServicesFactory<IMind, IConnectionManager, IPathFinder, INodeManager, IGraphStatisticsService> graphServicesFactory)
+        public StubGraphManager(IGraphServicesFactory<IMind, IConnectionManager, IPathFinder, INodeManager> graphServicesFactory)
         {
             _graphServicesFactory = graphServicesFactory;
         }
@@ -39,7 +39,7 @@ namespace Associativy.Tests.Stubs
 
         public static void Setup(ContainerBuilder builder)
         {
-            builder.RegisterGeneric(typeof(GraphServicesFactory<,,,,>)).As(typeof(IGraphServicesFactory<,,,,>));
+            builder.RegisterGeneric(typeof(GraphServicesFactory<,,,>)).As(typeof(IGraphServicesFactory<,,,>));
         }
 
 
