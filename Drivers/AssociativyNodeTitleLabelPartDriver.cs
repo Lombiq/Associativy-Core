@@ -8,7 +8,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Drivers
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeTitleLabelPartDriver : ContentPartDriver<AssociativyNodeTitleLabelPart>
     {
         protected override DriverResult Display(AssociativyNodeTitleLabelPart part, string displayType, dynamic shapeHelper)

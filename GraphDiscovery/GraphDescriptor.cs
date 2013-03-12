@@ -6,7 +6,6 @@ using Orchard.Localization;
 
 namespace Associativy.GraphDiscovery
 {
-    [OrchardFeature("Associativy")]
     public class GraphDescriptor : IGraphDescriptor
     {
         public string Name { get; private set; }

@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Models.Nodes
 {
-    [OrchardFeature("Associativy")]
     public class NodeConnector : INodeToNodeConnector
     {
         public int Node1Id { get; set; }

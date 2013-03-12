@@ -9,7 +9,6 @@ using Orchard.ContentManagement;
 
 namespace Associativy.Handlers
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeTitleLabelPartHandler : ContentHandler
     {
         protected override void GetItemMetadata(GetContentItemMetadataContext context)

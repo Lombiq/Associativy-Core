@@ -7,7 +7,6 @@ using Orchard.Localization;
 
 namespace Associativy.GraphDiscovery
 {
-    [OrchardFeature("Associativy")]
     public class DescribeContext
     {
         private readonly List<IGraphDescriptor> _descriptors;

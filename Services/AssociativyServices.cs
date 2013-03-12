@@ -4,7 +4,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyServices : IAssociativyServices
     {
         protected readonly IGraphManager _graphManager;

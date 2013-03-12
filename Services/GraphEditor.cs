@@ -8,7 +8,6 @@ using QuickGraph;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
     public class GraphEditor : IGraphEditor
     {
         public IMutableUndirectedGraph<TNode, IUndirectedEdge<TNode>> GraphFactory<TNode>()

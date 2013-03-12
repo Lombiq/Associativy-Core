@@ -3,7 +3,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Models
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeLabelPart : ContentPart<AssociativyNodeLabelPartRecord>, IAssociativyNodeLabelAspect
     {
         public string Label

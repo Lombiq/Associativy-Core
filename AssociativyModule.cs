@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyModule : IModule
     {
         public void Configure(IComponentRegistry componentRegistry)

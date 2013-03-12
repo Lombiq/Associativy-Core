@@ -7,7 +7,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Handlers
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeHandler : ContentHandler
     {
         private readonly Lazy<IGraphManager> _graphManager;

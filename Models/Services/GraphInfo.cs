@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Models.Services
 {
-    [OrchardFeature("Associativy")]
     public class GraphInfo : IGraphInfo
     {
         public int NodeCount { get; set; }

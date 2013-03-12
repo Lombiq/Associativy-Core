@@ -4,7 +4,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.GraphDiscovery
 {
-    [OrchardFeature("Associativy")]
     [Serializable]
     public class GraphContext : IGraphContext
     {

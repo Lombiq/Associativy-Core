@@ -11,7 +11,6 @@ using Orchard.Tokens;
 
 namespace Associativy.Handlers
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeLabelPartHandler : ContentHandler
     {
         public AssociativyNodeLabelPartHandler(

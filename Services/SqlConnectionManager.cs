@@ -14,7 +14,6 @@ namespace Associativy.Services
     /// Service for dealing with connections between nodes, persisting connections in the SQL database
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    [OrchardFeature("Associativy")]
     public class SqlConnectionManager<TNodeToNodeConnectorRecord> : GraphAwareServiceBase, ISqlConnectionManager<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {

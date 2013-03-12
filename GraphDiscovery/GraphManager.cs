@@ -5,7 +5,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.GraphDiscovery
 {
-    [OrchardFeature("Associativy")]
     public class GraphManager : IGraphManager
     {
         private readonly IEnumerable<IGraphProvider> _graphProviders;

@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Drivers
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeLabelPartDriver : ContentPartDriver<AssociativyNodeLabelPart>
     {
         protected override string Prefix

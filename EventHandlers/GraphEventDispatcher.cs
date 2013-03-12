@@ -2,7 +2,6 @@
 namespace Associativy.EventHandlers
 {
     // If needed, needs to handle the grapProvider
-    //[OrchardFeature("Associativy")]
     //public class GraphEventDispatcher : IAssociativeGraphEventDispatcher
     //{
     //    public event EventHandler ChangedEvent;

@@ -9,7 +9,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Settings
 {
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeLabelTypePartSettings
     {
         public string DefaultLabelPattern { get; set; }
@@ -21,7 +20,6 @@ namespace Associativy.Settings
         }
     }
 
-    [OrchardFeature("Associativy")]
     public class AssociativyNodeLabelSettingsHooks : ContentDefinitionEditorEventsBase
     {
         private string _contentType;

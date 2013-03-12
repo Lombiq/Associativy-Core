@@ -7,7 +7,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
     public class GraphAwareServiceBase
     {
         protected readonly IGraphDescriptor _graphDescriptor;

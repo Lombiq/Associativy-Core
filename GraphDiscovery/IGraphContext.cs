@@ -23,7 +23,6 @@ namespace Associativy.GraphDiscovery
         IEnumerable<string> ContentTypes { get; }
     }
 
-    [OrchardFeature("Associativy")]
     public static class GraphContextExtensions
     {
         public static string Stringify(this IGraphContext graphContext)

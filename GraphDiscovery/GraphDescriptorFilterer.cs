@@ -5,7 +5,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.GraphDiscovery
 {
-    [OrchardFeature("Associativy")]
     public class GraphDescriptorFilterer : IGraphDescriptorFilterer
     {
         public IEnumerable<IGraphDescriptor> FilterByMatchingGraphContext(IEnumerable<IGraphDescriptor> descriptors, IGraphContext graphContext) 

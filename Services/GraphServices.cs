@@ -4,7 +4,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {
-    [OrchardFeature("Associativy")]
     public abstract class GraphServicesBase : IGraphServices
     {
         protected IMind _mind;
@@ -20,7 +19,6 @@ namespace Associativy.Services
         public INodeManager NodeManager { get { return _nodeManager; } }
     }
 
-    [OrchardFeature("Associativy")]
     public class GraphServices : GraphServicesBase
     {
         public GraphServices(

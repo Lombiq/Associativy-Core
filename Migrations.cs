@@ -6,7 +6,6 @@ using Orchard.Environment.Extensions;
 
 namespace Associativy.Migrations
 {
-    [OrchardFeature("Associativy")]
     public class Migrations : DataMigrationImpl
     {
         public int Create()

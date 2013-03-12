@@ -18,7 +18,6 @@ namespace Associativy.Services
     {
     }
 
-    [OrchardFeature("Associativy")]
     public class StandardMind : GraphAwareServiceBase, IStandardMind
     {
         protected readonly IQueryableGraphFactory _queryableFactory;

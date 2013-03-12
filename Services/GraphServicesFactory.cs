@@ -20,7 +20,6 @@ namespace Associativy.Services
     {
     }
 
-    [OrchardFeature("Associativy")]
     public class GraphServicesFactory<TMind, TConnectionManager, TPathFinder, TNodeManager>
         : IGraphServicesFactory<TMind, TConnectionManager, TPathFinder, TNodeManager>
         where TMind : IMind

@@ -16,7 +16,6 @@ namespace Associativy.Services
     {
     }
 
-    [OrchardFeature("Associativy")]
     public class StandardNodeManager : GraphAwareServiceBase, IStandardNodeManager
     {
         protected readonly IContentManager _contentManager;

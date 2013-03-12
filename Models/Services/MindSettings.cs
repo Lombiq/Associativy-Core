@@ -2,7 +2,6 @@
 
 namespace Associativy.Models.Services
 {
-    [OrchardFeature("Associativy")]
     public class MindSettings : IMindSettings
     {
         public string Algorithm { get; set; }
