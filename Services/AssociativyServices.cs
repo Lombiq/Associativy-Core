@@ -1,6 +1,5 @@
 ﻿using Associativy.GraphDiscovery;
 using Associativy.Queryable;
-using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {

@@ -1,5 +1,4 @@
-﻿using Orchard.ContentManagement;
-
+﻿
 namespace Associativy.Models.Services
 {
     public interface IMindSettings

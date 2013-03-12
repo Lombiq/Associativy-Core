@@ -1,5 +1,4 @@
-﻿using Orchard.Environment.Extensions;
-
+﻿
 namespace Associativy.Models.Services
 {
     public class MindSettings : IMindSettings

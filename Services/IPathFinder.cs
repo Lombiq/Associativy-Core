@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
-using Orchard;
-using QuickGraph;
 using Associativy.Queryable;
 using Orchard.ContentManagement;
 

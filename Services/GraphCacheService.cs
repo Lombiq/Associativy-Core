@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Orchard.Caching.Services;

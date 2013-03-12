@@ -1,5 +1,4 @@
-﻿using Orchard.Environment.Extensions;
-
+﻿
 namespace Associativy.Models
 {
     public abstract class NodeToNodeConnectorRecord : INodeToNodeConnector

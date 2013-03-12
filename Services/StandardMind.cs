@@ -6,10 +6,6 @@ using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
 using Associativy.Queryable;
 using Orchard;
-using Orchard.Caching;
-using Orchard.Caching.Services;
-using Orchard.ContentManagement;
-using Orchard.Environment.Extensions;
 using QuickGraph;
 
 namespace Associativy.Services

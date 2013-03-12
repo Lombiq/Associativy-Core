@@ -3,7 +3,6 @@ using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Services;
 using Orchard.ContentManagement.Handlers;
-using Orchard.Environment.Extensions;
 
 namespace Associativy.Handlers
 {

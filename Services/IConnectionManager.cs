@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Associativy.GraphDiscovery;
 using Associativy.Models;
 using Associativy.Models.Services;
 using Orchard.ContentManagement;

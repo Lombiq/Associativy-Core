@@ -1,6 +1,4 @@
-﻿using Associativy.GraphDiscovery;
-using Orchard;
-using Orchard.ContentManagement;
+﻿using Orchard;
 using QuickGraph;
 
 namespace Associativy.Services

@@ -6,7 +6,6 @@ using Associativy.GraphDiscovery;
 using Associativy.Models;
 using Associativy.Models.Services;
 using Orchard.Data;
-using Orchard.Environment.Extensions;
 
 namespace Associativy.Services
 {

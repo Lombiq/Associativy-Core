@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using Associativy.GraphDiscovery;
+using Associativy.Models.Services;
 using Orchard.Events;
 using QuickGraph;
-using Associativy.GraphDiscovery;
-using Orchard.ContentManagement;
-using Associativy.Models.Services;
 
 namespace Associativy.EventHandlers
 {

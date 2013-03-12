@@ -1,5 +1,4 @@
-﻿using Associativy.GraphDiscovery;
-using Orchard;
+﻿using Orchard;
 
 namespace Associativy.Services
 {

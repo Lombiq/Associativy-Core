@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Associativy.GraphDiscovery;
-using Orchard;
 using Orchard.ContentManagement;
 using QuickGraph;
 

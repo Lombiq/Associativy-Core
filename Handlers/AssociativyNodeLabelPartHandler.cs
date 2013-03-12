@@ -6,7 +6,6 @@ using Associativy.Settings;
 using Orchard.ContentManagement.Handlers;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Data;
-using Orchard.Environment.Extensions;
 using Orchard.Tokens;
 
 namespace Associativy.Handlers

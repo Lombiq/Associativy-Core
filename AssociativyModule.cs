@@ -2,7 +2,6 @@
 using Associativy.Services;
 using Autofac;
 using Autofac.Core;
-using Orchard.Environment.Extensions;
 
 namespace Associativy
 {

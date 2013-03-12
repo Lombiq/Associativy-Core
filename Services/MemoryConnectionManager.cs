@@ -2,14 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Associativy.Models;
-using Orchard.Caching;
-using Associativy.Models.Nodes;
-using System.Threading;
-using Orchard.Caching.Services;
 using Associativy.Models.Services;
+using Orchard.Caching.Services;
 
 namespace Associativy.Services
 {
