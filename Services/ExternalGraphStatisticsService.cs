@@ -14,7 +14,7 @@ namespace Associativy.Services
         private readonly ICacheService _cacheService;
         private readonly IRepository<GraphStatisticsRecord> _repository;
 
-        private const string CacheKeyPrefix = "Associativy.Neo4j.GraphStatistics.";
+        private const string CacheKeyPrefix = "Associativy.GraphStatistics.";
         private const string GraphInfoCacheKey = CacheKeyPrefix + "GraphInfo";
 
 
