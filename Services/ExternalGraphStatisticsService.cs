@@ -38,7 +38,8 @@ namespace Associativy.Services
                     return new GraphInfo
                     {
                         NodeCount = record.NodeCount,
-                        ConnectionCount = record.ConnectionCount
+                        ConnectionCount = record.ConnectionCount,
+                        CentralNodeId = record.CentralNodeId
                     };
                 });
         }
