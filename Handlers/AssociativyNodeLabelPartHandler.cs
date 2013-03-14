@@ -24,10 +24,7 @@ namespace Associativy.Handlers
             {
                 if (!String.IsNullOrWhiteSpace(part.Label)) return;
 
-                var settings = contentDefinitionManager.Value
-                    .GetTypeDefinition(context.ContentType)
-                    .Parts.First(x => x.PartDefinition.Name == "AssociativyNodeLabelPart")
-                    .Settings.GetModel<AssociativyNodeLabelTypePartSettings>();
+                var settings = part.Settings.GetModel<AssociativyNodeLabelTypePartSettings>();
 
                 // Setting label to the tokenized value
                 part.Label = tokenizer.Value.Replace(
