@@ -48,11 +48,12 @@ namespace Associativy.Services
                 {
                     var method = parameters.Method;
                     var zoom = parameters.Zoom;
+                    var paging = parameters.Paging;
+                    var graphInfo = _graphDescriptor.Services.ConnectionManager.GetGraphInfo();
 
                     if ((method == ExecutionMethod.NodeCount || method == ExecutionMethod.ConnectionCount)
                             && zoom.IsFlat() && parameters.Paging.SkipConnections == 0)
                     {
-                        var graphInfo = _graphDescriptor.Services.ConnectionManager.GetGraphInfo();
                         var totalConnectionCount = graphInfo.ConnectionCount;
 
                         if (method == ExecutionMethod.ConnectionCount)
@@ -67,15 +68,24 @@ namespace Associativy.Services
                     }
 
 
+                    if (graphInfo.ConnectionCount > paging.SkipConnections + paging.TakeConnections)
+                    {
+                        var query =
+                            _graphDescriptor.Services.PathFinder
+                            .GetPartialGraph(graphInfo.CentralNodeId, new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache });
+
+                        return query.ExecuteWithParams(parameters);
+                    }
+
                     var graph = _cacheService.GetMonitored(_graphDescriptor, QueryableGraphHelper.MakeCacheKey(MakeCacheKey("GetAllAssociations.BaseGraph", settings), parameters), () =>
                         {
                             var g = _graphEditor.GraphFactory<int>();
 
-                            if (parameters.Zoom.Count == 0) return g;
+                            if (parameters.Zoom.Count == 0 || graphInfo.ConnectionCount <= paging.SkipConnections) return g;
 
                             // This won't include nodes that are not connected to anything
                             g.AddVerticesAndEdgeRange(
-                                _graphDescriptor.Services.ConnectionManager.GetAll(parameters.Paging.SkipConnections, parameters.Paging.TakeConnections)
+                                _graphDescriptor.Services.ConnectionManager.GetAll(paging.SkipConnections, paging.TakeConnections)
                                     .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;

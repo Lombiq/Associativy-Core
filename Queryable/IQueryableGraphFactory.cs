@@ -13,7 +13,7 @@ namespace Associativy.Queryable
 
     public static class QueryableGraphFactoryExtensions
     {
-        public static IQueryableGraph<TNode> CopyValueFactory<TNode>(this IQueryableGraphFactory factory, IQueryableGraph<TNode> queryableGraph)
+        public static IQueryableGraph<TNode> CreateCopyWithValueFactory<TNode>(this IQueryableGraphFactory factory, IQueryableGraph<TNode> queryableGraph)
         {
             return factory.Create(queryableGraph.ValueFactory);
         }

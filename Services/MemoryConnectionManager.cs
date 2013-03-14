@@ -86,6 +86,22 @@ namespace Associativy.Services
             storeConnection(node2Id, node1Id, 1);
             Interlocked.Increment(ref graph.ConnectionCount);
 
+            var node1NeighbourCount = GetNeighbourCount(node1Id);
+            if (node1NeighbourCount > graph.BiggestNodeNeighbourCount)
+            {
+                graph.BiggestNodeId = node1Id;
+                graph.BiggestNodeNeighbourCount = node1NeighbourCount;
+            }
+            else
+            {
+                var node2NeighbourCount = GetNeighbourCount(node2Id);
+                if (node2NeighbourCount > graph.BiggestNodeNeighbourCount)
+                {
+                    graph.BiggestNodeId = node2Id;
+                    graph.BiggestNodeNeighbourCount = node2NeighbourCount;
+                }
+            }
+
             _graphEventHandler.ConnectionAdded(_graphDescriptor, node1Id, node2Id);
         }
 
@@ -101,9 +117,11 @@ namespace Associativy.Services
                     graph.Connections[neighbourId].TryRemove(nodeId, out dummyValue);
                     Interlocked.Decrement(ref graph.ConnectionCount);
                 }
-            }
 
-            _graphEventHandler.ConnectionsDeletedFromNode(_graphDescriptor, nodeId);
+                _graphEventHandler.ConnectionsDeletedFromNode(_graphDescriptor, nodeId);
+
+                if (graph.BiggestNodeId == nodeId) FindBiggestNode(graph);
+            }
         }
 
         public void Disconnect(int node1Id, int node2Id)
@@ -117,6 +135,8 @@ namespace Associativy.Services
             graph.Connections[node2Id].TryRemove(node1Id, out dummyValue);
 
             Interlocked.Decrement(ref graph.ConnectionCount);
+
+            if (graph.BiggestNodeId == node1Id || graph.BiggestNodeId == node2Id) FindBiggestNode(graph);
 
             _graphEventHandler.ConnectionDeleted(_graphDescriptor, node1Id, node2Id);
         }
@@ -154,7 +174,8 @@ namespace Associativy.Services
             return new GraphInfo
             {
                 NodeCountLazy = new Lazy<int>(() => GetGraph().Connections.Count),
-                ConnectionCount = GetGraph().ConnectionCount
+                ConnectionCountLazy = new Lazy<int>(() => GetGraph().ConnectionCount),
+                CentralNodeIdLazy = new Lazy<int>(() => GetGraph().BiggestNodeId)
             };
         }
 
@@ -165,14 +186,27 @@ namespace Associativy.Services
         }
 
 
+        protected static void FindBiggestNode(Graph graph)
+        {
+            var nodeKvp = graph.Connections.Aggregate((node1, node2) => node1.Value.Count > node2.Value.Count ? node1 : node2);
+            graph.BiggestNodeId = nodeKvp.Key;
+            graph.BiggestNodeNeighbourCount = nodeKvp.Value.Count;
+        }
+
+
         protected class Graph
         {
             public int ConnectionCount;
+            public int BiggestNodeId;
+            public int BiggestNodeNeighbourCount;
+
+            // Schema: [node1Id][node2Id] = dummy, stored both ways for fast lookup
             public ConcurrentDictionary<int, ConcurrentDictionary<int, byte>> Connections;
 
             public Graph()
             {
                 ConnectionCount = 0;
+                BiggestNodeNeighbourCount = 0;
                 Connections = new ConcurrentDictionary<int, ConcurrentDictionary<int, byte>>();
             }
         }
@@ -182,8 +216,10 @@ namespace Associativy.Services
         {
             public Lazy<int> NodeCountLazy { get; set; }
             public int NodeCount { get { return NodeCountLazy.Value; } }
-            public int ConnectionCount { get; set; }
-            public int CentralNodeId { get; set; }
+            public Lazy<int> ConnectionCountLazy { get; set; }
+            public int ConnectionCount { get { return ConnectionCountLazy.Value; } }
+            public Lazy<int> CentralNodeIdLazy { get; set; }
+            public int CentralNodeId { get { return CentralNodeIdLazy.Value; } }
         }
     }
 }
