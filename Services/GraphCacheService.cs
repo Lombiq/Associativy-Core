@@ -20,8 +20,11 @@ namespace Associativy.Services
 
         public T GetMonitored<T>(IGraphDescriptor descriptor, string key, Func<T> factory)
         {
-            _graphEventMonitor.MonitorChanged(descriptor, key);
-            return _cacheService.Get(key, factory);
+            return _cacheService.Get(key, () =>
+                {
+                    _graphEventMonitor.MonitorChanged(descriptor, key);
+                    return factory();
+                });
         }
     }
 }

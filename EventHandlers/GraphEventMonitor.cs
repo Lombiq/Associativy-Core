@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Associativy.GraphDiscovery;
 using Orchard.Caching.Services;
+using System.Linq;
 
 namespace Associativy.EventHandlers
 {
@@ -19,23 +21,44 @@ namespace Associativy.EventHandlers
 
         public void MonitorChanged(IGraphDescriptor graphDescriptor, string cacheKey)
         {
-            GetKeys().TryAdd(cacheKey, 0);
+            var newDicionaryLazy = new Lazy<ConcurrentDictionary<string, byte>>(() =>
+                {
+                    var dictionary = new ConcurrentDictionary<string, byte>();
+                    dictionary[cacheKey] = 0;
+                    return dictionary;
+                });
+
+            GetKeys().AddOrUpdate(
+                graphDescriptor.Name,
+                newDicionaryLazy.Value,
+                (key, dictionary) =>
+                {
+                    dictionary[cacheKey] = 0;
+                    return dictionary;
+                });
         }
 
         public override void Changed(IGraphDescriptor graphDescriptor)
         {
-            foreach (var keyKvp in GetKeys())
+            ConcurrentDictionary<string, byte> dictionary;
+            if (GetKeys().TryGetValue(graphDescriptor.Name, out dictionary))
             {
-                _cacheService.Remove(keyKvp.Key);
+                byte dummy;
+
+                foreach (var cacheKey in dictionary.Keys.ToList())
+                {
+                    _cacheService.Remove(cacheKey);
+                    dictionary.TryRemove(cacheKey, out dummy);
+                }
             }
         }
 
 
-        private ConcurrentDictionary<string, byte> GetKeys()
+        private ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> GetKeys()
         {
             return _cacheService.Get(KeyChainCacheKey, () =>
                         {
-                            return new ConcurrentDictionary<string, byte>();
+                            return new ConcurrentDictionary<string, ConcurrentDictionary<string, byte>>();
                         });
         }
     }
