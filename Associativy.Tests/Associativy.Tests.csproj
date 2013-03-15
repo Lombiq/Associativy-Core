@@ -145,6 +145,7 @@
     <Compile Include="Services\MindTests.cs" />
     <Compile Include="Services\StandardPathFinderTests.cs" />
     <Compile Include="Stubs\StubCacheService.cs" />
+    <Compile Include="Stubs\StubExternalGraphStatisticsService.cs" />
     <Compile Include="Stubs\StubGraphEditor.cs" />
     <Compile Include="Stubs\StubGraphManager.cs" />
     <Compile Include="Stubs\StubNodeManager.cs" />
