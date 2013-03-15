@@ -20,23 +20,17 @@ namespace Associativy.Services
 
     public class StandardPathFinder : GraphAwareServiceBase, IStandardPathFinder
     {
-        protected readonly IGraphEditor _graphEditor;
-        protected readonly IGraphCacheService _cacheService;
-        protected readonly IQueryableGraphFactory _queryableFactory;
+        protected readonly IPathFinderAuxiliaries _pathFinderAuxiliaries;
 
         protected const string CachePrefix = "Associativy.StandardPathFinder.";
 
 
         public StandardPathFinder(
             IGraphDescriptor graphDescriptor,
-            IGraphEditor graphEditor,
-            IGraphCacheService cacheService,
-            IQueryableGraphFactory queryableFactory)
+            IPathFinderAuxiliaries pathFinderAuxiliaries)
             : base(graphDescriptor)
         {
-            _graphEditor = graphEditor;
-            _cacheService = cacheService;
-            _queryableFactory = queryableFactory;
+            _pathFinderAuxiliaries = pathFinderAuxiliaries;
         }
 
 
@@ -74,7 +68,7 @@ namespace Associativy.Services
         {
             if (settings == null) settings = PathFinderSettings.Default;
 
-            var paths = _cacheService.GetMonitored(_graphDescriptor, MakeCacheKey("FindPaths.Paths." + _graphDescriptor.Name + "/" + startNodeId.ToString() + "/" + targetNodeId.ToString(), settings), () =>
+            var paths = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey("FindPaths.Paths." + _graphDescriptor.Name + "/" + startNodeId.ToString() + "/" + targetNodeId.ToString(), settings), () =>
                 {
                     // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
                     // keeps track of the paths found.
@@ -170,7 +164,7 @@ namespace Associativy.Services
                 }, settings.UseCache);
 
 
-            return new PathResult
+            return new Associativy.Services.PathFinderAuxiliaries.PathResult
             {
                 SucceededPaths = paths,
                 SucceededGraph = PathToGraph(paths, "PathToGraph:" + startNodeId + "/" + targetNodeId, settings)
@@ -181,12 +175,12 @@ namespace Associativy.Services
         {
             if (settings == null) settings = PathFinderSettings.Default;
 
-            return _queryableFactory.Create<int>((parameters) =>
+            return _pathFinderAuxiliaries.QueryableFactory.Create<int>((parameters) =>
                 {
-                    var graph = _cacheService.GetMonitored(_graphDescriptor, MakeCacheKey("GetPartialGraph.BaseGraph." + centralNodeId, settings), () =>
+                    var graph = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey("GetPartialGraph.BaseGraph." + centralNodeId, settings), () =>
                     {
                         var connectionManager = _graphDescriptor.Services.ConnectionManager;
-                        var g = _graphEditor.GraphFactory<int>();
+                        var g = _pathFinderAuxiliaries.GraphEditor  .GraphFactory<int>();
                         var visited = new Dictionary<int, PathNode>();
                         var frontier = new Stack<PathNode>();
 
@@ -232,26 +226,13 @@ namespace Associativy.Services
         }
 
 
-        private IQueryableGraph<int> PathToGraph(List<List<int>> succeededPaths, string baseCacheKey, IPathFinderSettings settings)
+        private IQueryableGraph<int> PathToGraph(IEnumerable<IList<int>> succeededPaths, string baseCacheKey, IPathFinderSettings settings)
         {
-            return _queryableFactory.Create<int>((parameters) =>
+            return _pathFinderAuxiliaries.QueryableFactory.Create<int>((parameters) =>
                 {
-                    var method = parameters.Method;
-                    var zoom = parameters.Zoom;
-
-                    var graph = _cacheService.GetMonitored(_graphDescriptor, MakeCacheKey(baseCacheKey + "BaseGraph.", settings), () =>
+                    var graph = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey(baseCacheKey + "BaseGraph.", settings), () =>
                     {
-                        var g = _graphEditor.GraphFactory<int>();
-
-                        foreach (var path in succeededPaths)
-                        {
-                            for (int i = 1; i < path.Count; i++)
-                            {
-                                g.AddVerticesAndEdge(new UndirectedEdge<int>(path[i - 1], path[i]));
-                            }
-                        }
-
-                        return g;
+                        return _pathFinderAuxiliaries.PathToGraph(succeededPaths);
                     }, settings.UseCache);
 
 
@@ -263,8 +244,8 @@ namespace Associativy.Services
         {
             return QueryableGraphHelper.LastStepsWithPaging(new Params
             {
-                CacheService = _cacheService,
-                GraphEditor = _graphEditor,
+                CacheService = _pathFinderAuxiliaries.CacheService,
+                GraphEditor = _pathFinderAuxiliaries.GraphEditor,
                 GraphDescriptor = _graphDescriptor,
                 ExecutionParameters = parameters,
                 Graph = graph,
@@ -276,13 +257,6 @@ namespace Associativy.Services
         private string MakeCacheKey(string name, IPathFinderSettings settings)
         {
             return CachePrefix + _graphDescriptor.Name + "." + name + ".PathFinderSettings:" + settings.MaxDistance;
-        }
-
-
-        private class PathResult : IPathResult
-        {
-            public IQueryableGraph<int> SucceededGraph { get; set; }
-            public IEnumerable<IEnumerable<int>> SucceededPaths { get; set; }
         }
     }
 }

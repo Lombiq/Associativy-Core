@@ -155,6 +155,8 @@
     <Compile Include="Services\GraphAwareServiceBase.cs" />
     <Compile Include="Services\GraphServicesFactory.cs" />
     <Compile Include="Services\GraphServices.cs" />
+    <Compile Include="Services\IPathFinderAuxiliaries.cs" />
+    <Compile Include="Services\PathFinderAuxiliaries.cs" />
     <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
     <Compile Include="Services\IAssociativyServices.cs" />

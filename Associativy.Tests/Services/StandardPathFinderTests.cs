@@ -51,6 +51,7 @@ namespace Associativy.Tests.Services
             builder.RegisterType<GraphCacheService>().As<IGraphCacheService>();
             builder.RegisterType<StubGraphManager>().As<IGraphManager>();
             builder.RegisterType<MemoryConnectionManager>().As<IConnectionManager>();
+            builder.RegisterType<PathFinderAuxiliaries>().As<IPathFinderAuxiliaries>();
             builder.RegisterType<StandardPathFinder>().As<IPathFinder>();
             StubGraphManager.Setup(builder);
 
