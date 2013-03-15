@@ -126,8 +126,10 @@ namespace Associativy.Tests.Services
 
             Assert.That(succeededPaths.Count, Is.EqualTo(2));
 
-            Assert.That(PathVerifier.VerifyPath(succeededPaths[0], rightPath1), Is.True);
-            Assert.That(PathVerifier.VerifyPath(succeededPaths[1], rightPath2), Is.True);
+
+            // The order of found paths is not fixed.
+            Assert.That(PathVerifier.VerifyPath(succeededPaths[0], rightPath1) || PathVerifier.VerifyPath(succeededPaths[0], rightPath2), Is.True);
+            Assert.That(PathVerifier.VerifyPath(succeededPaths[1], rightPath1) || PathVerifier.VerifyPath(succeededPaths[1], rightPath2), Is.True);
         }
 
         [Test]
