@@ -7,7 +7,7 @@ namespace Associativy.Queryable
 {
     public static class QueryableGraphHelper
     {
-        public static dynamic LastStepsWithPaging(Params parameters)
+        public static dynamic LastStepsWithPaging(LastStepParams parameters)
         {
             var paging = parameters.ExecutionParameters.Paging;
             if (paging.SkipConnections != 0 || paging.TakeConnections < parameters.Graph.EdgeCount)
@@ -20,7 +20,7 @@ namespace Associativy.Queryable
             return LastSteps(parameters);
         }
 
-        public static dynamic LastSteps(Params parameters)
+        public static dynamic LastSteps(LastStepParams parameters)
         {
             var method = parameters.ExecutionParameters.Method;
             var zoom = parameters.ExecutionParameters.Zoom;
@@ -31,8 +31,7 @@ namespace Associativy.Queryable
                 graph = parameters.CacheService.GetMonitored(
                     parameters.GraphDescriptor,
                     MakeCacheKey(parameters.BaseCacheKey + ".ZoomedGraph", parameters.ExecutionParameters, true),
-                    () => parameters.GraphEditor.CreateZoomedGraph(graph, zoom.Level, zoom.Count),
-                    parameters.UseCache);
+                    () => parameters.GraphEditor.CreateZoomedGraph(graph, zoom.Level, zoom.Count));
             }
 
             switch (method)
@@ -44,8 +43,7 @@ namespace Associativy.Queryable
                 case ExecutionMethod.ZoomLevelCount:
                     return parameters.CacheService.GetMonitored(
                         parameters.GraphDescriptor, MakeCacheKey(parameters.BaseCacheKey + ".ZoomLevelCount", parameters.ExecutionParameters, true),
-                        () => parameters.GraphEditor.CalculateZoomLevelCount(graph, zoom.Count),
-                        parameters.UseCache);
+                        () => parameters.GraphEditor.CalculateZoomLevelCount(graph, zoom.Count));
                 case ExecutionMethod.ToGraph:
                     return graph;
                 default:
@@ -67,7 +65,7 @@ namespace Associativy.Queryable
 
     }
 
-    public class Params
+    public class LastStepParams
     {
         public IGraphCacheService CacheService { get; set; }
         public IGraphEditor GraphEditor { get; set; }

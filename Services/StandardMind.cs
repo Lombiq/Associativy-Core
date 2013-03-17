@@ -72,7 +72,7 @@ namespace Associativy.Services
                     {
                         var query =
                             _graphDescriptor.Services.PathFinder
-                            .GetPartialGraph(graphInfo.CentralNodeId, new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache });
+                            .GetPartialGraph(graphInfo.CentralNodeId, new PathFinderSettings { MaxDistance = settings.MaxDistance });
 
                         return query.ExecuteWithParams(parameters);
                     }
@@ -89,7 +89,7 @@ namespace Associativy.Services
                                     .Select(connector => new UndirectedEdge<int>(connector.Node1Id, connector.Node2Id)));
 
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
-                        }, settings.UseCache);
+                        });
 
 
                     _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
@@ -144,7 +144,7 @@ namespace Associativy.Services
                                     .Select(neighbourId => new UndirectedEdge<int>(nodeId, neighbourId)));
 
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
-                        }, settings.UseCache);
+                        });
 
                     _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, new[] { nodeId }, graph));
 
@@ -185,7 +185,7 @@ namespace Associativy.Services
                             }
 
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
-                        }, settings.UseCache);
+                        });
 
                     _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
 
@@ -229,7 +229,7 @@ namespace Associativy.Services
                                     return g;
                                 };
 
-                            var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance, UseCache = settings.UseCache };
+                            var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance };
                             var allPairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[0], nodeList[1], pathFinderSettings).SucceededPaths;
 
                             if (allPairSucceededPaths.Count() == 0) return emptyResult();
@@ -305,34 +305,32 @@ namespace Associativy.Services
                             }
 
                             return g;
-                        }, settings.UseCache);
+                        });
 
                     _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
 
-                    return QueryableGraphHelper.LastStepsWithPaging(new Params
+                    return QueryableGraphHelper.LastStepsWithPaging(new LastStepParams
                     {
                         CacheService = _cacheService,
                         GraphEditor = _graphEditor,
                         GraphDescriptor = _graphDescriptor,
                         ExecutionParameters = parameters,
                         Graph = graph,
-                        BaseCacheKey = MakeCacheKey("SophisticatedAssociations." + idsJoined, settings),
-                        UseCache = settings.UseCache
+                        BaseCacheKey = MakeCacheKey("SophisticatedAssociations." + idsJoined, settings)
                     });
                 });
         }
 
         protected dynamic LastSteps(IExecutionParams parameters, IUndirectedGraph<int, IUndirectedEdge<int>> graph, string cacheName, IMindSettings settings)
         {
-            return QueryableGraphHelper.LastSteps(new Params
+            return QueryableGraphHelper.LastSteps(new LastStepParams
             {
                 CacheService = _cacheService,
                 GraphEditor = _graphEditor,
                 GraphDescriptor = _graphDescriptor,
                 ExecutionParameters = parameters,
                 Graph = graph,
-                BaseCacheKey = MakeCacheKey(cacheName, settings),
-                UseCache = settings.UseCache
+                BaseCacheKey = MakeCacheKey(cacheName, settings)
             });
         }
 

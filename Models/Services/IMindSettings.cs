@@ -9,11 +9,6 @@ namespace Associativy.Models.Services
         string Algorithm { get; set; }
 
         /// <summary>
-        /// Use cache or regenerate the result
-        /// </summary>
-        bool UseCache { get; set; }
-
-        /// <summary>
         /// Maximal distance between two nodes that can be considered as related
         /// </summary>
         int MaxDistance { get; set; }
@@ -26,7 +21,6 @@ namespace Associativy.Models.Services
             return new MindSettings
             {
                 Algorithm = settings.Algorithm,
-                UseCache = settings.UseCache,
                 MaxDistance = settings.MaxDistance,
             };
         }
