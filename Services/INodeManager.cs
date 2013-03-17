@@ -7,7 +7,7 @@ namespace Associativy.Services
     /// <summary>
     /// Service for handling nodes
     /// </summary>
-    public interface INodeManager : IGraphAwareService
+    public interface INodeManager
     {
         /// <summary>
         /// Query for customized retrieving of nodes
@@ -24,7 +24,7 @@ namespace Associativy.Services
         /// Lists nodes that have labels similar to the given snippet
         /// </summary>
         /// <param name="labelSnippet">The snippet of the nodes's label to search for</param>
-        IContentQuery<ContentItem> GetSimilarNodesQuery( string labelSnippet);
+        IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet);
 
         /// <summary>
         /// Gets the nodes with the specified labels
