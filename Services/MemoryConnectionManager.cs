@@ -144,9 +144,11 @@ namespace Associativy.Services
         public IEnumerable<INodeToNodeConnector> GetAll(int skip, int count)
         {
             return GetGraph().Connections
+                    .AsQueryable()
                     .SelectMany(subDictionaryKvp => subDictionaryKvp.Value
                         .Where(kvp => kvp.Value == 0)
                         .Select(kvp => new Associativy.Models.Nodes.NodeConnector { Node1Id = subDictionaryKvp.Key, Node2Id = kvp.Key })
+                        .AsQueryable()
                         )
                     .Skip(skip)
                     .Take(count);
