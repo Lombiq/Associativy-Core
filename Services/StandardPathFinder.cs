@@ -180,7 +180,7 @@ namespace Associativy.Services
                     var graph = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey("GetPartialGraph.BaseGraph." + centralNodeId, settings), () =>
                     {
                         var connectionManager = _graphDescriptor.Services.ConnectionManager;
-                        var g = _pathFinderAuxiliaries.GraphEditor  .GraphFactory<int>();
+                        var g = _pathFinderAuxiliaries.GraphEditor.GraphFactory<int>();
                         var visited = new Dictionary<int, PathNode>();
                         var frontier = new Stack<PathNode>();
 
