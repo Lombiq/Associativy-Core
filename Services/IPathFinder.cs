@@ -13,10 +13,10 @@ namespace Associativy.Services
         /// <summary>
         /// Calculates all paths between two nodes, depending on the settings.
         /// </summary>
-        /// <param name="startNodeId"></param>
-        /// <param name="targetNodeId"></param>
+        /// <param name="node1Id"></param>
+        /// <param name="node2Id"></param>
         /// <param name="settings"></param>
-        IPathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings);
+        IPathResult FindPaths(int node1Id, int node2Id, IPathFinderSettings settings);
 
         /// <summary>
         /// Returns a partial graph of the graph that starts from the center node and contains all paths within the specified range, containing the ids of the content items

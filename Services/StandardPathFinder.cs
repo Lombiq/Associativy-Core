@@ -64,11 +64,19 @@ namespace Associativy.Services
         #endregion
 
 
-        public virtual IPathResult FindPaths(int startNodeId, int targetNodeId, IPathFinderSettings settings)
+        public virtual IPathResult FindPaths(int node1Id, int node2Id, IPathFinderSettings settings)
         {
             if (settings == null) settings = PathFinderSettings.Default;
 
-            var paths = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey("FindPaths.Paths." + _graphDescriptor.Name + "/" + startNodeId.ToString() + "/" + targetNodeId.ToString(), settings), () =>
+            // This way we'll use the same cache no matter in which order the arguments are specified
+            if (node2Id < node1Id)
+            {
+                var temp = node2Id;
+                node2Id = node1Id;
+                node1Id = temp;
+            }
+
+            var paths = _pathFinderAuxiliaries.CacheService.GetMonitored(_graphDescriptor, MakeCacheKey("FindPaths.Paths." + _graphDescriptor.Name + "/" + node1Id.ToString() + "/" + node2Id.ToString(), settings), () =>
                 {
                     // This below is a depth-first search that tries to find all paths to the target node that are within the maximal length (maxDistance) and
                     // keeps track of the paths found.
@@ -77,6 +85,14 @@ namespace Associativy.Services
                     var explored = new Dictionary<int, PathNode>();
                     var succeededPaths = new List<List<int>>();
                     var frontier = new Stack<FrontierNode>();
+
+                    var startNodeId = node1Id;
+                    var targetNodeId = node2Id;
+                    if (connectionManager.GetNeighbourCount(startNodeId) > connectionManager.GetNeighbourCount(targetNodeId))
+                    {
+                        startNodeId = node2Id;
+                        targetNodeId = startNodeId;
+                    }
 
                     explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
                     frontier.Push(new FrontierNode { Node = explored[startNodeId] });
@@ -167,7 +183,7 @@ namespace Associativy.Services
             return new Associativy.Services.PathFinderAuxiliaries.PathResult
             {
                 SucceededPaths = paths,
-                SucceededGraph = PathToGraph(paths, "PathToGraph:" + startNodeId + "/" + targetNodeId, settings)
+                SucceededGraph = PathToGraph(paths, "PathToGraph:" + node1Id + "/" + node2Id, settings)
             };
         }
 
