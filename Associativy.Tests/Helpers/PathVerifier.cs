@@ -33,7 +33,7 @@ namespace Associativy.Tests.Helpers
             var verificationList = verification.ToList();
 
             var i = 0;
-            while (i < pathList.Count && verificationList[i].Id == pathList[i])
+            while (i < pathList.Count && (verificationList[i].Id == pathList[i] || verificationList[i].Id == pathList[pathList.Count - i - 1]))
             {
                 i++;
             }

@@ -91,7 +91,7 @@ namespace Associativy.Services
                     if (connectionManager.GetNeighbourCount(startNodeId) > connectionManager.GetNeighbourCount(targetNodeId))
                     {
                         startNodeId = node2Id;
-                        targetNodeId = startNodeId;
+                        targetNodeId = node1Id;
                     }
 
                     explored[startNodeId] = new PathNode(startNodeId) { MinDistance = 0 };
