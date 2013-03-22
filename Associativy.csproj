@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AssociativyControllerBase.cs" />
     <Compile Include="Controllers\AssociativyNodeLabelAdminController.cs" />
     <Compile Include="Drivers\AssociativyNodeLabelPartDriver.cs" />
@@ -118,7 +119,6 @@
     <Compile Include="GraphStatisticsServicesMigrations.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
-    <Compile Include="Handlers\AssociativyNodeTitleLabelPartHandler.cs" />
     <Compile Include="Models\GraphStatisticsRecord.cs" />
     <Compile Include="Queryable\QueryableGraphHelper.cs" />
     <Compile Include="Migrations.cs" />
@@ -155,7 +155,10 @@
     <Compile Include="Services\GraphAwareServiceBase.cs" />
     <Compile Include="Services\GraphServicesFactory.cs" />
     <Compile Include="Services\GraphServices.cs" />
+    <Compile Include="Services\IndexingNotSetUpBanner.cs" />
+    <Compile Include="Services\INodeIndexingService.cs" />
     <Compile Include="Services\IPathFinderAuxiliaries.cs" />
+    <Compile Include="Services\NodeIndexingService.cs" />
     <Compile Include="Services\PathFinderAuxiliaries.cs" />
     <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
@@ -184,6 +187,10 @@
     <ProjectReference Include="..\Orchard.Caching\Orchard.Caching.csproj">
       <Project>{7528bf74-25c7-4abe-883a-443b4eec4776}</Project>
       <Name>Orchard.Caching</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orchard.Indexing\Orchard.Indexing.csproj">
+      <Project>{ea2b9121-ef54-40a6-a53e-6593c86ee696}</Project>
+      <Name>Orchard.Indexing</Name>
     </ProjectReference>
     <ProjectReference Include="..\Orchard.Tokens\Orchard.Tokens.csproj">
       <Project>{6F759635-13D7-4E94-BCC9-80445D63F117}</Project>

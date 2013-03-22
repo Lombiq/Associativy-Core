@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
@@ -6,6 +7,7 @@ using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Core.Common.Models;
+using Orchard.Indexing;
 using QuickGraph;
 
 namespace Associativy.Services
@@ -17,20 +19,23 @@ namespace Associativy.Services
     public class StandardNodeManager : GraphAwareServiceBase, IStandardNodeManager
     {
         protected readonly IContentManager _contentManager;
-        protected readonly INodeManagerEventHander _eventHandler;
         protected readonly IGraphEditor _graphEditor;
+        protected readonly INodeIndexingService _indexingService;
+        protected readonly INodeManagerEventHander _eventHandler;
 
 
         public StandardNodeManager(
             IGraphDescriptor graphDescriptor,
             IContentManager contentManager,
-            INodeManagerEventHander eventHandler,
-            IGraphEditor graphEditor)
+            IGraphEditor graphEditor,
+            INodeIndexingService indexingService,
+            INodeManagerEventHander eventHandler)
             : base(graphDescriptor)
         {
             _contentManager = contentManager;
-            _eventHandler = eventHandler;
             _graphEditor = graphEditor;
+            _indexingService = indexingService;
+            _eventHandler = eventHandler;
         }
 
 
@@ -49,35 +54,28 @@ namespace Associativy.Services
             return GetQuery().Where<CommonPartRecord>(r => idsList.Contains(r.Id));
         }
 
-        public virtual IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet)
+        public virtual IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
-            labelSnippet = labelSnippet.ToUpperInvariant();
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel.StartsWith(labelSnippet));
+            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet + "*"));
         }
 
-
-        public virtual IContentQuery<ContentItem> GetManyByLabelQuery(IEnumerable<string> labels)
+        public virtual IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)
         {
-            var labelsArray = labels.ToArray();
-            for (int i = 0; i < labelsArray.Length; i++)
+            var hits = new List<ISearchHit>();
+
+            foreach (var label in labels)
             {
-                labelsArray[i] = labelsArray[i].ToUpperInvariant();
+                var hit = _indexingService.SearchExact(_graphDescriptor.Name, label).FirstOrDefault();
+                if (hit != null) hits.Add(hit);
             }
 
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.UpperInvariantLabel));
-        }
-
-        public virtual IContentQuery<ContentItem> GetByLabelQuery(string label)
-        {
-            label = label.ToUpperInvariant();
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel == label);
+            return GetSearchHitQuery(hits);
         }
 
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
         {
-            var query = GetManyQuery(idGraph.Vertices);
-            var nodes = query.List().ToDictionary(node => node.Id);
+            var nodes = GetManyQuery(idGraph.Vertices).List().ToDictionary(node => node.Id);
 
             var graph = _graphEditor.GraphFactory<IContent>();
             graph.AddVertexRange(nodes.Values);
@@ -92,6 +90,13 @@ namespace Associativy.Services
             }
 
             return graph;
+        }
+
+
+        private IContentQuery<ContentItem> GetSearchHitQuery(IEnumerable<ISearchHit> hits)
+        {
+            if (!hits.Any()) return GetQuery().Where<CommonPartRecord>(record => false).ForPart<ContentItem>();
+            return GetManyQuery(hits.Select(hit => hit.ContentItemId));
         }
     }
 }

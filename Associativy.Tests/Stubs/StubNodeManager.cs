@@ -21,17 +21,12 @@ namespace Associativy.Tests.Stubs
             return new StubContentQuery();
         }
 
-        public IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet)
+        public IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManyByLabelQuery(IEnumerable<string> labels)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IContentQuery<ContentItem> GetByLabelQuery(string label)
+        public IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)
         {
             throw new NotImplementedException();
         }

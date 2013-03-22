@@ -32,6 +32,8 @@ namespace Associativy.Handlers
                     new Dictionary<string, object> { { "Content", context.ContentItem } }, 
                     new ReplaceOptions { Encoding = ReplaceOptions.NoEncode });
             });
+
+            OnIndexing<IAssociativyNodeLabelAspect>((context, part) => context.DocumentIndex.Add("nodeLabel", part.Label).RemoveTags().Analyze());
         }
     }
 }
