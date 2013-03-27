@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Associativy.GraphDiscovery;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Indexing;

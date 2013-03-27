@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
-using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Core.Common.Models;
