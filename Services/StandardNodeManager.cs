@@ -56,7 +56,8 @@ namespace Associativy.Services
 
         public virtual IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
-            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet + "*"));
+            // The max count is hard-coded now but should be somehow configurable
+            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet + "*", 50));
         }
 
         public virtual IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)

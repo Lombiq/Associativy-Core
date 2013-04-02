@@ -16,9 +16,9 @@ namespace Associativy.Services
 
     public static class NodeIndexingServiceExtensions
 	{
-        public static IEnumerable<ISearchHit> Search(this INodeIndexingService indexingService, string graphName, string labelQuery)
+        public static IEnumerable<ISearchHit> Search(this INodeIndexingService indexingService, string graphName, string labelQuery, int maxCount)
         {
-            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", labelQuery + "*", false));
+            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", labelQuery + "*", false).Slice(0, maxCount));
         }
 
         public static IEnumerable<ISearchHit> SearchExact(this INodeIndexingService indexingService, string graphName, string label)
