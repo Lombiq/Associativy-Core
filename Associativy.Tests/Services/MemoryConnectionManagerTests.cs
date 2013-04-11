@@ -135,7 +135,7 @@ namespace Associativy.Tests.Services
         }
 
         [Test]
-        public void GetNeighbourIdsPagingWorsk()
+        public void GetNeighbourIdsPagingWorks()
         {
             Action<IEnumerable<int>, IEnumerable<int>> checkSequence =
                 (sequence1, sequence2) =>
@@ -149,8 +149,8 @@ namespace Associativy.Tests.Services
             var fiveNeighbourIds1 = _memoryConnectionManager.GetNeighbourIds(5, 1, 5);
             var fivetNeighbourIds2 = _memoryConnectionManager.GetNeighbourIds(5, 3, 2);
 
-            checkSequence(oneNeighbourIds1, new[] { 2, 3 });
-            checkSequence(oneNeighbourIds2, new[] { 5 });
+            checkSequence(oneNeighbourIds1, new[] { 2, 5 });
+            checkSequence(oneNeighbourIds2, new[] { 3 });
             checkSequence(fiveNeighbourIds1, new[] { 2, 3 });
             checkSequence(fivetNeighbourIds2, new int[] { });
         }
