@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
+using NHibernate;
+using NHibernate.Linq;
 using Orchard;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.Records;
 using Orchard.Core.Common.Models;
 using Orchard.Indexing;
 using QuickGraph;
@@ -49,13 +53,35 @@ namespace Associativy.Services
             // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown from
             // Orchard.ContentManagement.DefaultContentQuery on line 90.
             var idsList = ids.ToList();
-            return GetQuery().Where<CommonPartRecord>(r => idsList.Contains(r.Id));
+            var query = GetQuery();
+
+            var field = query.GetType().GetField("_query", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
+            var rootQuery = field.GetValue(query);
+
+            // This below is using super-ugly reflection to get a query with ids. Hopefully this won't be needed soon, see: https://orchard.codeplex.com/workitem/18664
+            var options = new QueryOptions();
+            var rootQueryType = rootQuery.GetType();
+            var bindSession = rootQueryType.GetMethod("BindSession", BindingFlags.NonPublic | BindingFlags.Instance);
+            var queryProvider = new NHibernateQueryProvider((ISession)bindSession.Invoke(rootQuery, null), options);
+            var queryable = new Query<ContentItemRecord>(queryProvider, options).Where(record => idsList.Contains(record.Id));
+
+            var criteria = (NHibernate.Impl.CriteriaImpl)queryProvider.TranslateExpression(queryable.Expression);
+
+            var bindItemCriteria = rootQueryType.GetMethod("BindItemCriteria", BindingFlags.NonPublic | BindingFlags.Instance);
+            var bindCriteriaByPath = rootQueryType.GetMethod("BindCriteriaByPath", BindingFlags.NonPublic | BindingFlags.Instance);
+            var recordCriteria = (ICriteria)bindCriteriaByPath.Invoke(rootQuery, new object[] { (ICriteria)bindItemCriteria.Invoke(rootQuery, null), typeof(ContentItemRecord).Name });
+            foreach (var expressionEntry in criteria.IterateExpressionEntries())
+            {
+                recordCriteria.Add(expressionEntry.Criterion);
+            }
+
+            return query;
         }
 
         public virtual IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
             // The max count is hard-coded now but should be somehow configurable
-            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet + "*", 50));
+            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet.Trim() + "*", 50));
         }
 
         public virtual IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)
@@ -94,7 +120,7 @@ namespace Associativy.Services
 
         private IContentQuery<ContentItem> GetSearchHitQuery(IEnumerable<ISearchHit> hits)
         {
-            if (!hits.Any()) return GetQuery().Where<CommonPartRecord>(record => false).ForPart<ContentItem>();
+            if (!hits.Any()) return _contentManager.Query("ősőőfőwőeoeworőőeŰŰŰÍÍÍíűrőooeoerő"); // An empty query
             return GetManyQuery(hits.Select(hit => hit.ContentItemId));
         }
     }
