@@ -43,7 +43,7 @@ namespace Associativy.Services
         {
             MakeSettings(ref settings);
 
-            return _queryableFactory.Create<int>(
+            var queryable = _queryableFactory.Create<int>(
                 (parameters) =>
                 {
                     var method = parameters.Method;
@@ -92,11 +92,12 @@ namespace Associativy.Services
                         });
 
 
-                    _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, graph));
-
-
                     return LastSteps(parameters, graph, "GetAllAssociations", settings);
                 });
+
+            _eventHandler.AllAssociationsGraphBuilt(new AllAssociationsGraphBuiltContext(_graphDescriptor, settings, queryable));
+
+            return queryable;
         }
 
         public virtual IQueryableGraph<int> MakeAssociations(IEnumerable<int> nodeIds, IMindSettings settings)
@@ -108,21 +109,27 @@ namespace Associativy.Services
 
             MakeSettings(ref settings);
 
+            IQueryableGraph<int> queryable;
+
             // If there's only one node, return its neighbours
             if (nodeCount == 1)
             {
-                return GetNeighboursGraph(nodeIds.First(), settings);
+                queryable = GetNeighboursGraph(nodeIds.First(), settings);
             }
             // Simply calculate the intersection of the neighbours of the nodes
             else if (settings.Algorithm == "simple")
             {
-                return MakeSimpleAssociations(nodeIds, settings);
+                queryable = MakeSimpleAssociations(nodeIds, settings);
             }
             // Calculate the routes between two nodes
             else
             {
-                return MakeSophisticatedAssociations(nodeIds, settings);
+                queryable = MakeSophisticatedAssociations(nodeIds, settings);
             }
+
+            _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, queryable));
+
+            return queryable;
         }
 
 
@@ -146,8 +153,7 @@ namespace Associativy.Services
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
                         });
 
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, new[] { nodeId }, graph));
-
+                    
                     return LastSteps(parameters, graph, "GetNeighboursGraph." + nodeId, settings);
                 });
         }
@@ -187,7 +193,6 @@ namespace Associativy.Services
                             return (IUndirectedGraph<int, IUndirectedEdge<int>>)g;
                         });
 
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
 
                     return LastSteps(parameters, graph, "SimpleAssociations." + idsJoined, settings);
                 });
@@ -222,12 +227,7 @@ namespace Associativy.Services
                             var g = _graphEditor.GraphFactory<int>();
                             IList<IEnumerable<int>> succeededPaths;
 
-                            Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult =
-                                () =>
-                                {
-                                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, g));
-                                    return g;
-                                };
+                            Func<IUndirectedGraph<int, IUndirectedEdge<int>>> emptyResult = () =>  _graphEditor.GraphFactory<int>();
 
                             var pathFinderSettings = new PathFinderSettings { MaxDistance = settings.MaxDistance };
                             var allPairSucceededPaths = _graphDescriptor.Services.PathFinder.FindPaths(nodeList[0], nodeList[1], pathFinderSettings).SucceededPaths;
@@ -306,8 +306,6 @@ namespace Associativy.Services
 
                             return g;
                         });
-
-                    _eventHandler.SearchedGraphBuilt(new SearchedGraphBuiltContext(_graphDescriptor, settings, nodeIds, graph));
 
                     return QueryableGraphHelper.LastStepsWithPaging(new LastStepParams
                     {
