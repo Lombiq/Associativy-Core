@@ -17,12 +17,12 @@ namespace Associativy.Services
 	{
         public static IEnumerable<ISearchHit> Search(this INodeIndexingService indexingService, string graphName, string labelQuery, int maxCount)
         {
-            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", labelQuery + "*", false).Slice(0, maxCount));
+            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", labelQuery.Trim(), false).Slice(0, maxCount));
         }
 
         public static IEnumerable<ISearchHit> SearchExact(this INodeIndexingService indexingService, string graphName, string label)
         {
-            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", label, true).ExactMatch());
+            return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", label.Trim(), true).ExactMatch());
         }
 
 
