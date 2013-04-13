@@ -16,11 +16,6 @@ namespace Associativy.Tests.Stubs
             throw new NotImplementedException();
         }
 
-        public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)
-        {
-            return new StubContentQuery();
-        }
-
         public IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
             throw new NotImplementedException();
@@ -45,6 +40,11 @@ namespace Associativy.Tests.Stubs
             }
 
             public IContentQuery<ContentItem> ForVersion(VersionOptions options)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IContentQuery<ContentItem> ForContentItems(IEnumerable<int> ids)
             {
                 throw new NotImplementedException();
             }

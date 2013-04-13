@@ -15,12 +15,6 @@ namespace Associativy.Services
         IContentQuery<ContentItem> GetQuery();
 
         /// <summary>
-        /// Query for retrieving multiple items
-        /// </summary>
-        /// <param name="ids">Ids of nodes</param>
-        IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids);
-
-        /// <summary>
         /// Lists nodes that have labels similar to the given snippet
         /// </summary>
         /// <param name="labelSnippet">The snippet of the nodes's label to search for</param>
