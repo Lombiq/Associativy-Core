@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Associativy.GraphDiscovery;
 using Associativy.Services;
 using QuickGraph;
@@ -12,8 +13,12 @@ namespace Associativy.Queryable
             var paging = parameters.ExecutionParameters.Paging;
             if (paging.SkipConnections != 0 || paging.TakeConnections < parameters.Graph.EdgeCount)
             {
+                var graph = parameters.Graph;
                 var pagedGraph = parameters.GraphEditor.GraphFactory<int>();
-                pagedGraph.AddVerticesAndEdgeRange(parameters.Graph.Edges.Skip(paging.SkipConnections).Take(paging.TakeConnections));
+                pagedGraph.AddVerticesAndEdgeRange(graph.Edges
+                    .OrderByDescending(edge => Math.Min(graph.AdjacentDegree(edge.Source), graph.AdjacentDegree(edge.Target)))
+                    .Skip(paging.SkipConnections)
+                    .Take(paging.TakeConnections));
                 parameters.Graph = pagedGraph;
             }
 
