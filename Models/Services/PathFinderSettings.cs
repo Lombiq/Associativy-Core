@@ -5,7 +5,7 @@ namespace Associativy.Models.Services
     {
         public int MaxDistance { get; set; }
 
-        private static PathFinderSettings _default = new PathFinderSettings();
+        private static readonly PathFinderSettings _default = new PathFinderSettings();
         public static PathFinderSettings Default { get { return _default; } }
 
 
