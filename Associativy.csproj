@@ -137,6 +137,7 @@
     <Compile Include="Queryable\IQueryableGraphFactory.cs" />
     <Compile Include="Queryable\QueryableGraph.cs" />
     <Compile Include="Queryable\QueryableGraphFactory.cs" />
+    <Compile Include="Routes.cs" />
     <Compile Include="Services\ExternalGraphStatisticsService.cs" />
     <Compile Include="Services\GraphCacheService.cs" />
     <Compile Include="Services\IExternalGraphStatisticsService.cs" />
