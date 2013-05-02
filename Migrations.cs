@@ -2,11 +2,21 @@ using Associativy.Models;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
+using Orchard.Localization;
 
 namespace Associativy.Migrations
 {
     public class Migrations : DataMigrationImpl
     {
+        public Localizer T { get; set; }
+
+
+        public Migrations()
+        {
+            T = NullLocalizer.Instance;
+        }
+
+
         public int Create()
         {
             SchemaBuilder.CreateTable(typeof(AssociativyNodeLabelPartRecord).Name,
@@ -15,8 +25,15 @@ namespace Associativy.Migrations
                     .Column<string>("Label") // Labels can't be unique, as all graphs' nodes' labels are stored here
                 );
 
-            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, part => part.Attachable());
-            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name, part => part.Attachable());
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, 
+                part => part
+                    .Attachable()
+                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched.").Text));
+
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name, 
+                part => part
+                    .Attachable()
+                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too.").Text));
 
 
             return 4;
@@ -44,6 +61,14 @@ namespace Associativy.Migrations
         {
             SchemaBuilder.AlterTable(typeof(AssociativyNodeLabelPartRecord).Name,
                 table => table.DropColumn("UpperInvariantLabel"));
+
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name,
+                part => part
+                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched.").Text));
+
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name,
+                part => part
+                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too.").Text));
 
 
             return 4;
