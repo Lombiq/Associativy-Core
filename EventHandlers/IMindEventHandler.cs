@@ -3,7 +3,6 @@ using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
 using Associativy.Queryable;
 using Orchard.Events;
-using QuickGraph;
 
 namespace Associativy.EventHandlers
 {

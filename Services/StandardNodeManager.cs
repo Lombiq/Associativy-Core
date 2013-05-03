@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Orchard;
 using Orchard.ContentManagement;
-using Orchard.ContentManagement.Records;
-using Orchard.Core.Common.Models;
 using Orchard.Indexing;
 using QuickGraph;
 

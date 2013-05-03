@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Orchard.ContentManagement;
+﻿using Orchard.ContentManagement;
 using QuickGraph;
 
 namespace Associativy.Services
