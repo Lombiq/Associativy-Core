@@ -4,6 +4,6 @@ namespace Associativy.Models
 {
     public interface IAssociativyNodeLabelAspect : IContent
     {
-        string Label { get; }
+        string Label { get; set; }
     }
 }
