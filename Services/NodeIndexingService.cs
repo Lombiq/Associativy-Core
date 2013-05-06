@@ -3,6 +3,7 @@ using System.Linq;
 using Associativy.GraphDiscovery;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Indexing;
+using Orchard.Indexing.Services;
 using Orchard.Indexing.Settings;
 
 namespace Associativy.Services
@@ -10,16 +11,19 @@ namespace Associativy.Services
     public class NodeIndexingService : INodeIndexingService
     {
         private readonly IIndexManager _indexManager;
+        private readonly IIndexingService _indexingService;
         private readonly IGraphManager _graphManager;
         private readonly IContentDefinitionManager _contentDefinitionManager;
 
 
         public NodeIndexingService(
             IIndexManager indexManager,
+            IIndexingService indexingService,
             IGraphManager graphManager,
             IContentDefinitionManager contentDefinitionManager)
         {
             _indexManager = indexManager;
+            _indexingService = indexingService;
             _graphManager = graphManager;
             _contentDefinitionManager = contentDefinitionManager;
         }
@@ -77,6 +81,8 @@ namespace Associativy.Services
                         );
                 }
             }
+
+            _indexingService.RebuildIndex(IndexNameForGraph(graphName));
         }
 
         public ISearchBuilder GetSearchBuilder(string graphName)
