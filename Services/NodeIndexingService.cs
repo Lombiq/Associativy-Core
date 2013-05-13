@@ -42,7 +42,9 @@ namespace Associativy.Services
 
             foreach (var type in _graphManager.FindGraph(graphName).ContentTypes)
             {
-                var indexingSettings = _contentDefinitionManager.GetTypeDefinition(type).Settings.TryGetModel<TypeIndexing>();
+                var typeDefinition = _contentDefinitionManager.GetTypeDefinition(type);
+                if (typeDefinition == null) throw new ApplicationException("The type definition for the type \"" + type + "\" in the Associativy graph \"" + graphName + "\" was not found.");
+                var indexingSettings = typeDefinition.Settings.TryGetModel<TypeIndexing>();
 
                 if (indexingSettings == null || !indexingSettings.List.Contains(indexName)) return false;
             }
