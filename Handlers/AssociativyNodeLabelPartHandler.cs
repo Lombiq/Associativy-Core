@@ -32,7 +32,7 @@ namespace Associativy.Handlers
                     new ReplaceOptions { Encoding = ReplaceOptions.NoEncode });
             });
 
-            OnIndexing<IAssociativyNodeLabelAspect>((context, part) => context.DocumentIndex.Add("nodeLabel", part.Label).RemoveTags().Analyze());
+            OnIndexing<IAssociativyNodeLabelAspect>((context, part) => context.DocumentIndex.Add("nodeLabel", part.Label).RemoveTags().Analyze().Store());
         }
     }
 }

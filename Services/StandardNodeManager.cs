@@ -56,7 +56,10 @@ namespace Associativy.Services
             foreach (var label in labels)
             {
                 var hit = _indexingService.SearchExact(_graphDescriptor.Name, label).FirstOrDefault();
-                if (hit != null) hits.Add(hit);
+                if (hit != null && string.Compare(hit.GetString("nodeLabel"), label, System.StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    hits.Add(hit);
+                }
             }
 
             return GetSearchHitQuery(hits);
