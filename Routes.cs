@@ -18,7 +18,6 @@ namespace Associativy
 			{
 				new RouteDescriptor
 				{
-					Name = "AssociativyNodeLabelAdmin",
 					Route = new Route(
 						"Admin/Associativy/NodeLabel/{action}",
 						new RouteValueDictionary
