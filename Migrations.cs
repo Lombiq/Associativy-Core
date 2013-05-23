@@ -8,15 +8,6 @@ namespace Associativy.Migrations
 {
     public class Migrations : DataMigrationImpl
     {
-        public Localizer T { get; set; }
-
-
-        public Migrations()
-        {
-            T = NullLocalizer.Instance;
-        }
-
-
         public int Create()
         {
             SchemaBuilder.CreateTable(typeof(AssociativyNodeLabelPartRecord).Name,
@@ -28,12 +19,12 @@ namespace Associativy.Migrations
             ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name, 
                 part => part
                     .Attachable()
-                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched.").Text));
+                    .WithDescription("Stores a label used when the node of an Associativy graph is displayed or searched."));
 
             ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name, 
                 part => part
                     .Attachable()
-                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too.").Text));
+                    .WithDescription("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too."));
 
 
             return 4;
@@ -64,11 +55,11 @@ namespace Associativy.Migrations
 
             ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeLabelPart).Name,
                 part => part
-                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched.").Text));
+                    .WithDescription("Stores a label used when the node of an Associativy graph is displayed or searched."));
 
             ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleLabelPart).Name,
                 part => part
-                    .WithDescription(T("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too.").Text));
+                    .WithDescription("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too."));
 
 
             return 4;
