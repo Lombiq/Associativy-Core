@@ -55,10 +55,13 @@ namespace Associativy.Services
 
             foreach (var label in labels)
             {
-                var hit = _indexingService.SearchExact(_graphDescriptor.Name, label).FirstOrDefault();
-                if (hit != null && string.Compare(hit.GetString("nodeLabel"), label, System.StringComparison.OrdinalIgnoreCase) == 0)
+                var subHits = _indexingService.SearchExact(_graphDescriptor.Name, label);
+                foreach (var subHit in subHits)
                 {
-                    hits.Add(hit);
+                    if (subHit != null && string.Compare(subHit.GetString("nodeLabel"), label, System.StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        hits.Add(subHit);
+                    } 
                 }
             }
 
