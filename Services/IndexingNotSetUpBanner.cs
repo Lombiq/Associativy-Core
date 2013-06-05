@@ -42,7 +42,7 @@ namespace Associativy.Services
             var urlHelper = new UrlHelper(request.RequestContext);
             var i = 0;
 
-            foreach (var graph in _graphManager.FindDistinctGraphs(GraphContext.Empty))
+            foreach (var graph in _graphManager.FindGraphs(GraphContext.Empty))
             {
                 if (!_indexingService.IsIndexingSetupForGraph(graph.Name))
                 {

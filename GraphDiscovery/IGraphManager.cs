@@ -19,12 +19,6 @@ namespace Associativy.GraphDiscovery
         /// </summary>
         /// <param name="graphContext">The graph context instance to match against</param>
         IEnumerable<IGraphDescriptor> FindGraphs(IGraphContext graphContext);
-
-        /// <summary>
-        /// Lists graphs that match the specified context from the registered graphs and makes them distinct by looking at the graph name
-        /// </summary>
-        /// <param name="graphContext">The graph context instance to match against</param>
-        IEnumerable<IGraphDescriptor> FindDistinctGraphs(IGraphContext graphContext);
     }
 
 

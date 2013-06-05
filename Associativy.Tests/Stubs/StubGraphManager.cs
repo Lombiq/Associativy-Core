@@ -31,11 +31,6 @@ namespace Associativy.Tests.Stubs
             return new GraphDescriptor[] { TestGraphDescriptor() };
         }
 
-        public IEnumerable<IGraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
-        {
-            return new GraphDescriptor[] { TestGraphDescriptor() };
-        }
-
 
         public static void Setup(ContainerBuilder builder)
         {

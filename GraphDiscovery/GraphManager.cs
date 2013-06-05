@@ -46,14 +46,9 @@ namespace Associativy.GraphDiscovery
 
         public IEnumerable<IGraphDescriptor> FindGraphs(IGraphContext graphContext)
         {
-            return _descriptorFilterer.FilterByMatchingGraphContext(Descriptors, graphContext);
-        }
-
-        public IEnumerable<IGraphDescriptor> FindDistinctGraphs(IGraphContext graphContext)
-        {
             var descriptors = new Dictionary<string, IGraphDescriptor>();
 
-            foreach (var descriptor in FindGraphs(graphContext))
+            foreach (var descriptor in _descriptorFilterer.FilterByMatchingGraphContext(Descriptors, graphContext))
             {
                 if(!String.IsNullOrEmpty(descriptor.Name)) descriptors[descriptor.Name] = descriptor;
             }
