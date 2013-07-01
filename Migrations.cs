@@ -26,8 +26,13 @@ namespace Associativy.Migrations
                     .Attachable()
                     .WithDescription("Stores a label used when the node of an Associativy graph is displayed or searched. The label functions as the title of the item too."));
 
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleAdapterPart).Name,
+                part => part
+                    .Attachable()
+                    .WithDescription("When attached to a content type that has Title Part already attached, will use the title as the node label, without storing the label separately. Important: only attach to a content type that already has Title Part."));
 
-            return 4;
+
+            return 5;
         }
 
         public int UpdateFrom1()
@@ -63,6 +68,17 @@ namespace Associativy.Migrations
 
 
             return 4;
+        }
+
+        public int UpdateFrom4()
+        {
+            ContentDefinitionManager.AlterPartDefinition(typeof(AssociativyNodeTitleAdapterPart).Name,
+                part => part
+                    .Attachable()
+                    .WithDescription("When attached to a content type that has Title Part already attached, will use the title as the node label, without storing the label separately. Important: only attach to a content type that already has Title Part."));
+            
+
+            return 5;
         }
     }
 }

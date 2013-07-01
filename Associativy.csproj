@@ -98,6 +98,7 @@
     <Compile Include="Controllers\AssociativyControllerBase.cs" />
     <Compile Include="Controllers\AssociativyNodeLabelAdminController.cs" />
     <Compile Include="Drivers\AssociativyNodeLabelPartDriver.cs" />
+    <Compile Include="Drivers\AssociativyNodeTitleAdapterPartDriver.cs" />
     <Compile Include="Drivers\AssociativyNodeTitleLabelPartDriver.cs" />
     <Compile Include="EventHandlers\GraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\GraphEventHandlerBase.cs" />
@@ -118,7 +119,9 @@
     <Compile Include="GraphDiscovery\GraphDescriptorFilterer.cs" />
     <Compile Include="GraphStatisticsServicesMigrations.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
+    <Compile Include="Handlers\AssociativyNodeLabelAspectHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
+    <Compile Include="Models\AssociativyNodeTitleAdapterPart.cs" />
     <Compile Include="Models\GraphStatisticsRecord.cs" />
     <Compile Include="Queryable\QueryableGraphHelper.cs" />
     <Compile Include="Migrations.cs" />
