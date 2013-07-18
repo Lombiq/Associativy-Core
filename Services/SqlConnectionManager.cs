@@ -13,28 +13,20 @@ namespace Associativy.Services
     /// Service for dealing with connections between nodes, persisting connections in the SQL database
     /// </summary>
     /// <typeparam name="TNodeToNodeConnectorRecord">Record type for node to node connectors</typeparam>
-    public class SqlConnectionManager<TNodeToNodeConnectorRecord> : GraphAwareServiceBase, ISqlConnectionManager<TNodeToNodeConnectorRecord>
+    public class SqlConnectionManager<TNodeToNodeConnectorRecord> : SqlConnectionManagerBase<TNodeToNodeConnectorRecord>
         where TNodeToNodeConnectorRecord : INodeToNodeConnector, new()
     {
-        protected readonly IRepository<TNodeToNodeConnectorRecord> _nodeToNodeRecordRepository;
-        protected readonly IMemoryConnectionManager _memoryConnectionManager;
-        protected readonly IGraphEventHandler _graphEventHandler;
-
-
         public SqlConnectionManager(
             IGraphDescriptor graphDescriptor,
             IRepository<TNodeToNodeConnectorRecord> nodeToNodeRecordRepository,
             Func<IGraphDescriptor, IMemoryConnectionManager> memoryConnectionManagerFactory,
             IGraphEventHandler graphEventHandler)
-            : base(graphDescriptor)
+            : base(graphDescriptor, nodeToNodeRecordRepository, memoryConnectionManagerFactory, graphEventHandler)
         {
-            _nodeToNodeRecordRepository = nodeToNodeRecordRepository;
-            _memoryConnectionManager = memoryConnectionManagerFactory(graphDescriptor);
-            _graphEventHandler = graphEventHandler;
         }
 
 
-        public void TryLoadConnections()
+        public override void TryLoadConnections()
         {
             if (_memoryConnectionManager.GetConnectionCount() != 0) return;
 
@@ -44,14 +36,8 @@ namespace Associativy.Services
             }
         }
 
-        public virtual bool AreNeighbours(int node1Id, int node2Id)
-        {
-            TryLoadConnections();
 
-            return _memoryConnectionManager.AreNeighbours(node1Id, node2Id);
-        }
-
-        public virtual void Connect(int node1Id, int node2Id)
+        public override void Connect(int node1Id, int node2Id)
         {
             TryLoadConnections();
 
@@ -63,7 +49,7 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionAdded(_graphDescriptor, node1Id, node2Id);
         }
 
-        public virtual void DeleteFromNode(int nodeId)
+        public override void DeleteFromNode(int nodeId)
         {
             TryLoadConnections();
 
@@ -81,7 +67,7 @@ namespace Associativy.Services
             _graphEventHandler.ConnectionsDeletedFromNode(_graphDescriptor, nodeId);
         }
 
-        public virtual void Disconnect(int node1Id, int node2Id)
+        public override void Disconnect(int node1Id, int node2Id)
         {
             TryLoadConnections();
 
@@ -96,35 +82,6 @@ namespace Associativy.Services
             _memoryConnectionManager.Disconnect(node1Id, node2Id);
 
             _graphEventHandler.ConnectionDeleted(_graphDescriptor, node1Id, node2Id);
-        }
-
-        public virtual IEnumerable<INodeToNodeConnector> GetAll(int skip, int count)
-        {
-            TryLoadConnections();
-
-            return _memoryConnectionManager.GetAll(skip, count);
-        }
-
-
-        public virtual IEnumerable<int> GetNeighbourIds(int nodeId, int skip, int count)
-        {
-            TryLoadConnections();
-
-            return _memoryConnectionManager.GetNeighbourIds(nodeId, skip, count);
-        }
-
-        public virtual int GetNeighbourCount(int nodeId)
-        {
-            TryLoadConnections();
-
-            return _memoryConnectionManager.GetNeighbourCount(nodeId);
-        }
-
-        public virtual IGraphInfo GetGraphInfo()
-        {
-            TryLoadConnections();
-
-            return _memoryConnectionManager.GetGraphInfo();
         }
     }
 }
