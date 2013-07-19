@@ -113,6 +113,7 @@
     <Compile Include="GraphDiscovery\DescribeContext.cs" />
     <Compile Include="GraphDiscovery\GraphContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
+    <Compile Include="GraphDiscovery\IGraph.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
     <Compile Include="GraphDiscovery\IGraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphDescriptorFilterer.cs" />

@@ -7,11 +7,8 @@ namespace Associativy.GraphDiscovery
     /// <summary>
     /// Describes the capabilities of an associative graph
     /// </summary>
-    public interface IGraphDescriptor
+    public interface IGraphDescriptor : IGraph
     {
-        string Name { get; }
-        LocalizedString DisplayName { get; }
-        IEnumerable<string> ContentTypes { get; }
         IGraphServices Services { get; }
     }
 
