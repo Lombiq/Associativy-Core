@@ -89,13 +89,13 @@ namespace Associativy.Services
 
         public void RemoveIndexForGraph(string graphName)
         {
-            if (!IsIndexingSetupForGraph(graphName)) return;
-
             var provider = GetIndexProvider();
 
             if (provider == null) throw new InvalidOperationException("No search index provider was found. Thus index can't be deleted for the graph " + graphName + ".");
 
-            provider.DeleteIndex(IndexNameForGraph(graphName));
+            var indexName = IndexNameForGraph(graphName);
+            if (!provider.Exists(indexName)) return;
+            provider.DeleteIndex(indexName);
         }
 
         public ISearchBuilder GetSearchBuilder(string graphName)
