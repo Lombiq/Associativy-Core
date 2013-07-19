@@ -24,7 +24,7 @@ namespace Associativy.GraphDiscovery
 
     public static class GraphManagerExtensions
     {
-        public static IGraphDescriptor FindGraph(this IGraphManager graphManager, string name)
+        public static IGraphDescriptor FindGraphByName(this IGraphManager graphManager, string name)
         {
             return graphManager.FindGraph(new GraphContext { Name = name });
         }

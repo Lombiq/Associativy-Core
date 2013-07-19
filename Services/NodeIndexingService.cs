@@ -40,7 +40,7 @@ namespace Associativy.Services
             // TODO: cache this
             if (!provider.Exists(indexName)) return false;
 
-            foreach (var type in _graphManager.FindGraph(graphName).ContentTypes)
+            foreach (var type in _graphManager.FindGraphByName(graphName).ContentTypes)
             {
                 var typeDefinition = _contentDefinitionManager.GetTypeDefinition(type);
                 if (typeDefinition == null) throw new ApplicationException("The type definition for the type \"" + type + "\" in the Associativy graph \"" + graphName + "\" was not found.");
@@ -63,7 +63,7 @@ namespace Associativy.Services
             var indexName = IndexNameForGraph(graphName);
             provider.CreateIndex(indexName);
 
-            foreach (var type in _graphManager.FindGraph(graphName).ContentTypes)
+            foreach (var type in _graphManager.FindGraphByName(graphName).ContentTypes)
             {
                 var settings = _contentDefinitionManager.GetTypeDefinition(type).Settings;
                 var indexingSettings = settings.TryGetModel<TypeIndexing>();
