@@ -10,6 +10,7 @@ namespace Associativy.Services
     {
         bool IsIndexingSetupForGraph(string graphName);
         void SetupIndexingForGraph(string graphName);
+        void RemoveIndexForGraph(string graphName);
         ISearchBuilder GetSearchBuilder(string graphName);
     }
 
