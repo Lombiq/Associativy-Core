@@ -115,7 +115,7 @@ namespace Associativy.Services
 
         private static string IndexNameForGraph(string graphName)
         {
-            return "Associativy" + graphName;
+            return "Associativy_" + graphName;
         }
     }
 }
