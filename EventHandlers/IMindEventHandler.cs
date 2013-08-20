@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Associativy.GraphDiscovery;
 using Associativy.Models.Services;
+using Associativy.Queryable;
 using Orchard.Events;
-using QuickGraph;
 
 namespace Associativy.EventHandlers
 {
@@ -17,9 +17,9 @@ namespace Associativy.EventHandlers
     {
         public IGraphDescriptor GraphDescriptor { get; private set; }
         public IMindSettings Settings { get; set; }
-        public IUndirectedGraph<int, IUndirectedEdge<int>> IdGraph { get; private set; }
+        public IQueryableGraph<int> IdGraph { get; private set; }
 
-        protected MindEventContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        protected MindEventContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IQueryableGraph<int> idGraph)
         {
             GraphDescriptor = graphDescriptor;
             Settings = settings;
@@ -29,7 +29,7 @@ namespace Associativy.EventHandlers
 
     public class AllAssociationsGraphBuiltContext : MindEventContext
     {
-        public AllAssociationsGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public AllAssociationsGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IQueryableGraph<int> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
         }
@@ -39,7 +39,7 @@ namespace Associativy.EventHandlers
     {
         public IEnumerable<int> NodeIds { get; private set; }
 
-        public SearchedGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<int> nodeIds, IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
+        public SearchedGraphBuiltContext(IGraphDescriptor graphDescriptor, IMindSettings settings, IEnumerable<int> nodeIds, IQueryableGraph<int> idGraph)
             : base(graphDescriptor, settings, idGraph)
         {
             NodeIds = nodeIds;

@@ -94,9 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssociativyModule.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AssociativyControllerBase.cs" />
     <Compile Include="Controllers\AssociativyNodeLabelAdminController.cs" />
     <Compile Include="Drivers\AssociativyNodeLabelPartDriver.cs" />
+    <Compile Include="Drivers\AssociativyNodeTitleAdapterPartDriver.cs" />
     <Compile Include="Drivers\AssociativyNodeTitleLabelPartDriver.cs" />
     <Compile Include="EventHandlers\GraphEventDispatcher.cs" />
     <Compile Include="EventHandlers\GraphEventHandlerBase.cs" />
@@ -111,14 +113,16 @@
     <Compile Include="GraphDiscovery\DescribeContext.cs" />
     <Compile Include="GraphDiscovery\GraphContext.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptor.cs" />
+    <Compile Include="GraphDiscovery\IGraph.cs" />
     <Compile Include="GraphDiscovery\IGraphContext.cs" />
     <Compile Include="GraphDiscovery\IGraphDescriptor.cs" />
     <Compile Include="GraphDiscovery\IGraphDescriptorFilterer.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptorFilterer.cs" />
     <Compile Include="GraphStatisticsServicesMigrations.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
+    <Compile Include="Handlers\AssociativyNodeLabelAspectHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
-    <Compile Include="Handlers\AssociativyNodeTitleLabelPartHandler.cs" />
+    <Compile Include="Models\AssociativyNodeTitleAdapterPart.cs" />
     <Compile Include="Models\GraphStatisticsRecord.cs" />
     <Compile Include="Queryable\QueryableGraphHelper.cs" />
     <Compile Include="Migrations.cs" />
@@ -137,6 +141,7 @@
     <Compile Include="Queryable\IQueryableGraphFactory.cs" />
     <Compile Include="Queryable\QueryableGraph.cs" />
     <Compile Include="Queryable\QueryableGraphFactory.cs" />
+    <Compile Include="Routes.cs" />
     <Compile Include="Services\ExternalGraphStatisticsService.cs" />
     <Compile Include="Services\GraphCacheService.cs" />
     <Compile Include="Services\IExternalGraphStatisticsService.cs" />
@@ -155,7 +160,10 @@
     <Compile Include="Services\GraphAwareServiceBase.cs" />
     <Compile Include="Services\GraphServicesFactory.cs" />
     <Compile Include="Services\GraphServices.cs" />
+    <Compile Include="Services\IndexingNotSetUpBanner.cs" />
+    <Compile Include="Services\INodeIndexingService.cs" />
     <Compile Include="Services\IPathFinderAuxiliaries.cs" />
+    <Compile Include="Services\NodeIndexingService.cs" />
     <Compile Include="Services\PathFinderAuxiliaries.cs" />
     <Compile Include="Services\SqlConnectionManager.cs" />
     <Compile Include="Services\IConnectionManager.cs" />
@@ -167,6 +175,7 @@
     <Compile Include="Services\INodeManager.cs" />
     <Compile Include="Services\IMind.cs" />
     <Compile Include="Services\IPathFinder.cs" />
+    <Compile Include="Services\SqlConnectionManagerBase.cs" />
     <Compile Include="Services\StandardMind.cs" />
     <Compile Include="Services\StandardNodeManager.cs" />
     <Compile Include="Services\StandardPathFinder.cs" />
@@ -185,6 +194,10 @@
       <Project>{7528bf74-25c7-4abe-883a-443b4eec4776}</Project>
       <Name>Orchard.Caching</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Orchard.Indexing\Orchard.Indexing.csproj">
+      <Project>{ea2b9121-ef54-40a6-a53e-6593c86ee696}</Project>
+      <Name>Orchard.Indexing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Tokens\Orchard.Tokens.csproj">
       <Project>{6F759635-13D7-4E94-BCC9-80445D63F117}</Project>
       <Name>Orchard.Tokens</Name>
@@ -201,7 +214,9 @@
   <ItemGroup>
     <Content Include="Views\DefinitionTemplates\AssociativyNodeLabelTypePartSettings.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Views\NodeIndexingAntiforgeryToken.cshtml" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

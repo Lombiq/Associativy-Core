@@ -2,10 +2,9 @@
 using System.Linq;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
-using Associativy.Models;
 using Orchard;
 using Orchard.ContentManagement;
-using Orchard.Core.Common.Models;
+using Orchard.Indexing;
 using QuickGraph;
 
 namespace Associativy.Services
@@ -17,20 +16,23 @@ namespace Associativy.Services
     public class StandardNodeManager : GraphAwareServiceBase, IStandardNodeManager
     {
         protected readonly IContentManager _contentManager;
-        protected readonly INodeManagerEventHander _eventHandler;
         protected readonly IGraphEditor _graphEditor;
+        protected readonly INodeIndexingService _indexingService;
+        protected readonly INodeManagerEventHander _eventHandler;
 
 
         public StandardNodeManager(
             IGraphDescriptor graphDescriptor,
             IContentManager contentManager,
-            INodeManagerEventHander eventHandler,
-            IGraphEditor graphEditor)
+            IGraphEditor graphEditor,
+            INodeIndexingService indexingService,
+            INodeManagerEventHander eventHandler)
             : base(graphDescriptor)
         {
             _contentManager = contentManager;
-            _eventHandler = eventHandler;
             _graphEditor = graphEditor;
+            _indexingService = indexingService;
+            _eventHandler = eventHandler;
         }
 
 
@@ -41,43 +43,35 @@ namespace Associativy.Services
             return query;
         }
 
-        public IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids)
+        public virtual IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
-            // Otherwise an exception with message "Expression argument must be of type ICollection." is thrown from
-            // Orchard.ContentManagement.DefaultContentQuery on line 90.
-            var idsList = ids.ToList();
-            return GetQuery().Where<CommonPartRecord>(r => idsList.Contains(r.Id));
+            // The max count is hard-coded now but should be somehow configurable
+            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet.Trim() + "*", 50));
         }
 
-        public virtual IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet)
+        public virtual IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)
         {
-            labelSnippet = labelSnippet.ToUpperInvariant();
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel.StartsWith(labelSnippet));
-        }
+            var hits = new List<ISearchHit>();
 
-
-        public virtual IContentQuery<ContentItem> GetManyByLabelQuery(IEnumerable<string> labels)
-        {
-            var labelsArray = labels.ToArray();
-            for (int i = 0; i < labelsArray.Length; i++)
+            foreach (var label in labels)
             {
-                labelsArray[i] = labelsArray[i].ToUpperInvariant();
+                var subHits = _indexingService.SearchExact(_graphDescriptor.Name, label);
+                foreach (var subHit in subHits)
+                {
+                    if (subHit != null && string.Compare(subHit.GetString("nodeLabel"), label, System.StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        hits.Add(subHit);
+                    } 
+                }
             }
 
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => labelsArray.Contains(r.UpperInvariantLabel));
-        }
-
-        public virtual IContentQuery<ContentItem> GetByLabelQuery(string label)
-        {
-            label = label.ToUpperInvariant();
-            return GetQuery().Where<AssociativyNodeLabelPartRecord>(r => r.UpperInvariantLabel == label);
+            return GetSearchHitQuery(hits);
         }
 
 
         public virtual IUndirectedGraph<IContent, IUndirectedEdge<IContent>> MakeContentGraph(IUndirectedGraph<int, IUndirectedEdge<int>> idGraph)
         {
-            var query = GetManyQuery(idGraph.Vertices);
-            var nodes = query.List().ToDictionary(node => node.Id);
+            var nodes = GetQuery().ForContentItems(idGraph.Vertices).List().ToDictionary(node => node.Id);
 
             var graph = _graphEditor.GraphFactory<IContent>();
             graph.AddVertexRange(nodes.Values);
@@ -92,6 +86,13 @@ namespace Associativy.Services
             }
 
             return graph;
+        }
+
+
+        private IContentQuery<ContentItem> GetSearchHitQuery(IEnumerable<ISearchHit> hits)
+        {
+            if (!hits.Any()) return _contentManager.Query("ősőőfőwőeoeworőőeŰŰŰÍÍÍíűrőooeoerő"); // An empty query
+            return GetQuery().ForContentItems(hits.Select(hit => hit.ContentItemId));
         }
     }
 }

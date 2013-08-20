@@ -46,7 +46,7 @@ namespace Associativy.Controllers
                 _contentManager.Publish(item);
             }
 
-            _orchardServices.Notifier.Information(T("Labels were refreshed."));
+            _orchardServices.Notifier.Information(T("Node labels were refreshed."));
         }
     }
 }

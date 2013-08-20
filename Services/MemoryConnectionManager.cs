@@ -158,7 +158,9 @@ namespace Associativy.Services
         {
             ConcurrentDictionary<int, byte> subDictionary;
 
-            if (GetGraph().Connections.TryGetValue(nodeId, out subDictionary)) return subDictionary.Keys.Skip(skip).Take(count);
+            var connections = GetGraph().Connections;
+            if (connections.TryGetValue(nodeId, out subDictionary)) 
+                return subDictionary.Keys.OrderByDescending(id => connections[id].Count).Skip(skip).Take(count);
 
             return Enumerable.Empty<int>();
         }

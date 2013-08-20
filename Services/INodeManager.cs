@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Orchard.ContentManagement;
+﻿using Orchard.ContentManagement;
 using QuickGraph;
 
 namespace Associativy.Services
@@ -15,28 +14,16 @@ namespace Associativy.Services
         IContentQuery<ContentItem> GetQuery();
 
         /// <summary>
-        /// Query for retrieving multiple items
-        /// </summary>
-        /// <param name="ids">Ids of nodes</param>
-        IContentQuery<ContentItem> GetManyQuery(IEnumerable<int> ids);
-
-        /// <summary>
         /// Lists nodes that have labels similar to the given snippet
         /// </summary>
         /// <param name="labelSnippet">The snippet of the nodes's label to search for</param>
-        IContentQuery<ContentItem> GetSimilarNodesQuery(string labelSnippet);
+        IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet);
 
         /// <summary>
-        /// Gets the nodes with the specified labels
+        /// Gets node(s) with the specified label(s)
         /// </summary>
-        /// <param name="labels">The labels</param>
-        IContentQuery<ContentItem> GetManyByLabelQuery(IEnumerable<string> labels);
-
-        /// <summary>
-        /// Gets the node with the specified label
-        /// </summary>
-        /// <param name="label">The label</param>
-        IContentQuery<ContentItem> GetByLabelQuery(string label);
+        /// <param name="labels">Label(s) to search for</param>
+        IContentQuery<ContentItem> GetByLabelQuery(params string[] labels);
 
         /// <summary>
         /// Creates a graph of content items from a graph of content item IDs
