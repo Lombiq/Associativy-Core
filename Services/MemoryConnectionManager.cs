@@ -192,6 +192,14 @@ namespace Associativy.Services
 
         protected static void FindBiggestNode(Graph graph)
         {
+            if (graph.ConnectionCount == 0)
+            {
+                graph.BiggestNodeId = 0;
+                graph.BiggestNodeNeighbourCount = 0;
+
+                return;
+            }
+
             var nodeKvp = graph.Connections.Aggregate((node1, node2) => node1.Value.Count > node2.Value.Count ? node1 : node2);
             graph.BiggestNodeId = nodeKvp.Key;
             graph.BiggestNodeNeighbourCount = nodeKvp.Value.Count;
