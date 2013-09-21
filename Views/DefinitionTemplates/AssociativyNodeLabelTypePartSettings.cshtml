@@ -23,7 +23,7 @@
 }
 <fieldset>
     @Html.LabelFor(m => m.DefaultLabelPattern, T("Pattern for generating labels"))
-    @Html.TextBoxFor(m => m.DefaultLabelPattern, new { @class = "tokenized textMedium" })
+    @Html.TextBoxFor(m => m.DefaultLabelPattern, new { @class = "tokenized text medium" })
     @Html.ValidationMessageFor(m => m.DefaultLabelPattern)
 </fieldset>
 @Display.TokenHint()

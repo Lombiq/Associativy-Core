@@ -2,7 +2,7 @@
 
 <fieldset>
     @Html.LabelFor(m => m.Label, T("Node label"))
-    @Html.TextBoxFor(m => m.Label, new { @class = "textMedium" })
+    @Html.TextBoxFor(m => m.Label, new { @class = "text medium" })
     @Html.ValidationMessageFor(m => m.Label)
     <span class="hint">@T("This will be used as the node's label in the Associativy graph. If empty, the default pattern will be used to generate the label.")</span>
 </fieldset>
