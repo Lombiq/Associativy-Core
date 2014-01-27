@@ -103,6 +103,16 @@ namespace Associativy.Tests.Stubs
             {
                 throw new NotImplementedException();
             }
+
+            public IContentQuery<ContentItem> WithQueryHints(QueryHints hints)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IContentQuery<ContentItem> WithQueryHintsFor(string contentType)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
