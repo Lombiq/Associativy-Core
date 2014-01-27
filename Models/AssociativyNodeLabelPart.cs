@@ -6,8 +6,8 @@ namespace Associativy.Models
     {
         public string Label
         {
-            get { return Record.Label; }
-            set { Record.Label = value; }
+            get { return Retrieve(x => x.Label); }
+            set { Store(x => x.Label, value); }
         }
     }
 }
