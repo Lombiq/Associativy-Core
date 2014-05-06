@@ -28,5 +28,10 @@ namespace Associativy.GraphDiscovery
         {
             return graphManager.FindGraph(new GraphContext { Name = name });
         }
+
+        public static IEnumerable<IGraphDescriptor> FindGraphsByContentTypes(this IGraphManager graphManager, params string[] contentTypes)
+        {
+            return graphManager.FindGraphs(new GraphContext { ContentTypes = contentTypes });
+        }
     }
 }

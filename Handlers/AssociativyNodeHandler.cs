@@ -40,7 +40,7 @@ namespace Associativy.Handlers
 
         private void TryInvokeEventHandler(string contentType, Action<IGraphDescriptor> eventHandler)
         {
-            var descriptors = _graphManager.Value.FindGraphs(new GraphContext { ContentTypes = new string[] { contentType } });
+            var descriptors = _graphManager.Value.FindGraphsByContentTypes(contentType);
 
             foreach (var descriptor in descriptors)
             {
