@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Orchard;
+using Orchard.ContentManagement;
 using Orchard.Indexing;
 
 namespace Associativy.Services
@@ -11,11 +12,18 @@ namespace Associativy.Services
         bool IsIndexingSetupForGraph(string graphName);
         void SetupIndexingForGraph(string graphName);
         void RemoveIndexForGraph(string graphName);
+        void IndexNodesForGraph(string graphName, IEnumerable<IContent> nodes);
         ISearchBuilder GetSearchBuilder(string graphName);
     }
 
+
     public static class NodeIndexingServiceExtensions
 	{
+        public static void IndexNodeForGraph(this INodeIndexingService indexingService, string graphName, IContent node)
+        {
+            indexingService.IndexNodesForGraph(graphName, new[] { node });
+        }
+
         public static IEnumerable<ISearchHit> Search(this INodeIndexingService indexingService, string graphName, string labelQuery, int maxCount)
         {
             return indexingService.Search(graphName, searchBuilder => searchBuilder.Parse("nodeLabel", labelQuery.Trim(), false).Slice(0, maxCount));

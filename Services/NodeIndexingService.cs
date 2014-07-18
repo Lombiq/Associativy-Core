@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Associativy.GraphDiscovery;
+using Orchard.ContentManagement;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Indexing;
 using Orchard.Indexing.Services;
@@ -13,6 +15,7 @@ namespace Associativy.Services
         private readonly IIndexManager _indexManager;
         private readonly IIndexingService _indexingService;
         private readonly IGraphManager _graphManager;
+        private readonly IContentManager _contentManager;
         private readonly IContentDefinitionManager _contentDefinitionManager;
 
 
@@ -20,11 +23,13 @@ namespace Associativy.Services
             IIndexManager indexManager,
             IIndexingService indexingService,
             IGraphManager graphManager,
+            IContentManager contentManager,
             IContentDefinitionManager contentDefinitionManager)
         {
             _indexManager = indexManager;
             _indexingService = indexingService;
             _graphManager = graphManager;
+            _contentManager = contentManager;
             _contentDefinitionManager = contentDefinitionManager;
         }
 
@@ -96,6 +101,24 @@ namespace Associativy.Services
             var indexName = IndexNameForGraph(graphName);
             if (!provider.Exists(indexName)) return;
             provider.DeleteIndex(indexName);
+        }
+
+        public void IndexNodesForGraph(string graphName, IEnumerable<IContent> nodes)
+        {
+            if (!IsIndexingSetupForGraph(graphName)) return;
+
+            var indexProvider = GetIndexProvider();
+
+            var documents = new List<IDocumentIndex>();
+
+            foreach (var node in nodes)
+            {
+                var document = indexProvider.New(node.ContentItem.Id);
+                _contentManager.Index(node.ContentItem, document);
+                documents.Add(document);
+            }
+
+            indexProvider.Store(IndexNameForGraph(graphName), documents);
         }
 
         public ISearchBuilder GetSearchBuilder(string graphName)
