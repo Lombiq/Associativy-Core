@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Associativy.EventHandlers;
 using Associativy.GraphDiscovery;
 using Orchard;
@@ -46,7 +47,7 @@ namespace Associativy.Services
         public virtual IContentQuery<ContentItem> GetBySimilarLabelQuery(string labelSnippet)
         {
             // The max count is hard-coded now but should be somehow configurable
-            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, labelSnippet.Trim() + "*", 50));
+            return GetSearchHitQuery(_indexingService.Search(_graphDescriptor.Name, EscapeSearchCharacters(labelSnippet.Trim()) + "*", 50));
         }
 
         public virtual IContentQuery<ContentItem> GetByLabelQuery(params string[] labels)
@@ -55,7 +56,7 @@ namespace Associativy.Services
 
             foreach (var label in labels)
             {
-                var subHits = _indexingService.SearchExact(_graphDescriptor.Name, label);
+                var subHits = _indexingService.SearchExact(_graphDescriptor.Name, EscapeSearchCharacters(label));
                 foreach (var subHit in subHits)
                 {
                     if (subHit != null && string.Compare(subHit.GetString("nodeLabel"), label, System.StringComparison.OrdinalIgnoreCase) == 0)
@@ -93,6 +94,14 @@ namespace Associativy.Services
         {
             if (!hits.Any()) return _contentManager.Query("ősőőfőwőeoeworőőeŰŰŰÍÍÍíűrőooeoerő"); // An empty query
             return GetQuery().ForContentItems(hits.Select(hit => hit.ContentItemId));
+        }
+
+
+        private static string EscapeSearchCharacters(string query)
+        {
+            // Escapes Lucene special characters (see http://lucene.apache.org/core/2_9_4/queryparsersyntax.html#Escaping%20Special%20Characters)
+            // without directly depending on Lucene. This is a workaround.
+            return Regex.Replace(query, @"((\&\&)|(\|\|)|([!(){}[\]^\\""~*?:]))", match => "\\" + match.Groups[1]);
         }
     }
 }
