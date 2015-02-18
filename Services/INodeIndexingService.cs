@@ -18,7 +18,7 @@ namespace Associativy.Services
 
 
     public static class NodeIndexingServiceExtensions
-	{
+    {
         public static void IndexNodeForGraph(this INodeIndexingService indexingService, string graphName, IContent node)
         {
             indexingService.IndexNodesForGraph(graphName, new[] { node });
@@ -43,5 +43,5 @@ namespace Associativy.Services
 
             return setup(searchBuilder).Search().OrderByDescending(hit => hit.Score);
         }
-	}
+    }
 }
