@@ -42,5 +42,20 @@ namespace Associativy.Tests.Stubs
         {
             _cache.Clear();
         }
+
+        public object GetObject<T>(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Put<T>(string key, T value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Put<T>(string key, T value, TimeSpan validFor)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
