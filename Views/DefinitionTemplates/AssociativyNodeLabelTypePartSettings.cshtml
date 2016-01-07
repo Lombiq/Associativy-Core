@@ -1,4 +1,4 @@
-﻿@model Associativy.Settings.AssociativyNodeLabelTypePartSettings
+@model Associativy.Settings.AssociativyNodeLabelTypePartSettings
 @{
     Script.Require("jQuery").AtFoot();
 }
@@ -31,5 +31,5 @@
 <fieldset>
     <button type="button" id="button.RefreshLabels" name="button.RefreshLabels" value="UpdateLabels"
         onclick="$.associativy.refreshLabels(); return false;">@T("Refresh labels")</button>
-    <span class="hint">@T("This will regenerate labels stored with content items for this content type, based on the token configuration provided here.")</span>
+    @Html.Hint(T("This will regenerate labels stored with content items for this content type, based on the token configuration provided here."))
 </fieldset>
