@@ -17,17 +17,6 @@ namespace Associativy.Tests.Stubs
         }
 
 
-        public object Get(string key)
-        {
-            if (!_cache.ContainsKey(key)) return null;
-            return _cache[key];
-        }
-
-        public void Put(string key, object value)
-        {
-            _cache[key] = value;
-        }
-
         public void Put(string key, object value, TimeSpan validFor)
         {
             throw new NotImplementedException();
@@ -45,17 +34,18 @@ namespace Associativy.Tests.Stubs
 
         public object GetObject<T>(string key)
         {
-            throw new NotImplementedException();
+            if (!_cache.ContainsKey(key)) return null;
+            return _cache[key];
         }
 
         public void Put<T>(string key, T value)
         {
-            throw new NotImplementedException();
+            _cache[key] = value;
         }
 
         public void Put<T>(string key, T value, TimeSpan validFor)
         {
-            throw new NotImplementedException();
+            Put(key, value, validFor);
         }
     }
 }
