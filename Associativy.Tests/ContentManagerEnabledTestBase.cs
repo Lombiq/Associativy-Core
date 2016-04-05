@@ -60,7 +60,7 @@ namespace Associativy.Tests
             builder.RegisterInstance(new ShellSettings { Name = "Default" }).As<ShellSettings>();
             builder.RegisterInstance(new Mock<ISettingsFormatter>().Object);
             _session = _sessionFactory.OpenSession();
-            builder.RegisterInstance(new DefaultContentManagerTests.TestSessionLocator(_session)).As<ISessionLocator>();
+            builder.RegisterInstance(new TestTransactionManager(_session)).As<ITransactionManager>();
 
             _container = builder.Build();
         }
