@@ -3,14 +3,14 @@ AntiForgery: enabled
 Author: Piedone
 Website: http://associativy.com
 Version: 1.1
-OrchardVersion: 1.9.3
+OrchardVersion: 1.10
 Description: Associativy aims to give a platform for building knowledge bases organized through associative connections
 Features:
     Associativy:
 		Name: Associativy Core
         Description: Core functionality of the Associativy platform
 		Category: Associativy
-		Dependencies: Orchard.Caching, Orchard.Indexing, Orchard.jQuery, Orchard.Tokens, Title
+		Dependencies: Orchard.Caching, Orchard.Indexing, Orchard.Resources, Orchard.Tokens, Title
     Associativy.GraphStatisticsServices:
 		Name: Associativy Graph Statistics Services
         Description: Services that Associativy modules can use to store and provide statistical graph data
