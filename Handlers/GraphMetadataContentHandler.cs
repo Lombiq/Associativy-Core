@@ -28,7 +28,7 @@ namespace Associativy.Handlers
             if (!neighbourIds.Any()) return;
 
             var element = context.Element(ElementName);
-            element.SetAttributeValue("RecordId", context.ContentItemRecord.Id);
+            element.SetAttributeValue("NodeId", context.ContentItemRecord.Id);
             foreach (var id in neighbourIds) element.Add(new XElement("ConnectionId", id));
         }
     }
