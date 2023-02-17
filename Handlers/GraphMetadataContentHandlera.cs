@@ -5,13 +5,13 @@ using System.Xml.Linq;
 
 namespace Associativy.Handlers
 {
-    public class GraphMetaDataContentHandler : ContentHandler
+    public class GraphMetadataContentHandler : ContentHandler
     {
-        public const string ElementName = "GraphMetaData";
+        public const string ElementName = "GraphMetadata";
 
         private readonly IGraphManager _graphManager;
 
-        public GraphMetaDataContentHandler(IGraphManager graphManager)
+        public GraphMetadataContentHandler(IGraphManager graphManager)
         {
             _graphManager = graphManager;
         }
