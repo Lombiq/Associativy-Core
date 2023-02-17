@@ -145,6 +145,7 @@
     <Compile Include="GraphDiscovery\IGraphDescriptorFilterer.cs" />
     <Compile Include="GraphDiscovery\GraphDescriptorFilterer.cs" />
     <Compile Include="GraphStatisticsServicesMigrations.cs" />
+    <Compile Include="Handlers\GraphMetaDataContentHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelAspectHandler.cs" />
     <Compile Include="Handlers\AssociativyNodeLabelPartHandler.cs" />
