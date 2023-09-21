@@ -22,7 +22,7 @@ namespace Associativy.Handlers
                 .FindGraph(new GraphContext())
                 .Services
                 .ConnectionManager
-                .GetNeighbourIds(context.ContentItemRecord.Id, skip: 0, count: int.MaxValue)
+                .GetNeighbourIds(context.ContentItemRecord?.Id ?? 0, skip: 0, count: int.MaxValue)
                 .ToList();
 
             if (!neighbourIds.Any()) return;
